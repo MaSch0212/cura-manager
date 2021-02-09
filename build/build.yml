@@ -53,7 +53,7 @@ steps:
         Write-Host "##vso[task.setvariable variable=GitReleaseTag;]$releaseTagName"
         Write-Host "##vso[task.setvariable variable=PublishGitHubRelease;]true"
 
-        $expectedMdFile = "release-notes/v$(AppVersion).md"
+        $expectedMdFile = "docs/release-notes/v$(AppVersion).md"
         if (-not (Test-Path $expectedMdFile -PathType Leaf)) {
             Write-Error "There is no release-notes file for version $(AppVersion). Please make sure that the file `"$expectedMdFile`" exists."
             exit -1
