@@ -1,0 +1,75 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- General Project info -->
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
+    <OutputPath>../../bin/$(Configuration)</OutputPath>
+    <CodeAnalysisRuleSet>../../build/CuraManager.ruleset</CodeAnalysisRuleSet>
+
+    <!-- Output info -->
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OutputType>WinExe</OutputType>
+    <ApplicationIcon>C:\TFS\cura-manager\resources\CuraManager.ico</ApplicationIcon>
+    
+    <!-- Package Info -->
+    <Version>1.3.1</Version>
+    <Authors>Marc Schmidt</Authors>
+    <SupportedOSPlatform>windows</SupportedOSPlatform>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <OutputZipDir Condition=" '$(OutputZipDir)' == '' ">$(OutputPath)</OutputZipDir>
+    <OutputZipPath Condition=" '$(OutputZipPath)' == '' ">$(OutputZipDir)\$(AssemblyName)-$(Version)-$(RuntimeIdentifier).zip</OutputZipPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MaSch.Generators" Version="0.1.0" />
+    <PackageReference Include="MaSch.Native.Windows" Version="0.1.0" />
+    <PackageReference Include="MaSch.Presentation" Version="0.1.2" />
+    <PackageReference Include="MaSch.Presentation.Wpf.Controls" Version="0.1.1" />
+    <PackageReference Include="MaSch.Presentation.Wpf.MaterialDesign" Version="0.1.0" />
+    <PackageReference Include="MaSch.Presentation.Wpf.Themes" Version="0.1.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="5.0.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.30" />
+    <PackageReference Include="ini-parser-netstandard" Version="2.5.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="System.IO.Compression" Version="4.3.0" />
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="5.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="..\..\resources\CuraManager.ico" Link="Resources\CuraManager.ico" />
+    <Resource Include="..\..\resources\CuraManager512.png" Link="Resources\CuraManager512.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources\StringTable.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>StringTable.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\StringTable.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>StringTable.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <Target Name="PowerShellAfterPublish" AfterTargets="Publish">
+    <MakeDir Directories="$(OutputZipDir)" />
+    <ZipDirectory SourceDirectory="$(PublishDir)" DestinationFile="$(OutputZipPath)" Overwrite="true" />
+    <Message Text="##vso[task.setvariable variable=AppVersion;]$(Version)" Importance="high" />
+  </Target>
+</Project>

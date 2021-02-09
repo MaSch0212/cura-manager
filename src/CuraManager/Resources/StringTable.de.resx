@@ -1,0 +1,517 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="PageHeader_PrintProjects" xml:space="preserve">
+    <value>Druckprojekte</value>
+  </data>
+  <data name="PageHeader_Settings" xml:space="preserve">
+    <value>Einstellungen</value>
+  </data>
+  <data name="PageHeader_About" xml:space="preserve">
+    <value>Über</value>
+  </data>
+  <data name="CurrentVersion" xml:space="preserve">
+    <value>Aktuelle Version</value>
+  </data>
+  <data name="CheckingForUpdates" xml:space="preserve">
+    <value>Suche nach Updates</value>
+  </data>
+  <data name="NewVersion" xml:space="preserve">
+    <value>Neue Version</value>
+  </data>
+  <data name="UpdateNow" xml:space="preserve">
+    <value>Jetzt aktualisieren</value>
+  </data>
+  <data name="UseSystemLanguage" xml:space="preserve">
+    <value>Betriebssystemsprache verwenden</value>
+  </data>
+  <data name="Title_CreateCuraProject" xml:space="preserve">
+    <value>Cura Projekt erstellen</value>
+  </data>
+  <data name="ProjectName" xml:space="preserve">
+    <value>Projektname</value>
+  </data>
+  <data name="ModelsToInclude" xml:space="preserve">
+    <value>Modelle des Projekts</value>
+  </data>
+  <data name="DisableAll" xml:space="preserve">
+    <value>Alle deaktivieren</value>
+  </data>
+  <data name="EnableAll" xml:space="preserve">
+    <value>Alle aktivieren</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Abbrechen</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>Erstellen</value>
+  </data>
+  <data name="Title_CreateProject" xml:space="preserve">
+    <value>Projekt erstellen</value>
+  </data>
+  <data name="ArchiveContainingModels" xml:space="preserve">
+    <value>Archiv mit 3D-Modellen</value>
+  </data>
+  <data name="FilesAddToProject" xml:space="preserve">
+    <value>Dateien, die zum Projekt hinzugefügt werden sollen</value>
+  </data>
+  <data name="DropFilesHereOrUseButton" xml:space="preserve">
+    <value>Legen Sie hier einige Dateien ab oder verwenden Sie die Plus-Schaltfläche oben rechts.</value>
+  </data>
+  <data name="UrlToProjectPage" xml:space="preserve">
+    <value>URL zur Projektseite (z.B.: Thingiverse)</value>
+  </data>
+  <data name="Msg_SelectAtLeastOneModel" xml:space="preserve">
+    <value>Bitte wählen Sie mindestens ein 3D-Modell aus.</value>
+  </data>
+  <data name="ZipArchive" xml:space="preserve">
+    <value>ZIP-Archiv</value>
+  </data>
+  <data name="Untitled" xml:space="preserve">
+    <value>Unbenannt</value>
+  </data>
+  <data name="Msg_SpecifyProjectName" xml:space="preserve">
+    <value>Bitte geben Sie einen Namen für das Projekt ein.</value>
+  </data>
+  <data name="Msg_SelectArchiveToImport" xml:space="preserve">
+    <value>Bitte wählen Sie ein Archiv aus, das Sie in ein Projekt importieren möchten.</value>
+  </data>
+  <data name="Msg_ArchiveDoesNotExist" xml:space="preserve">
+    <value>Sie haben eine Archivdatei ausgewählt, die nicht existiert.</value>
+  </data>
+  <data name="Msg_ProjectAlreadyExists" xml:space="preserve">
+    <value>Ein Projekt mit dem Namen "{0}" existiert bereits. Bitte wählen Sie einen anderen Namen.</value>
+  </data>
+  <data name="Msg_AddAtLeastOneFileToProject" xml:space="preserve">
+    <value>Bitte fügen Sie dem Projekt mindestens eine Datei hinzu.</value>
+  </data>
+  <data name="Msg_TypeInUrl" xml:space="preserve">
+    <value>Bitte geben Sie eine Webadresse ein.</value>
+  </data>
+  <data name="Msg_UnsupportedProjectPageUrl" xml:space="preserve">
+    <value>Der angegebene Link wird aktuell nicht unterstützt.</value>
+  </data>
+  <data name="ErrorHasOccurred" xml:space="preserve">
+    <value>Es ist ein Fehler aufgetreten!</value>
+  </data>
+  <data name="SendErrorToDeveloper" xml:space="preserve">
+    <value>Ein unerwarteter Fehler ist aufgetreten. Bitte senden Sie den folgenden Fehlerbericht an den Entwickler:</value>
+  </data>
+  <data name="CopyToClipboard" xml:space="preserve">
+    <value>In die Zwischenablage kopieren</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Schließen</value>
+  </data>
+  <data name="Title_Rename" xml:space="preserve">
+    <value>Umbenennen</value>
+  </data>
+  <data name="NewName" xml:space="preserve">
+    <value>Neuer Name</value>
+  </data>
+  <data name="Rename" xml:space="preserve">
+    <value>Umbenennen</value>
+  </data>
+  <data name="Msg_EnterNewName" xml:space="preserve">
+    <value>Bitte geben Sie einen neuen Namen ein.</value>
+  </data>
+  <data name="Title_UpdateVersion" xml:space="preserve">
+    <value>Version aktualisieren</value>
+  </data>
+  <data name="ErrorTryLater" xml:space="preserve">
+    <value>Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später noch einmal.</value>
+  </data>
+  <data name="OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="NewVersionAvailable" xml:space="preserve">
+    <value>Eine neue Version ist verfügbar.</value>
+  </data>
+  <data name="ShouldDownloadUpdateNow" xml:space="preserve">
+    <value>Möchten Sie jetzt die neueste Version herunterladen und installieren?</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Ja</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>Nein</value>
+  </data>
+  <data name="Downloading" xml:space="preserve">
+    <value>Wird heruntergeladen</value>
+  </data>
+  <data name="Downloaded" xml:space="preserve">
+    <value>Heruntergeladen</value>
+  </data>
+  <data name="DownloadComplete" xml:space="preserve">
+    <value>Der Download ist abgeschlossen!</value>
+  </data>
+  <data name="UpdateNowText" xml:space="preserve">
+    <value>Der Download ist abgeschlossen und das Update kann nun gestartet werden. Klicken Sie auf "Jetzt installieren", um das Update jetzt zu starten!
+Nach dem Drücken der Schaltfläche wird die Anwendung neu gestartet.</value>
+  </data>
+  <data name="InstallNow" xml:space="preserve">
+    <value>Jetzt installieren</value>
+  </data>
+  <data name="CheckForUpdates" xml:space="preserve">
+    <value>Nach Updates suchen</value>
+  </data>
+  <data name="Copyright" xml:space="preserve">
+    <value>Copyright © 2019 bei Marc Schmidt</value>
+  </data>
+  <data name="DevelopedAndPublished" xml:space="preserve">
+    <value>Entwickelt und veröffentlicht von Marc Schmidt</value>
+  </data>
+  <data name="Changelog" xml:space="preserve">
+    <value>Änderungsprotokoll</value>
+  </data>
+  <data name="ToolTip_CreateProjectModels" xml:space="preserve">
+    <value>Projekt aus Modellen erstellen...</value>
+  </data>
+  <data name="ToolTip_CreateProjectWeb" xml:space="preserve">
+    <value>Projekt aus dem Web erstellen...</value>
+  </data>
+  <data name="ToolTIp_CreateProjectZip" xml:space="preserve">
+    <value>Projekt aus ZIP erstellen...</value>
+  </data>
+  <data name="CreationTime" xml:space="preserve">
+    <value>Erstelldatum</value>
+  </data>
+  <data name="ToolTip_AddFilesToProject" xml:space="preserve">
+    <value>Dateien zum Projekt hinzufügen</value>
+  </data>
+  <data name="ToolTip_NewCuraProject" xml:space="preserve">
+    <value>Neues Cura Projekt erstellen</value>
+  </data>
+  <data name="ToolTip_OpenProjectFolder" xml:space="preserve">
+    <value>Projektordner öffnen</value>
+  </data>
+  <data name="ToolTip_OpenProjectPage" xml:space="preserve">
+    <value>Projekt-Webseite öffnen</value>
+  </data>
+  <data name="ToolTip_RenameProject" xml:space="preserve">
+    <value>Projekt umbenennen</value>
+  </data>
+  <data name="ToolTip_DeleteProject" xml:space="preserve">
+    <value>Projekt löschen</value>
+  </data>
+  <data name="Open" xml:space="preserve">
+    <value>Öffnen</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Löschen</value>
+  </data>
+  <data name="CuraProjectFiles" xml:space="preserve">
+    <value>Cura Projektdateien</value>
+  </data>
+  <data name="ModelFiles" xml:space="preserve">
+    <value>3D-Modell-Dateien</value>
+  </data>
+  <data name="OtherFiles" xml:space="preserve">
+    <value>Sonstige Dateien</value>
+  </data>
+  <data name="ToolTip_UndoAll" xml:space="preserve">
+    <value>Alle Änderungen rückgängig machen</value>
+  </data>
+  <data name="ToolTip_SaveAll" xml:space="preserve">
+    <value>Alle Änderungen speichern</value>
+  </data>
+  <data name="ApplicationLanguage" xml:space="preserve">
+    <value>Anwendungssprache</value>
+  </data>
+  <data name="PrintProjectsFolderLocation" xml:space="preserve">
+    <value>Ordner für Druckprojekte</value>
+  </data>
+  <data name="CuraAppDataLocation" xml:space="preserve">
+    <value>Pfad des Cura AppData-Verzeichnisses</value>
+  </data>
+  <data name="CuraProgramFilesLocation" xml:space="preserve">
+    <value>Pfad des Cura Installationverzeichnisses</value>
+  </data>
+  <data name="UpdateProfilesInCuraProjects" xml:space="preserve">
+    <value>Das Profil und die Maschineneinstellungen im Cura-Projekt aktualisieren, bevor es geöffnet wird. Dies verhindert unerwünschte Änderungen an Ihren Profilen beim Öffnen von Cura-Projekten.</value>
+  </data>
+  <data name="Msg_VersionUpToDate" xml:space="preserve">
+    <value>Die installierte Version ist auf dem neuesten Stand.</value>
+  </data>
+  <data name="Prog_AddOneFileToProject" xml:space="preserve">
+    <value>Datei wird zum Projekt hinzugefügt...</value>
+  </data>
+  <data name="Prog_AddMultipleFilesToProject" xml:space="preserve">
+    <value>Dateien werden zum Projekt hinzugefügt...</value>
+  </data>
+  <data name="Fail_AddOneFileToProject" xml:space="preserve">
+    <value>Hinzufügen der Datei fehlgeschlagen</value>
+  </data>
+  <data name="Fail_AddMultipleFilesToProject" xml:space="preserve">
+    <value>Hinzufügen der Dateien fehlgeschlagen</value>
+  </data>
+  <data name="Suc_AddOneFileToProject" xml:space="preserve">
+    <value>Datei wurde hinzugefügt</value>
+  </data>
+  <data name="Suc_AddMultipleFilesToProject" xml:space="preserve">
+    <value>Dateien wurden hinzugefügt</value>
+  </data>
+  <data name="Msg_PrintProjectsFolderNotConfigured" xml:space="preserve">
+    <value>Der "Ordner für Druckprojekte" ist nicht konfiguriert oder das Verzeichnis existiert nicht. Bitte konfigurieren Sie diese Einstellung auf der Einstellungsseite korrekt.</value>
+  </data>
+  <data name="Prog_CreateProject" xml:space="preserve">
+    <value>Projekt "{0}" wird angelegt...</value>
+  </data>
+  <data name="Fail_CreateProject" xml:space="preserve">
+    <value>Anlegen des Projekts ist fehlgeschlagen</value>
+  </data>
+  <data name="Suc_CreateProject" xml:space="preserve">
+    <value>Projekt wurde angelegt</value>
+  </data>
+  <data name="Msg_CuraPathsNotConfigured" xml:space="preserve">
+    <value>Die Cura-Pfade sind nicht korrekt konfiguriert. Bitte stellen Sie sicher, dass unter dem konfigurierten AppData-Pfad eine "cura.cfg"-Datei und unter dem ProgramFiles-Pfad die "Cura.exe"-Datei vorhanden ist.</value>
+  </data>
+  <data name="Prog_CreateCuraProject" xml:space="preserve">
+    <value>Cura Projekt wird erstellt...</value>
+  </data>
+  <data name="Fail_CreateCuraProject" xml:space="preserve">
+    <value>Erstellen des Cura Projekts ist fehlgeschlagen</value>
+  </data>
+  <data name="Suc_CreateCuraProject" xml:space="preserve">
+    <value>Cura Projekt wurde erstellt</value>
+  </data>
+  <data name="Msg_ConfirmProjectDeletion" xml:space="preserve">
+    <value>Möchten Sie wirklich das Projekt "{0}" mit all seinen Dateien und Unterverzeichnissen löschen?</value>
+  </data>
+  <data name="Prog_DeleteProject" xml:space="preserve">
+    <value>Projekt "{0}" wird gelöscht...</value>
+  </data>
+  <data name="Fail_DeleteProject" xml:space="preserve">
+    <value>Löschen des Projekts "{0}" ist fehlgeschlagen</value>
+  </data>
+  <data name="Suc_DeleteProject" xml:space="preserve">
+    <value>Projekt "{0}" wurde gelöscht</value>
+  </data>
+  <data name="Title_RenameProject" xml:space="preserve">
+    <value>Projekt umbenennen</value>
+  </data>
+  <data name="Desc_RenameProject" xml:space="preserve">
+    <value>Geben Sie einen neuen Namen für das Projekt "{0}" ein.</value>
+  </data>
+  <data name="Msg_ConfirmFileDeletion" xml:space="preserve">
+    <value>Möchten SIe die Datei "{0}" wirklich löschen?</value>
+  </data>
+  <data name="Msg_FileAlreadyExists" xml:space="preserve">
+    <value>Eine Datei mit dem Namen "{0}" existiert bereits. Bitte wählen Sie einen anderen Namen.</value>
+  </data>
+  <data name="Title_RenameFile" xml:space="preserve">
+    <value>Datei umbenennen</value>
+  </data>
+  <data name="Desc_RenameFile" xml:space="preserve">
+    <value>Geben Sie einen neuen Namen für die Datei "{0}" ein.</value>
+  </data>
+  <data name="Msg_UnsavedChanges" xml:space="preserve">
+    <value>Sie haben Änderungen vorgenommen. Möchten Sie diese jetzt speichern?</value>
+  </data>
+  <data name="Suc_UndoChanges" xml:space="preserve">
+    <value>Änderungen wurden widerrufen</value>
+  </data>
+  <data name="Fail_SaveChanges" xml:space="preserve">
+    <value>Speichern der Änderungen ist fehlgeschlagen</value>
+  </data>
+  <data name="Suc_SaveChanges" xml:space="preserve">
+    <value>Änderungen wurden gespeichert</value>
+  </data>
+  <data name="ToolTip_ArchiveProject" xml:space="preserve">
+    <value>Projekt archivieren</value>
+  </data>
+  <data name="ToolTip_TakeProjectOutOfArchive" xml:space="preserve">
+    <value>Projekt aus Archiv holen</value>
+  </data>
+  <data name="ShowNonArchivedProjects" xml:space="preserve">
+    <value>Aktive Projekte anzeigen</value>
+  </data>
+  <data name="ShowArchivedProjects" xml:space="preserve">
+    <value>Archivierte Projekte anzeigen</value>
+  </data>
+  <data name="Msg_NothingValidInClipboard" xml:space="preserve">
+    <value>In der Zwischenablage gibt es nichts zu importieren.</value>
+  </data>
+  <data name="ShowWebDialogWhenAddingLink" xml:space="preserve">
+    <value>Den Dialog "Projekt erstellen" anzeigen, wenn Weblinks über die Zwischenablage oder per Drag &amp; Drop hinzugefügt werden. (Wenn nicht aktiviert, wird automatisch der Name der heruntergeladenen Datei verwendet).</value>
+  </data>
+  <data name="ToolTip_CreateProjectClipboard" xml:space="preserve">
+    <value>Projekt aus Zwischenablage erstellen...</value>
+  </data>
+  <data name="Prog_LoadProjectData" xml:space="preserve">
+    <value>Projektdatei wird geladen...</value>
+  </data>
+  <data name="CopyTo" xml:space="preserve">
+    <value>Auf {0} kopieren</value>
+  </data>
+  <data name="RemovableDrive" xml:space="preserve">
+    <value>Wechseldatenträger</value>
+  </data>
+  <data name="Prog_CopyFile" xml:space="preserve">
+    <value>Datei wird kopiert...</value>
+  </data>
+  <data name="Suc_CopyFile" xml:space="preserve">
+    <value>Datei wurde kopiert</value>
+  </data>
+  <data name="Fail_CopyFile" xml:space="preserve">
+    <value>Kopieren der Datei ist fehlgeschlagen</value>
+  </data>
+  <data name="Archived" xml:space="preserve">
+    <value>Archiviert</value>
+  </data>
+  <data name="ApplicationTheme" xml:space="preserve">
+    <value>Farbschema der Anwendung</value>
+  </data>
+  <data name="Msg_WrongThingiverseUrl" xml:space="preserve">
+    <value>Die angegebene Adresse ist keine gültige Thingiverse-Thing URL. Sie sollte in etwa so aussehen: https://www.thingiverse.com/thing:00000</value>
+  </data>
+  <data name="Msg_ProjectCreationFailed" xml:space="preserve">
+    <value>Das Erstellen des Projekts ist fehlgeschlagen: {0}</value>
+  </data>
+  <data name="Fail_ReloadModels" xml:space="preserve">
+    <value>Neu laden der Modelle ist fehlgeschlagen</value>
+  </data>
+  <data name="Prog_ReloadModels" xml:space="preserve">
+    <value>Modelle werden neu geladen...</value>
+  </data>
+  <data name="Suc_ReloadModels" xml:space="preserve">
+    <value>Modelle wurden neu geladen</value>
+  </data>
+  <data name="ToolTip_ReloadModels" xml:space="preserve">
+    <value>Modelle neu laden</value>
+  </data>
+  <data name="Desc_CreateTag" xml:space="preserve">
+    <value>Geben Sie einen Namen für den neuen Tag sein.</value>
+  </data>
+  <data name="Title_CreateTag" xml:space="preserve">
+    <value>Tag erstellen</value>
+  </data>
+  <data name="CreateNewTag" xml:space="preserve">
+    <value>Create new tag</value>
+  </data>
+  <data name="Tags" xml:space="preserve">
+    <value>Tags</value>
+  </data>
+  <data name="RefreshFilter" xml:space="preserve">
+    <value>Filter neu laden</value>
+  </data>
+  <data name="ToolTip_Filter" xml:space="preserve">
+    <value>Filter</value>
+  </data>
+</root>

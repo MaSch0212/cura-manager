@@ -1,0 +1,489 @@
+﻿<mv:ExtendedSplitViewContent x:Class="CuraManager.Views.Main.PrintsView"
+                             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                             xmlns:conv="clr-namespace:CuraManager.Converter"
+                             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                             xmlns:l="clr-namespace:CuraManager.Views.Main"
+                             xmlns:local="clr-namespace:CuraManager.Views.Main"
+                             xmlns:m="http://schemas.masch212.de/MaSch/Wpf"
+                             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                             xmlns:mct="http://schemas.masch212.de/MaSch/Wpf/Controls"
+                             xmlns:models="clr-namespace:CuraManager.Models"
+                             xmlns:mv="http://schemas.masch212.de/MaSch/Wpf/Views"
+                             xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+                             xmlns:vm="clr-namespace:CuraManager.ViewModels.Main"
+                             Title="{m:Translation PageHeader_PrintProjects}"
+                             d:DesignHeight="450"
+                             d:DesignWidth="800"
+                             ToolbarVisibility="Visible"
+                             mc:Ignorable="d">
+    <mv:ExtendedSplitViewContent.DataContext>
+        <vm:PrintsViewModel />
+    </mv:ExtendedSplitViewContent.DataContext>
+    <mv:ExtendedSplitViewContent.Resources>
+        <conv:TagsConverter x:Key="TagsConverter" />
+        <ContextMenu x:Key="FilterContextMenu">
+            <MenuItem Header="{m:Translation ShowNonArchivedProjects}"
+                      IsCheckable="True"
+                      IsChecked="{Binding ShowNonArchivedElements}"
+                      StaysOpenOnClick="True" />
+            <MenuItem Header="{m:Translation ShowArchivedProjects}"
+                      IsCheckable="True"
+                      IsChecked="{Binding ShowArchivedElements}"
+                      StaysOpenOnClick="True" />
+            <Separator />
+            <MenuItem Header="{m:Translation Tags}" Icon="{m:MaterialDesignIcon Icon=Tag}">
+                <MenuItem.Resources>
+                    <CollectionViewSource x:Key="Tags">
+                        <CollectionViewSource.Source>
+                            <MultiBinding Converter="{StaticResource TagsConverter}">
+                                <Binding Path="AvailableTags" />
+                                <Binding Path="VisibleTags" />
+                            </MultiBinding>
+                        </CollectionViewSource.Source>
+                        <CollectionViewSource.SortDescriptions>
+                            <scm:SortDescription Direction="Ascending" PropertyName="Name" />
+                        </CollectionViewSource.SortDescriptions>
+                    </CollectionViewSource>
+                </MenuItem.Resources>
+                <MenuItem.ItemsSource>
+                    <CompositeCollection>
+                        <CollectionContainer Collection="{Binding Source={StaticResource Tags}}" />
+                    </CompositeCollection>
+                </MenuItem.ItemsSource>
+                <MenuItem.ItemContainerStyle>
+                    <Style TargetType="MenuItem">
+                        <Setter Property="Header" Value="{Binding Name}" />
+                        <Setter Property="IsCheckable" Value="True" />
+                        <Setter Property="IsChecked" Value="{Binding IsSet}" />
+                        <Setter Property="StaysOpenOnClick" Value="True" />
+                    </Style>
+                </MenuItem.ItemContainerStyle>
+            </MenuItem>
+            <Separator />
+            <MenuItem Command="{Binding RefreshFilterCommand}"
+                      Header="{m:Translation RefreshFilter}"
+                      Icon="{m:MaterialDesignIcon Icon=Refresh}"
+                      IsCheckable="False"
+                      StaysOpenOnClick="False" />
+        </ContextMenu>
+        <ContextMenu x:Key="ElementTagsContextMenu">
+            <ContextMenu.Resources>
+                <CollectionViewSource x:Key="Tags">
+                    <CollectionViewSource.Source>
+                        <MultiBinding Converter="{StaticResource TagsConverter}">
+                            <Binding Path="AvailableTags" />
+                            <Binding Path="SelectedElement.Tags" />
+                        </MultiBinding>
+                    </CollectionViewSource.Source>
+                    <CollectionViewSource.SortDescriptions>
+                        <scm:SortDescription Direction="Ascending" PropertyName="Name" />
+                    </CollectionViewSource.SortDescriptions>
+                </CollectionViewSource>
+                <Style BasedOn="{StaticResource {x:Type MenuItem}}" TargetType="MenuItem">
+                    <Setter Property="Header" Value="{Binding Name}" />
+                    <Setter Property="IsCheckable" Value="True" />
+                    <Setter Property="IsChecked" Value="{Binding IsSet}" />
+                    <Setter Property="StaysOpenOnClick" Value="True" />
+                </Style>
+            </ContextMenu.Resources>
+            <ContextMenu.ItemsSource>
+                <CompositeCollection>
+                    <CollectionContainer Collection="{Binding Source={StaticResource Tags}}" />
+                    <Separator />
+                    <MenuItem Command="{Binding CreateTagCommand}"
+                              CommandParameter="{Binding SelectedElement}"
+                              Header="{m:Translation CreateNewTag}"
+                              Icon="{m:MaterialDesignIcon Icon=Plus}"
+                              IsCheckable="False"
+                              StaysOpenOnClick="False" />
+                </CompositeCollection>
+            </ContextMenu.ItemsSource>
+        </ContextMenu>
+    </mv:ExtendedSplitViewContent.Resources>
+    <mv:ExtendedSplitViewContent.ToolbarContent>
+        <StackPanel Orientation="Horizontal">
+            <mct:IconButton Command="{Binding NewProjectFromClipboardCommand}"
+                            Icon="{m:MaterialDesignIcon ClipboardPlus}"
+                            ToolTip="{m:Translation ToolTip_CreateProjectClipboard}" />
+            <Separator />
+            <mct:IconButton Command="{Binding NewProjectFromModelsCommand}"
+                            Icon="{m:MaterialDesignIcon ShapePlus}"
+                            ToolTip="{m:Translation ToolTip_CreateProjectModels}" />
+            <mct:IconButton Command="{Binding NewProjectFromWebCommand}"
+                            Icon="{m:MaterialDesignIcon LinkPlus}"
+                            ToolTip="{m:Translation ToolTip_CreateProjectWeb}" />
+            <mct:IconButton Command="{Binding NewProjectFromArchiveCommand}"
+                            Icon="{m:MaterialDesignIcon BookPlus}"
+                            ToolTip="{m:Translation ToolTIp_CreateProjectZip}" />
+            <Separator />
+            <mct:IconButton Command="{Binding ReloadModelsCommand}"
+                            Icon="{m:MaterialDesignIcon Icon=Reload}"
+                            ToolTip="{m:Translation ToolTip_ReloadModels}" />
+        </StackPanel>
+    </mv:ExtendedSplitViewContent.ToolbarContent>
+    <mv:ExtendedSplitViewContent.ToolbarEndContent>
+        <StackPanel Orientation="Horizontal">
+            <mct:IconToggleButton Checked="ContextMenuToggleButton_Checked"
+                                  Icon="{m:MaterialDesignIcon Icon=Filter}"
+                                  Tag="{StaticResource FilterContextMenu}"
+                                  ToolTip="{m:Translation ToolTip_Filter}" />
+            <Separator />
+            <mct:TextBox x:Name="FilterTextBox"
+                         Width="200"
+                         VerticalAlignment="Center"
+                         Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}">
+                <mct:TextBox.EndContent>
+                    <mct:IconPresenter Padding="8" Icon="{m:MaterialDesignIcon Magnify}" />
+                </mct:TextBox.EndContent>
+            </mct:TextBox>
+        </StackPanel>
+    </mv:ExtendedSplitViewContent.ToolbarEndContent>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition>
+                <ColumnDefinition.Style>
+                    <Style TargetType="ColumnDefinition">
+                        <Setter Property="MinWidth" Value="256" />
+                        <Setter Property="Width" Value="{Binding RelativeSource={RelativeSource AncestorType=local:PrintsView}, Path=PanelWidth, Mode=TwoWay, Converter={StaticResource GridLengthToDouble}}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SelectedElement}" Value="{x:Null}">
+                                <Setter Property="MinWidth" Value="0" />
+                                <Setter Property="Width" Value="0" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ColumnDefinition.Style>
+            </ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <DataGrid x:Name="PrintsDataGrid"
+                  Grid.Column="0"
+                  AllowDrop="True"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False"
+                  CanUserReorderColumns="False"
+                  CanUserResizeColumns="True"
+                  CanUserResizeRows="False"
+                  CanUserSortColumns="True"
+                  Drop="DataGrid_OnDrop"
+                  EnableRowVirtualization="True"
+                  HeadersVisibility="Column"
+                  IsReadOnly="True"
+                  ItemsSource="{Binding PrintElementsViewSource.View}"
+                  SelectedItem="{Binding SelectedElement}"
+                  SelectionMode="Single"
+                  SelectionUnit="FullRow">
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding Name}" Header="{m:Translation ProjectName}" />
+                <DataGridTextColumn Binding="{Binding CreationTime, StringFormat='yyyy-MM-dd HH:mm:ss'}" Header="{m:Translation CreationTime}" />
+                <DataGridTextColumn Binding="{Binding TagsDisplay}"
+                                    CanUserResize="False"
+                                    CanUserSort="False"
+                                    Header="{m:Translation Tags}" />
+            </DataGrid.Columns>
+            <DataGrid.CellStyle>
+                <Style BasedOn="{StaticResource {x:Type DataGridCell}}" TargetType="DataGridCell">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsArchived}" Value="True">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.CellStyle>
+            <DataGrid.RowStyle>
+                <Style BasedOn="{StaticResource {x:Type DataGridRow}}" TargetType="DataGridRow">
+                    <Style.Setters>
+                        <Setter Property="Tag" Value="{Binding RelativeSource={RelativeSource AncestorType=DataGrid}, Path=DataContext}" />
+                        <Setter Property="ContextMenu">
+                            <Setter.Value>
+                                <ContextMenu DataContext="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
+                                    <MenuItem Command="{Binding AddFilesToProjectCommand}"
+                                              CommandParameter="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              Header="{m:Translation ToolTip_AddFilesToProject}"
+                                              Icon="{m:MaterialDesignIcon Icon=PlusBoxMultiple}" />
+                                    <MenuItem Command="{Binding NewCuraProjectCommand}"
+                                              CommandParameter="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              Header="{m:Translation ToolTip_NewCuraProject}"
+                                              Icon="{StaticResource CuraIcon}" />
+                                    <Separator />
+                                    <MenuItem Command="{Binding OpenProjectFolderCommand}"
+                                              CommandParameter="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              Header="{m:Translation ToolTip_OpenProjectFolder}"
+                                              Icon="{m:MaterialDesignIcon OpenInNew}" />
+                                    <MenuItem Command="{Binding OpenProjectWebsiteCommand}"
+                                              CommandParameter="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              Header="{m:Translation ToolTip_OpenProjectPage}"
+                                              Icon="{m:MaterialDesignIcon Web}" />
+                                    <Separator />
+                                    <MenuItem Command="{Binding RenameProjectCommand}"
+                                              CommandParameter="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              Header="{m:Translation ToolTip_RenameProject}"
+                                              Icon="{m:MaterialDesignIcon Icon=FormTextbox}" />
+                                    <MenuItem Header="{m:Translation Tags}" Icon="{m:MaterialDesignIcon Icon=Tag}">
+                                        <MenuItem.Resources>
+                                            <CollectionViewSource x:Key="Tags">
+                                                <CollectionViewSource.Source>
+                                                    <MultiBinding Converter="{StaticResource TagsConverter}">
+                                                        <Binding Path="AvailableTags" />
+                                                        <Binding Path="PlacementTarget.DataContext.Tags" RelativeSource="{RelativeSource AncestorType=ContextMenu}" />
+                                                    </MultiBinding>
+                                                </CollectionViewSource.Source>
+                                                <CollectionViewSource.SortDescriptions>
+                                                    <scm:SortDescription Direction="Ascending" PropertyName="Name" />
+                                                </CollectionViewSource.SortDescriptions>
+                                            </CollectionViewSource>
+                                        </MenuItem.Resources>
+                                        <MenuItem.ItemsSource>
+                                            <CompositeCollection>
+                                                <CollectionContainer Collection="{Binding Source={StaticResource Tags}}" />
+                                                <Separator />
+                                                <MenuItem Command="{Binding CreateTagCommand}"
+                                                          Header="{m:Translation CreateNewTag}"
+                                                          Icon="{m:MaterialDesignIcon Icon=Plus}"
+                                                          IsCheckable="False"
+                                                          StaysOpenOnClick="False"
+                                                          Tag="blub" />
+                                            </CompositeCollection>
+                                        </MenuItem.ItemsSource>
+                                        <MenuItem.ItemContainerStyle>
+                                            <Style TargetType="MenuItem">
+                                                <Setter Property="Header" Value="{Binding Name}" />
+                                                <Setter Property="IsCheckable" Value="True" />
+                                                <Setter Property="IsChecked" Value="{Binding IsSet}" />
+                                                <Setter Property="StaysOpenOnClick" Value="True" />
+                                                <Style.Triggers>
+                                                    <Trigger Property="Tag" Value="blub">
+                                                        <Setter Property="CommandParameter" Value="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </MenuItem.ItemContainerStyle>
+                                    </MenuItem>
+                                    <MenuItem Header="{m:Translation Archived}"
+                                              Icon="{m:MaterialDesignIcon Archive}"
+                                              IsCheckable="True"
+                                              IsChecked="{Binding Path=PlacementTarget.DataContext.IsArchived, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              StaysOpenOnClick="True" />
+                                    <Separator />
+                                    <MenuItem Command="{Binding DeleteProjectCommand}"
+                                              CommandParameter="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              Header="{m:Translation ToolTip_DeleteProject}"
+                                              Icon="{m:MaterialDesignIcon Delete}">
+                                        <m:Theming.ThemeOverrides>
+                                            <m:ThemeOverrideCollection>
+                                                <m:ThemeOverride Key="HighlightColor" Value="{StaticResource RedColor}" />
+                                                <m:ThemeOverride Key="NormalForegroundColor" Value="{StaticResource RedColor}" />
+                                                <m:ThemeOverride Key="HoverForegroundColor" Value="{StaticResource RedColor}" />
+                                            </m:ThemeOverrideCollection>
+                                        </m:Theming.ThemeOverrides>
+                                    </MenuItem>
+                                </ContextMenu>
+                            </Setter.Value>
+                        </Setter>
+                        <EventSetter Event="MouseMove" Handler="DataGrid_OnMouseMove" />
+                    </Style.Setters>
+                </Style>
+            </DataGrid.RowStyle>
+        </DataGrid>
+        <GridSplitter Grid.Column="1"
+                      Width="5"
+                      Margin="5,0"
+                      HorizontalAlignment="Left"
+                      ResizeBehavior="PreviousAndCurrent"
+                      ResizeDirection="Columns" />
+        <DockPanel Grid.Column="1"
+                   Margin="15,0,0,0"
+                   AllowDrop="True"
+                   Drop="ProjectDetailsPane_Drop"
+                   MouseMove="ProjectDetailsPane_OnMouseMove">
+            <StackPanel DockPanel.Dock="Top">
+                <TextBlock FontSize="24"
+                           FontWeight="Light"
+                           Text="{Binding SelectedElement.Name}"
+                           TextTrimming="CharacterEllipsis" />
+                <StackPanel Margin="0,5,0,0"
+                            HorizontalAlignment="Right"
+                            IsEnabled="{Binding SelectedElement.IsInitializing, Converter={StaticResource BoolNegation}}"
+                            Orientation="Horizontal">
+                    <StackPanel.Resources>
+                        <Style TargetType="mct:IconButton">
+                            <Setter Property="Height" Value="32" />
+                            <Setter Property="Width" Value="32" />
+                            <Setter Property="Padding" Value="6" />
+                        </Style>
+                        <Style TargetType="mct:IconToggleButton">
+                            <Setter Property="Height" Value="32" />
+                            <Setter Property="Width" Value="32" />
+                            <Setter Property="Padding" Value="6" />
+                        </Style>
+                    </StackPanel.Resources>
+                    <mct:IconButton Command="{Binding AddFilesToProjectCommand}"
+                                    CommandParameter="{Binding SelectedElement}"
+                                    Icon="{m:MaterialDesignIcon Icon=PlusBoxMultiple}"
+                                    ToolTip="{m:Translation ToolTip_AddFilesToProject}" />
+                    <mct:IconButton Command="{Binding NewCuraProjectCommand}"
+                                    CommandParameter="{Binding SelectedElement}"
+                                    Icon="{StaticResource CuraIcon}"
+                                    ToolTip="{m:Translation ToolTip_NewCuraProject}" />
+                    <mct:IconButton Margin="10,0,0,0"
+                                    Command="{Binding OpenProjectFolderCommand}"
+                                    CommandParameter="{Binding SelectedElement}"
+                                    Icon="{m:MaterialDesignIcon OpenInNew}"
+                                    ToolTip="{m:Translation ToolTip_OpenProjectFolder}" />
+                    <mct:IconButton Command="{Binding OpenProjectWebsiteCommand}"
+                                    CommandParameter="{Binding SelectedElement}"
+                                    Icon="{m:MaterialDesignIcon Web}"
+                                    ToolTip="{m:Translation ToolTip_OpenProjectPage}" />
+                    <mct:IconButton Margin="10,0,0,0"
+                                    Command="{Binding RenameProjectCommand}"
+                                    CommandParameter="{Binding SelectedElement}"
+                                    Icon="{m:MaterialDesignIcon Icon=FormTextbox}"
+                                    ToolTip="{m:Translation ToolTip_RenameProject}" />
+                    <mct:IconToggleButton Checked="ContextMenuToggleButton_Checked"
+                                          Icon="{m:MaterialDesignIcon Icon=Tag}"
+                                          Tag="{StaticResource ElementTagsContextMenu}"
+                                          ToolTip="{m:Translation Tags}" />
+                    <mct:IconToggleButton Icon="{m:MaterialDesignIcon Archive}" IsChecked="{Binding SelectedElement.IsArchived}">
+                        <mct:IconToggleButton.Style>
+                            <Style BasedOn="{StaticResource {x:Type mct:IconToggleButton}}" TargetType="mct:IconToggleButton">
+                                <Setter Property="ToolTip" Value="{m:Translation ToolTip_ArchiveProject}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedElement.IsArchived}" Value="True">
+                                        <Setter Property="ToolTip" Value="{m:Translation ToolTip_TakeProjectOutOfArchive}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </mct:IconToggleButton.Style>
+                    </mct:IconToggleButton>
+                    <mct:IconButton Margin="10,0,0,0"
+                                    Command="{Binding DeleteProjectCommand}"
+                                    CommandParameter="{Binding SelectedElement}"
+                                    Icon="{m:MaterialDesignIcon Delete}"
+                                    ToolTip="{m:Translation ToolTip_DeleteProject}">
+                        <m:Theming.ThemeOverrides>
+                            <m:ThemeOverrideCollection>
+                                <m:ThemeOverride Key="HighlightColor" Value="{StaticResource RedColor}" />
+                            </m:ThemeOverrideCollection>
+                        </m:Theming.ThemeOverrides>
+                    </mct:IconButton>
+                </StackPanel>
+            </StackPanel>
+            <Grid>
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                              VerticalScrollBarVisibility="Auto"
+                              Visibility="{Binding SelectedElement.IsInitializing, Converter={StaticResource BoolNegationToVisibility}}">
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel.Resources>
+                            <DataTemplate x:Key="PrintElementFileTemplate" DataType="{x:Type models:PrintElementFile}">
+                                <Border Padding="5,2.5" Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=l:PrintsView}}">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="Transparent" />
+                                            <Style.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="{m:ThemeValue Key=ListBoxItemHoverBackgroundBrush}" />
+                                                </Trigger>
+                                                <DataTrigger Binding="{Binding ContextMenu.IsOpen, RelativeSource={RelativeSource Self}}" Value="True">
+                                                    <Setter Property="Background" Value="{m:ThemeValue Key=ListBoxItemHoverBackgroundBrush}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <Border.InputBindings>
+                                        <MouseBinding Command="{Binding RelativeSource={RelativeSource AncestorType=l:PrintsView}, Path=DataContext.OpenProjectFileCommand}"
+                                                      CommandParameter="{Binding}"
+                                                      Gesture="LeftDoubleClick" />
+                                    </Border.InputBindings>
+                                    <Border.ContextMenu>
+                                        <ContextMenu Opened="PrintElementFileContextMenu_OnOpened">
+                                            <MenuItem Command="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.Tag.OpenProjectFileCommand}"
+                                                      CommandParameter="{Binding}"
+                                                      Header="{m:Translation Open}"
+                                                      Icon="{m:MaterialDesignIcon OpenInNew}" />
+                                            <Separator />
+                                            <MenuItem Command="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.Tag.RenameProjectFileCommand}"
+                                                      CommandParameter="{Binding}"
+                                                      Header="{m:Translation Rename}"
+                                                      Icon="{m:MaterialDesignIcon Icon=Textbox}" />
+                                            <Separator />
+                                            <MenuItem Command="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.Tag.DeleteProjectFileCommand}"
+                                                      CommandParameter="{Binding}"
+                                                      Header="{m:Translation Delete}"
+                                                      Icon="{m:MaterialDesignIcon Delete}">
+                                                <m:Theming.ThemeOverrides>
+                                                    <m:ThemeOverrideCollection>
+                                                        <m:ThemeOverride Key="HighlightColor" Value="{StaticResource RedColor}" />
+                                                        <m:ThemeOverride Key="NormalForegroundColor" Value="{StaticResource RedColor}" />
+                                                        <m:ThemeOverride Key="HoverForegroundColor" Value="{StaticResource RedColor}" />
+                                                    </m:ThemeOverrideCollection>
+                                                </m:Theming.ThemeOverrides>
+                                            </MenuItem>
+                                        </ContextMenu>
+                                    </Border.ContextMenu>
+                                    <DockPanel>
+                                        <Image Width="32"
+                                               Height="32"
+                                               VerticalAlignment="Center"
+                                               DockPanel.Dock="Left"
+                                               Source="{Binding Icon}"
+                                               Stretch="Uniform" />
+                                        <Border Width="48"
+                                                Height="24"
+                                                Padding="4"
+                                                VerticalAlignment="Center"
+                                                Background="{m:ThemeValue Key=NormalForegroundBrush}"
+                                                CornerRadius="2"
+                                                DockPanel.Dock="Right"
+                                                Opacity="0.25">
+                                            <Viewbox HorizontalAlignment="Center" Stretch="Uniform">
+                                                <TextBlock FontWeight="SemiBold"
+                                                           Foreground="{m:ThemeValue Key=NormalBackgroundBrush}"
+                                                           Text="{Binding FileExtension}" />
+                                            </Viewbox>
+                                        </Border>
+                                        <TextBlock Margin="10,0"
+                                                   VerticalAlignment="Center"
+                                                   Text="{Binding FileName}"
+                                                   TextTrimming="CharacterEllipsis" />
+                                    </DockPanel>
+                                </Border>
+                            </DataTemplate>
+                            <CollectionViewSource x:Key="CuraProjectFiles" Source="{Binding SelectedElement.CuraProjectFiles}">
+                                <CollectionViewSource.SortDescriptions>
+                                    <scm:SortDescription Direction="Ascending" PropertyName="FileName" />
+                                </CollectionViewSource.SortDescriptions>
+                            </CollectionViewSource>
+                            <CollectionViewSource x:Key="ModelFiles" Source="{Binding SelectedElement.ModelFiles}">
+                                <CollectionViewSource.SortDescriptions>
+                                    <scm:SortDescription Direction="Ascending" PropertyName="FileName" />
+                                </CollectionViewSource.SortDescriptions>
+                            </CollectionViewSource>
+                            <CollectionViewSource x:Key="OtherFiles" Source="{Binding SelectedElement.OtherFiles}">
+                                <CollectionViewSource.SortDescriptions>
+                                    <scm:SortDescription Direction="Ascending" PropertyName="FileName" />
+                                </CollectionViewSource.SortDescriptions>
+                            </CollectionViewSource>
+                        </StackPanel.Resources>
+                        <GroupBox Header="{m:Translation CuraProjectFiles}" Visibility="{Binding SelectedElement.CuraProjectFiles.Count, Converter={StaticResource ZeroToCollapsed}}">
+                            <ItemsControl ItemTemplate="{StaticResource PrintElementFileTemplate}" ItemsSource="{Binding Source={StaticResource CuraProjectFiles}}" />
+                        </GroupBox>
+                        <GroupBox Header="{m:Translation ModelFiles}" Visibility="{Binding SelectedElement.ModelFiles.Count, Converter={StaticResource ZeroToCollapsed}}">
+                            <ItemsControl ItemTemplate="{StaticResource PrintElementFileTemplate}" ItemsSource="{Binding Source={StaticResource ModelFiles}}" />
+                        </GroupBox>
+                        <GroupBox Header="{m:Translation OtherFiles}" Visibility="{Binding SelectedElement.OtherFiles.Count, Converter={StaticResource ZeroToCollapsed}}">
+                            <ItemsControl ItemTemplate="{StaticResource PrintElementFileTemplate}" ItemsSource="{Binding Source={StaticResource OtherFiles}}" />
+                        </GroupBox>
+                    </StackPanel>
+                </ScrollViewer>
+                <mct:BusyIndicator Width="64"
+                                   Height="64"
+                                   Margin="0,64,0,0"
+                                   VerticalAlignment="Top"
+                                   CircleMode="True"
+                                   IsEnabled="{Binding SelectedElement.IsInitializing}" />
+            </Grid>
+        </DockPanel>
+    </Grid>
+</mv:ExtendedSplitViewContent>

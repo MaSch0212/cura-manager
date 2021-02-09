@@ -1,0 +1,87 @@
+﻿<mct:Window x:Class="CuraManager.Views.MainWindow"
+            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+            xmlns:m="http://schemas.masch212.de/MaSch/Wpf"
+            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+            xmlns:mct="http://schemas.masch212.de/MaSch/Wpf/Controls"
+            xmlns:mv="http://schemas.masch212.de/MaSch/Wpf/Views"
+            xmlns:views="clr-namespace:CuraManager.Views.Main"
+            xmlns:vm="clr-namespace:CuraManager.ViewModels"
+            Title="Cura Manager"
+            Width="1024"
+            Height="768"
+            DragMoveOnContentBorder="False"
+            Icon="../Resources/CuraManager.ico"
+            mc:Ignorable="d">
+    <mct:Window.DataContext>
+        <vm:MainWindowModel />
+    </mct:Window.DataContext>
+    <m:Theming.ThemeOverrides>
+        <m:ThemeOverrideCollection>
+            <m:ThemeOverride Key="WindowWindowChromeBrush">
+                <SolidColorBrush Color="{m:ThemeValue Key=SplitViewMenuBackgroundBrush, PropertyName=Color}" />
+            </m:ThemeOverride>
+            <m:ThemeOverride Key="WindowTitleBrush">
+                <SolidColorBrush Color="White" />
+            </m:ThemeOverride>
+            <m:ThemeOverride Key="WindowButtonsNormalSymbolBrush">
+                <SolidColorBrush Color="White" />
+            </m:ThemeOverride>
+            <m:ThemeOverride Key="WindowCloseButtonNormalSymbolBrush">
+                <SolidColorBrush Color="White" />
+            </m:ThemeOverride>
+        </m:ThemeOverrideCollection>
+    </m:Theming.ThemeOverrides>
+    <Grid>
+        <mv:SplitView x:Name="MainSplitView">
+            <mv:SplitViewItem x:Name="PrintProjectsPage"
+                              Header="{m:Translation PageHeader_PrintProjects}"
+                              Icon="{m:MaterialDesignIcon Printer3d}">
+                <views:PrintsView />
+            </mv:SplitViewItem>
+            <mv:SplitViewItemGroup>
+                <mv:SplitViewItem x:Name="SettingsPage"
+                                  Header="{m:Translation PageHeader_Settings}"
+                                  Icon="{m:MaterialDesignIcon Icon=CogOutline}">
+                    <views:SettingsView />
+                </mv:SplitViewItem>
+                <mv:SplitViewItem x:Name="AboutPage"
+                                  Header="{m:Translation PageHeader_About}"
+                                  Icon="{m:MaterialDesignIcon InformationOutline}">
+                    <views:AboutView />
+                </mv:SplitViewItem>
+            </mv:SplitViewItemGroup>
+            <mv:SplitView.MenuInfoAreaExpandedTop>
+                <StackPanel Grid.Row="0">
+                    <TextBlock x:Name="VersionNumber"
+                               Margin="0,5"
+                               HorizontalAlignment="Center"
+                               FontSize="10"
+                               Foreground="{m:ThemeValue Key=DisabledForegroundBrush}">
+                        <Span xml:space="preserve"><Run Text="{m:Translation CurrentVersion}" />: <Run Text="{Binding Version}" /></Span>
+                    </TextBlock>
+                </StackPanel>
+            </mv:SplitView.MenuInfoAreaExpandedTop>
+            <mv:SplitView.MenuInfoAreaCollapsedTop>
+                <StackPanel Grid.Row="0">
+                    <TextBlock Margin="0,5"
+                               FontSize="10"
+                               Foreground="{m:ThemeValue Key=DisabledForegroundBrush}"
+                               Text="{Binding Version}"
+                               TextAlignment="Center" />
+                </StackPanel>
+            </mv:SplitView.MenuInfoAreaCollapsedTop>
+        </mv:SplitView>
+        <TextBlock x:Name="DebugHint"
+                   Margin="0,-35,0,0"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Top"
+                   FontSize="24"
+                   FontWeight="Light"
+                   Foreground="Red"
+                   IsHitTestVisible="False"
+                   Text="Debug-Mode"
+                   Visibility="{Binding IsInDebugMode, Converter={StaticResource BoolToVisibility}}" />
+    </Grid>
+</mct:Window>

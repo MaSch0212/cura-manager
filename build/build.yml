@@ -1,0 +1,80 @@
+trigger:
+  branches:
+    include:
+    - main
+  paths:
+    include:
+    - build
+    - docs/release-notes
+    - src
+
+pool:
+  vmImage: 'windows-2019'
+
+steps:
+- checkout: self
+  clean: true
+  persistCredentials: true
+
+# - task: DotNetCoreCLI@2
+#   displayName: "\U0001F308 Run Unit Tests"
+#   inputs:
+#     command: 'test'
+#     projects: '**/*Test.csproj'
+#     arguments: '--collect "Code coverage" -p:TreatWarningsAsErrors=true'
+
+- task: DotNetCoreCLI@2
+  displayName: "\U0001F6E0 Build projects"
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    arguments: '-c Release -r win-x64 --no-self-contained -p:PublishReadyToRun=true -p:OutputZipDir=$(Build.ArtifactStagingDirectory) -p:TreatWarningsAsErrors=true'
+    zipAfterPublish: false
+
+- task: PublishBuildArtifacts@1
+  displayName: "\U0001F6EB Publish to Azure Pipeline"
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
+
+- powershell: |
+    Write-Host "Current Version: $(AppVersion)"
+
+    $releaseTagName = "release-$(AppVersion)"
+    git rev-parse "$releaseTagName"
+
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "The tag `"$releaseTagName`" already exists. No GitHub Release will be created."
+        Write-Host "##vso[task.setvariable variable=PublishGitHubRelease;]false"
+    } else {
+        $LASTEXITCODE = 0
+        
+        Write-Host "##vso[task.setvariable variable=GitReleaseTag;]$releaseTagName"
+        Write-Host "##vso[task.setvariable variable=PublishGitHubRelease;]true"
+
+        $expectedMdFile = "release-notes/v$(AppVersion).md"
+        if (-not (Test-Path $expectedMdFile -PathType Leaf)) {
+            Write-Error "There is no release-notes file for version $(AppVersion). Please make sure that the file `"$expectedMdFile`" exists."
+            exit -1
+        }
+        
+        Write-Host "Tag `"$releaseTagName`" does not exist. GitHub Release will be created."
+        Write-Host "Creating and pushing tag `"$releaseTagName`"..."
+        git tag "$releaseTagName"
+        git push origin "$releaseTagName"
+    }
+  displayName: "\U0001F6E0 Determine Version and create Tag"
+
+- task: GitHubRelease@1
+  displayName: "\U0001F680 Publish to GitHub (Create Release)"
+  inputs:
+    gitHubConnection: 'github.com_MaSch0212'
+    repositoryName: '$(Build.Repository.Name)'
+    action: 'create'
+    target: '$(Build.SourceVersion)'
+    tagSource: 'userSpecifiedTag'
+    tag: '$(GitReleaseTag)'
+    releaseNotesFilePath: 'docs/release-notes/v$(AppVersion).md'
+    addChangeLog: false
+  condition: and(succeeded(), eq(variables['PublishGitHubRelease'], 'true'))

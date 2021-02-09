@@ -1,0 +1,93 @@
+﻿<mv:ExtendedSplitViewContent x:Class="CuraManager.Views.Main.SettingsView"
+                             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                             xmlns:local="clr-namespace:CuraManager.Views.Main"
+                             xmlns:m="http://schemas.masch212.de/MaSch/Wpf"
+                             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                             xmlns:mct="http://schemas.masch212.de/MaSch/Wpf/Controls"
+                             xmlns:mcv="http://schemas.masch212.de/MaSch/Wpf/Converter"
+                             xmlns:mt="clr-namespace:MaSch.Presentation.Wpf;assembly=MaSch.Presentation.Wpf.Themes"
+                             xmlns:mv="http://schemas.masch212.de/MaSch/Wpf/Views"
+                             xmlns:vm="clr-namespace:CuraManager.ViewModels.Main"
+                             Title="{m:Translation PageHeader_Settings}"
+                             d:DesignHeight="600"
+                             d:DesignWidth="800"
+                             ToolbarVisibility="Visible"
+                             mc:Ignorable="d">
+    <mv:ExtendedSplitViewContent.DataContext>
+        <vm:SettingsViewModel />
+    </mv:ExtendedSplitViewContent.DataContext>
+    <mv:ExtendedSplitViewContent.ToolbarContent>
+        <StackPanel Orientation="Horizontal">
+            <mct:IconButton Command="{Binding UndoCommand}"
+                            Icon="{m:MaterialDesignIcon UndoVariant}"
+                            ToolTip="{m:Translation ToolTip_UndoAll}" />
+            <mct:IconButton Command="{Binding SaveCommand}"
+                            Icon="{m:MaterialDesignIcon ContentSave}"
+                            ToolTip="{m:Translation ToolTip_SaveAll}" />
+        </StackPanel>
+    </mv:ExtendedSplitViewContent.ToolbarContent>
+    <mv:ExtendedSplitViewContent.Resources>
+        <Style BasedOn="{StaticResource {x:Type Label}}" TargetType="Label">
+            <Setter Property="Margin" Value="0,10,0,0" />
+        </Style>
+    </mv:ExtendedSplitViewContent.Resources>
+    <StackPanel>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" MaxWidth="350" />
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+                <StackPanel.Resources>
+                    <Style BasedOn="{StaticResource {x:Type mct:IconButton}}" TargetType="{x:Type mct:IconButton}">
+                        <Setter Property="Padding" Value="8" />
+                        <Setter Property="Icon">
+                            <Setter.Value>
+                                <m:MaterialDesignIcon Icon="DotsHorizontal" />
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </StackPanel.Resources>
+
+                <Label Margin="0" Content="{m:Translation ApplicationLanguage}" />
+                <ComboBox DisplayMemberPath="Item2"
+                          ItemsSource="{Binding AvailableLanguages}"
+                          SelectedItem="{Binding CurrentLanguage}" />
+
+                <Label Content="{m:Translation ApplicationTheme}" />
+                <ComboBox DisplayMemberPath="Description"
+                          ItemsSource="{Binding Source={m:Enumeration {x:Type mt:DefaultTheme}}}"
+                          SelectedValue="{Binding Settings.Theme}"
+                          SelectedValuePath="Value" />
+
+                <Label Content="{m:Translation PrintProjectsFolderLocation}" />
+                <mct:TextBox Text="{Binding Settings.PrintsPath}">
+                    <mct:TextBox.EndContent>
+                        <mct:IconButton Command="{Binding BrowseDirectoryCommand}" CommandParameter="PrintsPath" />
+                    </mct:TextBox.EndContent>
+                </mct:TextBox>
+
+                <Label Content="{m:Translation CuraAppDataLocation}" />
+                <mct:TextBox Text="{Binding Settings.CuraAppDataPath}">
+                    <mct:TextBox.EndContent>
+                        <mct:IconButton Command="{Binding BrowseDirectoryCommand}" CommandParameter="CuraAppDataPath" />
+                    </mct:TextBox.EndContent>
+                </mct:TextBox>
+
+                <Label Content="{m:Translation CuraProgramFilesLocation}" />
+                <mct:TextBox Text="{Binding Settings.CuraProgramFilesPath}">
+                    <mct:TextBox.EndContent>
+                        <mct:IconButton Command="{Binding BrowseDirectoryCommand}" CommandParameter="CuraProgramFilesPath" />
+                    </mct:TextBox.EndContent>
+                </mct:TextBox>
+            </StackPanel>
+        </Grid>
+        <CheckBox Margin="0,10,0,0"
+                  Content="{m:Translation UpdateProfilesInCuraProjects}"
+                  IsChecked="{Binding Settings.UpdateCuraProjectsOnOpen}" />
+        <CheckBox Margin="0,10,0,0"
+                  Content="{m:Translation ShowWebDialogWhenAddingLink}"
+                  IsChecked="{Binding Settings.ShowWebDialogWhenAddingLink}" />
+    </StackPanel>
+</mv:ExtendedSplitViewContent>

@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28922.388
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CuraManager", "src\CuraManager\CuraManager.csproj", "{C54F273B-F3F4-4CB8-A51B-4CFFE9D8F098}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "resources", "resources", "{7692067A-0215-4577-A8A4-33613E68393D}"
+	ProjectSection(SolutionItems) = preProject
+		resources\CuraManager.afdesign = resources\CuraManager.afdesign
+		resources\CuraManager.ico = resources\CuraManager.ico
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{3B8571FA-A1C3-4E6A-8229-5DC9C1EDE538}"
+	ProjectSection(SolutionItems) = preProject
+		build\build.yml = build\build.yml
+		build\CuraManager.ruleset = build\CuraManager.ruleset
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C54F273B-F3F4-4CB8-A51B-4CFFE9D8F098}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C54F273B-F3F4-4CB8-A51B-4CFFE9D8F098}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C54F273B-F3F4-4CB8-A51B-4CFFE9D8F098}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C54F273B-F3F4-4CB8-A51B-4CFFE9D8F098}.Debug|x64.Build.0 = Debug|Any CPU
+		{C54F273B-F3F4-4CB8-A51B-4CFFE9D8F098}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C54F273B-F3F4-4CB8-A51B-4CFFE9D8F098}.Debug|x86.Build.0 = Debug|Any CPU
+		{C54F273B-F3F4-4CB8-A51B-4CFFE9D8F098}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C54F273B-F3F4-4CB8-A51B-4CFFE9D8F098}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C54F273B-F3F4-4CB8-A51B-4CFFE9D8F098}.Release|x64.ActiveCfg = Release|Any CPU
+		{C54F273B-F3F4-4CB8-A51B-4CFFE9D8F098}.Release|x64.Build.0 = Release|Any CPU
+		{C54F273B-F3F4-4CB8-A51B-4CFFE9D8F098}.Release|x86.ActiveCfg = Release|Any CPU
+		{C54F273B-F3F4-4CB8-A51B-4CFFE9D8F098}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {138F69F1-B0FF-43BB-91B8-866C871BCA48}
+	EndGlobalSection
+EndGlobal

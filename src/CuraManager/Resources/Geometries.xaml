@@ -1,0 +1,14 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:CuraManager.Resources"
+                    xmlns:m="http://schemas.masch212.de/MaSch/Wpf">
+
+    <Geometry x:Key="CuraGeometry">M340 512L0 512L0.258 510.614L0 172L172 0L512 0L512 340L340 512ZM389 103L255 102C255 102 134.29 98.407 123 230C122.296 238.211 121.952 252.665 123 260C141.338 388.351 255 382 255 382L389 382L389 309L255 309C255 309 197.075 306.835 195.936 243.879C194.752 178.503 255 176 255 176L389 176L389 103Z</Geometry>
+
+    <m:Icon x:Key="CuraIcon"
+            Geometry="{StaticResource CuraGeometry}"
+            IsGeometryFilled="True"
+            Stretch="Uniform"
+            Type="Geometry" />
+
+</ResourceDictionary>
