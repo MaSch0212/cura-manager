@@ -12,7 +12,7 @@
     <!-- Output info -->
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <OutputType>WinExe</OutputType>
-    <ApplicationIcon>C:\TFS\cura-manager\resources\CuraManager.ico</ApplicationIcon>
+    <ApplicationIcon>../../resources/CuraManager.ico</ApplicationIcon>
     
     <!-- Package Info -->
     <Version>1.3.1</Version>
