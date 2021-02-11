@@ -60,8 +60,8 @@ namespace CuraManager.Services
             });
             p.WaitForInputIdle();
 
-            if (TryFindChild(AutomationElement.RootElement, CheckWindow, out var curaWindow) &&
-                TryFindChild(curaWindow, CheckEditNameButton, out var editNameButton) &&
+            if (TryFindChild(AutomationElement.RootElement, CheckWindow, TimeSpan.FromMinutes(5), out var curaWindow) &&
+                TryFindChild(curaWindow, CheckEditNameButton, TimeSpan.FromSeconds(30), out var editNameButton) &&
                 editNameButton.TryGetCurrentPattern(InvokePattern.Pattern, out var objInvokePattern) && objInvokePattern is InvokePattern invokePattern)
             {
                 invokePattern.Invoke();
@@ -116,7 +116,7 @@ namespace CuraManager.Services
                 parser.WriteData(sw, iniData);
         }
 
-        private static bool TryFindChild(AutomationElement parent, Func<TreeWalker, AutomationElement, bool> checkFunc, out AutomationElement element)
+        private static bool TryFindChild(AutomationElement parent, Func<TreeWalker, AutomationElement, bool> checkFunc, TimeSpan timeout, out AutomationElement element)
         {
             var treeWalker = TreeWalker.RawViewWalker;
             element = Waiter.WaitUntil(
@@ -127,7 +127,7 @@ namespace CuraManager.Services
                         e = treeWalker.GetNextSibling(e);
                     return e;
                 },
-                new WaiterOptions { ThrowException = false });
+                new WaiterOptions { ThrowException = false, Timeout = timeout });
             return element != null;
         }
 

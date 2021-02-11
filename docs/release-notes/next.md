@@ -4,4 +4,4 @@ The following changes were made in this version:
 | ---- | ----------- |
 
 
-[comment]: # (Use one of the following types: bugfix, feature, new-tool)
+[comment]: # (Use one of the following types: bugfix, feature)
