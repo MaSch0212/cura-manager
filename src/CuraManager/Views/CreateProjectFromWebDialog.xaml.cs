@@ -54,7 +54,7 @@ namespace CuraManager.Views
                     }
                     catch (Exception)
                     {
-                        // The url is not supported -> Do nothing
+                        IsLoadingName = false;
                     }
                 }
             }

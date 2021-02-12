@@ -19,6 +19,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{3B8571FA
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug_MaSchLocal|Any CPU = Debug_MaSchLocal|Any CPU
+		Debug_MaSchLocal|x64 = Debug_MaSchLocal|x64
+		Debug_MaSchLocal|x86 = Debug_MaSchLocal|x86
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
@@ -27,6 +30,12 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C54F273B-F3F4-4CB8-A51B-4CFFE9D8F098}.Debug_MaSchLocal|Any CPU.ActiveCfg = Debug_MaSchLocal|Any CPU
+		{C54F273B-F3F4-4CB8-A51B-4CFFE9D8F098}.Debug_MaSchLocal|Any CPU.Build.0 = Debug_MaSchLocal|Any CPU
+		{C54F273B-F3F4-4CB8-A51B-4CFFE9D8F098}.Debug_MaSchLocal|x64.ActiveCfg = Debug|Any CPU
+		{C54F273B-F3F4-4CB8-A51B-4CFFE9D8F098}.Debug_MaSchLocal|x64.Build.0 = Debug|Any CPU
+		{C54F273B-F3F4-4CB8-A51B-4CFFE9D8F098}.Debug_MaSchLocal|x86.ActiveCfg = Debug|Any CPU
+		{C54F273B-F3F4-4CB8-A51B-4CFFE9D8F098}.Debug_MaSchLocal|x86.Build.0 = Debug|Any CPU
 		{C54F273B-F3F4-4CB8-A51B-4CFFE9D8F098}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C54F273B-F3F4-4CB8-A51B-4CFFE9D8F098}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C54F273B-F3F4-4CB8-A51B-4CFFE9D8F098}.Debug|x64.ActiveCfg = Debug|Any CPU

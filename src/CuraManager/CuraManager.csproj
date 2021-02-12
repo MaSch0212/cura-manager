@@ -15,9 +15,10 @@
     <ApplicationIcon>../../resources/CuraManager.ico</ApplicationIcon>
     
     <!-- Package Info -->
-    <Version>1.3.3</Version>
+    <Version>1.3.4</Version>
     <Authors>Marc Schmidt</Authors>
     <SupportedOSPlatform>windows</SupportedOSPlatform>
+    <Configurations>Debug;Release;Debug_MaSchLocal</Configurations>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -25,7 +26,7 @@
     <OutputZipPath Condition=" '$(OutputZipPath)' == '' ">$(OutputZipDir)\$(AssemblyName)-$(Version)-$(RuntimeIdentifier).zip</OutputZipPath>
   </PropertyGroup>
 
-  <ItemGroup Condition=" '$(MASCH_SOURCES)' == '' or '$(Configuration)' == 'Release' ">
+  <ItemGroup Condition=" '$(MASCH_SOURCES)' == '' or '$(Configuration)' != 'Debug_MaSchLocal' ">
     <PackageReference Include="MaSch.Generators" Version="0.1.0" />
     <PackageReference Include="MaSch.Native.Windows" Version="0.1.0" />
     <PackageReference Include="MaSch.Presentation" Version="0.1.2" />
@@ -34,7 +35,7 @@
     <PackageReference Include="MaSch.Presentation.Wpf.Themes" Version="0.1.0" />
   </ItemGroup>
   
-  <ItemGroup Condition=" '$(MASCH_SOURCES)' != '' and '$(Configuration)' != 'Release' ">
+  <ItemGroup Condition=" '$(MASCH_SOURCES)' != '' and '$(Configuration)' == 'Debug_MaSchLocal' ">
     <ProjectReference Include="$(MASCH_SOURCES)\src\Generators\MaSch.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="$(MASCH_SOURCES)\src\Native.Windows\MaSch.Native.Windows.csproj" />
     <ProjectReference Include="$(MASCH_SOURCES)\src\Core\MaSch.Core.csproj" />

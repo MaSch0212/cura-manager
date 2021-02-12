@@ -59,7 +59,7 @@ namespace CuraManager.Services.WebProviders
         {
             var json = await _httpClient.GetStringAsync(GetDownloadDataUri(webAddress));
             var jObject = JObject.Parse(json);
-            return new Uri(jObject["url"].ToObject<string>());
+            return new Uri(new Uri("https://www.youmagine.com/"), jObject["url"].ToObject<string>());
         }
 
         private Uri GetDownloadDataUri(Uri webAddress)

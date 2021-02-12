@@ -34,7 +34,7 @@ Give the project a name and add the 3D models by either using drag 'n' drop or s
 You want to just download some models from you favorite 3D model site? You can easily do that using the "Create Project from the Web..." button.<br>
 Currently links from the following websites are supported:
 - [Thingiverse](https://www.thingiverse.com/)
-- [MyMiniFactory](https://www.myminifactory.com/)
+- ~~[MyMiniFactory](https://www.myminifactory.com/)~~ (currently not working due to forced login)
 - [YouMagine](https://www.youmagine.com/)
 
 After pressing the "Create" button all files from the given link are downloaded and added to the project.<br>

@@ -84,7 +84,9 @@ namespace CuraManager
             ServiceContext.AddService<IDownloadService>(new DownloadService(new IWebProvider[]
             {
                 new ThingiverseProvider(),
-                new MyMiniFactoryProvider(),
+
+                // Disabled MyMiniFactory because it requires a login now for direct download links.
+                // new MyMiniFactoryProvider(),
                 new YouMagineProvider(),
             }));
 
