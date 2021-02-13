@@ -17,6 +17,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{3B8571FA
 		build\CuraManager.ruleset = build\CuraManager.ruleset
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{4E4CE25F-E04A-40E0-82B8-B0E35F6D59AB}"
+	ProjectSection(SolutionItems) = preProject
+		docs\release-notes\next.md = docs\release-notes\next.md
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug_MaSchLocal|Any CPU = Debug_MaSchLocal|Any CPU

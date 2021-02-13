@@ -18,6 +18,7 @@ using CuraManager.Views;
 using MaSch.Core;
 using MaSch.Core.Attributes;
 using MaSch.Core.Extensions;
+using MaSch.Core.Observable.Collections;
 using MaSch.Presentation;
 using MaSch.Presentation.Translation;
 using MaSch.Presentation.Wpf.Commands;
@@ -96,12 +97,15 @@ namespace CuraManager.ViewModels.Main
             PrintElementsViewSource.Filter += PrintElementsViewSource_OnFilter;
             PrintElementsViewSource.SortDescriptions.Add(new SortDescription(nameof(PrintElement.IsArchived), ListSortDirection.Ascending));
             PrintElementsViewSource.SortDescriptions.Add(new SortDescription(nameof(PrintElement.Name), ListSortDirection.Ascending));
-            PrintElements = new ObservableCollection<PrintElement>();
             AvailableTags = new ObservableCollection<string>();
             AvailableTagsViewSource = new CollectionViewSource { Source = AvailableTags };
             AvailableTagsViewSource.SortDescriptions.Add(new SortDescription(null, ListSortDirection.Ascending));
             VisibleTags = new ObservableCollection<string>();
             VisibleTags.CollectionChanged += (s, e) => PrintElementsViewSource.View.Refresh();
+
+            var printElements = new FullyObservableCollection<PrintElement>();
+            printElements.CollectionItemPropertyChanged += PrintElements_CollectionItemPropertyChanged;
+            PrintElements = printElements;
 
             NewProjectFromModelsCommand = new AsyncDelegateCommand(ExecuteNewProjectFromModels);
             NewProjectFromWebCommand = new AsyncDelegateCommand(ExecuteNewProjectFromWeb);
@@ -604,6 +608,15 @@ namespace CuraManager.ViewModels.Main
             else
             {
                 e.Accepted = false;
+            }
+        }
+
+        private void PrintElements_CollectionItemPropertyChanged(object sender, CollectionItemPropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(PrintElement.IsArchived))
+            {
+                if (ShowArchivedElements && ShowNonArchivedElements)
+                    PrintElementsViewSource.View.Refresh();
             }
         }
         #endregion
