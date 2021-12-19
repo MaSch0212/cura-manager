@@ -16,7 +16,7 @@
     <ApplicationIcon>../../resources/CuraManager.ico</ApplicationIcon>
     
     <!-- Package Info -->
-    <Version>1.3.4</Version>
+    <Version>1.4.0</Version>
     <Authors>Marc Schmidt</Authors>
     <SupportedOSPlatform>windows</SupportedOSPlatform>
     <Configurations>Debug;Release;Debug_MaSchLocal</Configurations>
