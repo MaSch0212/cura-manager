@@ -1,65 +1,56 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Net;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using CuraManager.Common;
+﻿using CuraManager.Common;
 using CuraManager.Models;
 using CuraManager.Resources;
 using CuraManager.Views;
-using MaSch.Core;
-using MaSch.Core.Extensions;
 using MaSch.Presentation.Translation;
+using System.IO;
+using System.IO.Compression;
+using System.Net.Http;
 
-namespace CuraManager.Services.WebProviders
+namespace CuraManager.Services.WebProviders;
+
+public class ThingiverseProvider : IWebProvider
 {
-    public class ThingiverseProvider : IWebProvider
+    private static readonly Regex LinkRegex = new(@"https?:\/\/(www\.)?thingiverse\.com\/thing:[0-9]+", RegexOptions.Compiled);
+    private readonly HttpClient _httpClient = new();
+
+    public ICollection<string> SupportedHosts { get; } = new[] { "www.thingiverse.com" };
+
+    public async Task<string> GetProjectName(Uri webAddress)
     {
-        private static readonly Regex LinkRegex = new Regex(@"https?:\/\/(www\.)?thingiverse\.com\/thing:[0-9]+", RegexOptions.Compiled);
-        private readonly WebClient _webClient = new WebClient();
+        using var request = new HttpRequestMessage(HttpMethod.Head, GetDownloadUrl(webAddress));
+        using var response = await _httpClient.SendAsync(request);
+        return Path.GetFileNameWithoutExtension(Uri.UnescapeDataString(response.RequestMessage.RequestUri.ToString()))
+            .Replace('_', ' ')
+            .Replace('+', ' ');
+    }
 
-        public ICollection<string> SupportedHosts { get; } = new[] { "www.thingiverse.com" };
+    public async Task DownloadFiles(Uri webAddress, PrintElement printElement)
+    {
+        var zipFilePath = Path.GetTempFileName();
+        using (var response = await _httpClient.GetAsync(GetDownloadUrl(webAddress)))
+        using (var fs = new FileStream(zipFilePath, FileMode.Create))
+            await response.Content.CopyToAsync(fs);
 
-        public async Task<string> GetProjectName(Uri webAddress)
+        using (var zipFile = ZipFile.OpenRead(zipFilePath))
         {
-            var request = WebRequest.Create(GetDownloadUrl(webAddress));
-            request.Method = "HEAD";
-            using (var response = await request.GetResponseAsync())
-            {
-                return Path.GetFileNameWithoutExtension(response.ResponseUri.ToString())
-                    .Replace('_', ' ')
-                    .Replace('+', ' ');
-            }
+            await CreateProjectFromArchiveDialog.GetFilesToExtract(zipFile, printElement.DirectoryLocation)
+                .ForEachAsync(x => Task.Run(() => x.Entry.ExtractToFile(x.TargetPath)));
         }
 
-        public async Task DownloadFiles(Uri webAddress, PrintElement printElement)
-        {
-            var zipFilePath = Path.GetTempFileName();
-            await _webClient.DownloadFileTaskAsync(GetDownloadUrl(webAddress), zipFilePath);
+        File.Delete(zipFilePath);
+    }
 
-            using (var zipFile = ZipFile.OpenRead(zipFilePath))
-            {
-                await CreateProjectFromArchiveDialog.GetFilesToExtract(zipFile, printElement.DirectoryLocation)
-                    .ForEachAsync(x => Task.Run(() => x.entry.ExtractToFile(x.targetPath)));
-            }
+    private static Uri GetDownloadUrl(Uri webAddress)
+    {
+        var match = LinkRegex.Match(webAddress.AbsoluteUri);
+        if (!match.Success)
+            throw new WebProviderException(ServiceContext.GetService<ITranslationManager>().GetTranslation(nameof(StringTable.Msg_WrongThingiverseUrl)));
 
-            File.Delete(zipFilePath);
-        }
+        var builder = new UriBuilder(match.Value);
 
-        private Uri GetDownloadUrl(Uri webAddress)
-        {
-            var match = LinkRegex.Match(webAddress.AbsoluteUri);
-            if (!match.Success)
-                throw new WebProviderException(ServiceContext.GetService<ITranslationManager>().GetTranslation(nameof(StringTable.Msg_WrongThingiverseUrl)));
+        builder.Path += "/zip";
 
-            var builder = new UriBuilder(match.Value);
-
-            builder.Path += "/zip";
-
-            return builder.Uri;
-        }
+        return builder.Uri;
     }
 }

@@ -2,38 +2,37 @@
 using Newtonsoft.Json;
 using System.IO;
 
-namespace CuraManager.Services
+namespace CuraManager.Services;
+
+public class CachingService : ICachingService
 {
-    public class CachingService : ICachingService
+    public CachingService()
     {
-        public CachingService()
-        {
-        }
+    }
 
-        public MetadataCache LoadCache(string printsPath)
-        {
-            MetadataCache result;
-            var cacheFilePath = GetCacheFilePath(printsPath);
+    public MetadataCache LoadCache(string printsPath)
+    {
+        MetadataCache result;
+        var cacheFilePath = GetCacheFilePath(printsPath);
 
-            if (!File.Exists(cacheFilePath))
-                result = new MetadataCache();
-            else
-                result = JsonConvert.DeserializeObject<MetadataCache>(File.ReadAllText(cacheFilePath));
-            result.PrintsPath = printsPath;
+        if (!File.Exists(cacheFilePath))
+            result = new MetadataCache();
+        else
+            result = JsonConvert.DeserializeObject<MetadataCache>(File.ReadAllText(cacheFilePath));
+        result.PrintsPath = printsPath;
 
-            return result;
-        }
+        return result;
+    }
 
-        public void UpdateCache(MetadataCache cache)
-        {
-            var cacheFilePath = GetCacheFilePath(cache.PrintsPath);
-            Directory.CreateDirectory(Path.GetDirectoryName(cacheFilePath));
-            File.WriteAllText(cacheFilePath, JsonConvert.SerializeObject(cache, Formatting.Indented));
-        }
+    public void UpdateCache(MetadataCache cache)
+    {
+        var cacheFilePath = GetCacheFilePath(cache.PrintsPath);
+        Directory.CreateDirectory(Path.GetDirectoryName(cacheFilePath));
+        File.WriteAllText(cacheFilePath, JsonConvert.SerializeObject(cache, Formatting.Indented));
+    }
 
-        private string GetCacheFilePath(string printsPath)
-        {
-            return Path.Combine(printsPath, "metadata-cache.json");
-        }
+    private string GetCacheFilePath(string printsPath)
+    {
+        return Path.Combine(printsPath, "metadata-cache.json");
     }
 }

@@ -1,8 +1,7 @@
 ﻿using MaSch.Presentation.Wpf.Views.SplitView;
 
-namespace CuraManager.ViewModels.Main
+namespace CuraManager.ViewModels.Main;
+
+public class HomeViewModel : SplitViewContentViewModel
 {
-    public class HomeViewModel : SplitViewContentViewModel
-    {
-    }
 }

@@ -1,10 +1,8 @@
 ﻿using CuraManager.Services.WebProviders;
-using System;
 
-namespace CuraManager.Services
+namespace CuraManager.Services;
+
+public interface IDownloadService : IWebProvider
 {
-    public interface IDownloadService : IWebProvider
-    {
-        bool IsLinkSupported(Uri webAddress);
-    }
+    bool IsLinkSupported(Uri webAddress);
 }

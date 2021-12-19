@@ -1,10 +1,9 @@
 ﻿using CuraManager.Models;
 
-namespace CuraManager.Services
+namespace CuraManager.Services;
+
+public interface ICachingService
 {
-    public interface ICachingService
-    {
-        MetadataCache LoadCache(string printsPath);
-        void UpdateCache(MetadataCache cache);
-    }
+    MetadataCache LoadCache(string printsPath);
+    void UpdateCache(MetadataCache cache);
 }

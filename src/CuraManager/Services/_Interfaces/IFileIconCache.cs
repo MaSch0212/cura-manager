@@ -1,9 +1,8 @@
 ﻿using System.Windows.Media;
 
-namespace CuraManager.Services
+namespace CuraManager.Services;
+
+public interface IFileIconCache
 {
-    public interface IFileIconCache
-    {
-        ImageSource GetFileIcon(string filePath);
-    }
+    ImageSource GetFileIcon(string filePath);
 }

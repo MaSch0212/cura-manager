@@ -1,27 +1,25 @@
-﻿using System;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
-namespace CuraManager.Common
+namespace CuraManager.Common;
+
+public class WebProviderException : Exception
 {
-    public class WebProviderException : Exception
+    public WebProviderException()
     {
-        public WebProviderException()
-        {
-        }
+    }
 
-        public WebProviderException(string message)
-            : base(message)
-        {
-        }
+    public WebProviderException(string message)
+        : base(message)
+    {
+    }
 
-        public WebProviderException(string message, Exception innerException)
-            : base(message, innerException)
-        {
-        }
+    public WebProviderException(string message, Exception innerException)
+        : base(message, innerException)
+    {
+    }
 
-        protected WebProviderException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
+    protected WebProviderException(SerializationInfo info, StreamingContext context)
+        : base(info, context)
+    {
     }
 }

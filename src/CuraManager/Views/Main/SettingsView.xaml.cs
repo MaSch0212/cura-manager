@@ -1,13 +1,9 @@
-﻿namespace CuraManager.Views.Main
+﻿namespace CuraManager.Views.Main;
+
+public partial class SettingsView
 {
-    /// <summary>
-    /// Interaction logic for SettingsView.xaml
-    /// </summary>
-    public partial class SettingsView
+    public SettingsView()
     {
-        public SettingsView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

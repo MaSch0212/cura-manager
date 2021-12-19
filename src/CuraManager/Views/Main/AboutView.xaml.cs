@@ -1,13 +1,9 @@
-﻿namespace CuraManager.Views.Main
+﻿namespace CuraManager.Views.Main;
+
+public partial class AboutView
 {
-    /// <summary>
-    /// Interaction logic for AboutView.xaml
-    /// </summary>
-    public partial class AboutView
+    public AboutView()
     {
-        public AboutView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

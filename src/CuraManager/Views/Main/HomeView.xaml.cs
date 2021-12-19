@@ -1,13 +1,9 @@
-﻿namespace CuraManager.Views.Main
+﻿namespace CuraManager.Views.Main;
+
+public partial class HomeView
 {
-    /// <summary>
-    /// Interaction logic for HomeView.xaml
-    /// </summary>
-    public partial class HomeView
+    public HomeView()
     {
-        public HomeView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

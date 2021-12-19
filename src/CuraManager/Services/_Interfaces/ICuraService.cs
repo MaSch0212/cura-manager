@@ -1,13 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using CuraManager.Models;
+﻿using CuraManager.Models;
 
-namespace CuraManager.Services
+namespace CuraManager.Services;
+
+public interface ICuraService
 {
-    public interface ICuraService
-    {
-        Task<bool> CreateCuraProject(PrintElement element);
-        void OpenCura(PrintElement element, string printName, IEnumerable<string> modelsToAdd);
-        void OpenCuraProject(string fileName);
-    }
+    Task<bool> CreateCuraProject(PrintElement element);
+    void OpenCura(PrintElement element, string printName, IEnumerable<string> modelsToAdd);
+    void OpenCuraProject(string fileName);
 }
