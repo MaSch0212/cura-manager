@@ -1,10 +1,12 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Input;
 using CuraManager.Models;
 using CuraManager.Resources;
@@ -202,6 +204,19 @@ namespace CuraManager.Views.Main
                         button.IsChecked = false;
                 }
             }
+        }
+
+        private void PrintsDataGrid_Sorting(object sender, DataGridSortingEventArgs e)
+        {
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                var dataGrid = (DataGrid)sender;
+                var collectionView = CollectionViewSource.GetDefaultView(dataGrid.ItemsSource);
+                if (!collectionView.SortDescriptions.Any(x => x.PropertyName == nameof(PrintElement.IsArchived)))
+                    collectionView.SortDescriptions.Add(new SortDescription(nameof(PrintElement.IsArchived), ListSortDirection.Ascending));
+                if (!collectionView.SortDescriptions.Any(x => x.PropertyName == nameof(PrintElement.Name)))
+                    collectionView.SortDescriptions.Add(new SortDescription(nameof(PrintElement.Name), ListSortDirection.Ascending));
+            }));
         }
     }
 }

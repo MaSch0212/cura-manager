@@ -174,8 +174,16 @@
                   ItemsSource="{Binding PrintElementsViewSource.View}"
                   SelectedItem="{Binding SelectedElement}"
                   SelectionMode="Single"
-                  SelectionUnit="FullRow">
+                  SelectionUnit="FullRow"
+                  Sorting="PrintsDataGrid_Sorting">
             <DataGrid.Columns>
+                <DataGridTemplateColumn SortMemberPath="IsArchived">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <mct:IconPresenter Icon="{m:MaterialDesignIcon Icon=ArchiveOutline}" Width="12" Height="16" Padding="0.2" Visibility="{Binding Metadata.IsArchived, Converter={StaticResource BoolToVisibility}}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTextColumn Binding="{Binding Name}" Header="{m:Translation ProjectName}" />
                 <DataGridTextColumn Binding="{Binding CreationTime, StringFormat='yyyy-MM-dd HH:mm:ss'}" Header="{m:Translation CreationTime}" />
                 <DataGridTextColumn Binding="{Binding TagsDisplay}"
@@ -482,7 +490,8 @@
                                    Margin="0,64,0,0"
                                    VerticalAlignment="Top"
                                    CircleMode="True"
-                                   IsEnabled="{Binding SelectedElement.IsInitializing}" />
+                                   IsEnabled="{Binding SelectedElement.IsInitializing}"
+                                   IsHitTestVisible="False" />
             </Grid>
         </DockPanel>
     </Grid>
