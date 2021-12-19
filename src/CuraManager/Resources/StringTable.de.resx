@@ -112,10 +112,10 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="PageHeader_PrintProjects" xml:space="preserve">
     <value>Druckprojekte</value>
@@ -270,9 +270,6 @@ Nach dem Drücken der Schaltfläche wird die Anwendung neu gestartet.</value>
   </data>
   <data name="CheckForUpdates" xml:space="preserve">
     <value>Nach Updates suchen</value>
-  </data>
-  <data name="Copyright" xml:space="preserve">
-    <value>Copyright © 2019 bei Marc Schmidt</value>
   </data>
   <data name="DevelopedAndPublished" xml:space="preserve">
     <value>Entwickelt und veröffentlicht von Marc Schmidt</value>

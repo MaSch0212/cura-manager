@@ -31,7 +31,7 @@
             <TextBlock FontSize="42" FontWeight="Light">
                 <Span xml:space="preserve"><Run Text="{m:Translation PageHeader_About}" /> Cura Manager</Span>
             </TextBlock>
-            <TextBlock Margin="0,10,0,5" Text="{m:Translation Copyright}" />
+            <TextBlock Margin="0,10,0,5" Text="{Binding Copyright, Mode=OneWay}" />
             <TextBlock Margin="0,0,0,10" Text="{m:Translation DevelopedAndPublished}" />
         </StackPanel>
     </DockPanel>
