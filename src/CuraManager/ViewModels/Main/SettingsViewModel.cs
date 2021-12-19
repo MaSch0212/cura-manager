@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -112,7 +113,18 @@ namespace CuraManager.ViewModels.Main
             if (property == null)
                 throw new ArgumentException($"A setting with the name \"{settingName}\" does not exist.", nameof(settingName));
 
-            var fbd = new FolderBrowserDialog { SelectedPath = (string)property.GetValue(Settings) };
+            var selectedPath = (string)property.GetValue(Settings);
+
+            var fbd = new FolderBrowserDialog
+            {
+                SelectedPath = !string.IsNullOrWhiteSpace(selectedPath) ? selectedPath : settingName switch
+                {
+                    nameof(Settings.CuraAppDataPath) => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "cura") + Path.DirectorySeparatorChar,
+                    nameof(Settings.CuraProgramFilesPath) => Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles) + Path.DirectorySeparatorChar,
+                    _ => null,
+                },
+            };
+
             NativeWindow owner = null;
             if (Application.Current.MainWindow != null)
             {
