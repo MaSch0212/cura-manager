@@ -46,33 +46,65 @@ public class CuraService : ICuraService
 
         SetCuraSaveDialogPath(element.DirectoryLocation, settings);
 
+        var curaPath = GetCuraExecutableFilePath(settings) ?? throw new FileNotFoundException("Could not find cura executable.");
+        var curaFileName = Path.GetFileNameWithoutExtension(curaPath);
+
         var p = Process.Start(new ProcessStartInfo
         {
-            FileName = Path.Combine(settings.CuraProgramFilesPath, "Cura.exe"),
+            FileName = curaPath,
             Arguments = $"\"{string.Join("\" \"", modelsToAdd)}\"",
         });
         p.WaitForInputIdle();
 
-        if (TryFindChild(AutomationElement.RootElement, CheckWindow, TimeSpan.FromMinutes(5), out var curaWindow) &&
-            TryFindChild(curaWindow, CheckEditNameButton, TimeSpan.FromSeconds(30), out var editNameButton) &&
-            editNameButton.TryGetCurrentPattern(InvokePattern.Pattern, out var objInvokePattern) && objInvokePattern is InvokePattern invokePattern)
+        if (curaFileName == "Cura")
+            SetName4x();
+        else
+            SetName5x();
+
+        void SetName4x()
         {
-            invokePattern.Invoke();
-            SendKeys.SendWait($"{printName}{{ENTER}}");
+            if (TryFindChild(AutomationElement.RootElement, CheckWindow, TimeSpan.FromMinutes(5), out var curaWindow) &&
+                TryFindChild(curaWindow, CheckEditNameButton, TimeSpan.FromSeconds(30), out var editNameButton) &&
+                editNameButton.TryGetCurrentPattern(InvokePattern.Pattern, out var objInvokePattern) && objInvokePattern is InvokePattern invokePattern)
+            {
+                invokePattern.Invoke();
+                SendKeys.SendWait($"{printName}{{ENTER}}");
+            }
+
+            bool CheckWindow(TreeWalker treeWalker, AutomationElement e)
+            {
+                return e.Current.ProcessId == p.Id &&
+                       e.Current.Name?.Contains("Ultimaker Cura") == true;
+            }
+
+            bool CheckEditNameButton(TreeWalker treeWalker, AutomationElement e)
+            {
+                return ReferenceEquals(e.Current.ControlType, ControlType.Button) &&
+                        string.IsNullOrEmpty(e.Current.Name) &&
+                        !e.Current.IsOffscreen &&
+                        ReferenceEquals(treeWalker.GetNextSibling(e)?.Current.ControlType, ControlType.Edit);
+            }
         }
 
-        bool CheckWindow(TreeWalker treeWalker, AutomationElement e)
+        void SetName5x()
         {
-            return e.Current.ProcessId == p.Id &&
-                   e.Current.Name?.Contains("Ultimaker Cura") == true;
-        }
+            if (TryFindChild(AutomationElement.RootElement, CheckWindow, TimeSpan.FromMinutes(5), out var curaWindow) &&
+                TryFindChild(curaWindow, CheckEditNameButton, TimeSpan.FromSeconds(30), out var editNameButton) &&
+                editNameButton.TryGetCurrentPattern(ValuePattern.Pattern, out var objValuePattern) && objValuePattern is ValuePattern valuePattern)
+            {
+                valuePattern.SetValue(printName);
+            }
 
-        bool CheckEditNameButton(TreeWalker treeWalker, AutomationElement e)
-        {
-            return ReferenceEquals(e.Current.ControlType, ControlType.Button) &&
-                   string.IsNullOrEmpty(e.Current.Name) &&
-                   !e.Current.IsOffscreen &&
-                   ReferenceEquals(treeWalker.GetNextSibling(e)?.Current.ControlType, ControlType.Edit);
+            bool CheckWindow(TreeWalker treeWalker, AutomationElement e)
+            {
+                return e.Current.ProcessId == p.Id &&
+                       e.Current.Name?.Contains("Ultimaker Cura") == true;
+            }
+
+            bool CheckEditNameButton(TreeWalker treeWalker, AutomationElement e)
+            {
+                return ReferenceEquals(e.Current.ControlType, ControlType.Edit) && !e.Current.IsOffscreen;
+            }
         }
     }
 
@@ -87,9 +119,27 @@ public class CuraService : ICuraService
 
         Process.Start(new ProcessStartInfo
         {
-            FileName = Path.Combine(settings.CuraProgramFilesPath, "Cura.exe"),
+            FileName = GetCuraExecutableFilePath(settings) ?? throw new FileNotFoundException("Could not find cura executable."),
             Arguments = $"\"{fileName}\"",
         });
+    }
+
+    public bool AreCuraPathsCorrect(CuraManagerSettings settings)
+    {
+        return Directory.Exists(settings.CuraAppDataPath)
+            && Directory.Exists(settings.CuraProgramFilesPath)
+            && File.Exists(Path.Combine(settings.CuraAppDataPath, "cura.cfg"))
+            && (File.Exists(Path.Combine(settings.CuraProgramFilesPath, "Cura.exe")) || File.Exists(Path.Combine(settings.CuraProgramFilesPath, "Ultimaker-Cura.exe")));
+    }
+
+    private static string GetCuraExecutableFilePath(CuraManagerSettings settings)
+    {
+        string curaExecutableFile = Path.Combine(settings.CuraProgramFilesPath, "Ultimaker-Cura.exe");
+        if (!File.Exists(curaExecutableFile))
+            curaExecutableFile = Path.Combine(settings.CuraProgramFilesPath, "Cura.exe");
+        if (!File.Exists(curaExecutableFile))
+            curaExecutableFile = null;
+        return curaExecutableFile;
     }
 
     private static void SetCuraSaveDialogPath(string targetPath, CuraManagerSettings settings)
@@ -126,6 +176,9 @@ public class CuraService : ICuraService
 
     private static void UpdateCuraProjectConfigs(string fileName, CuraManagerSettings settings)
     {
+        string curaResourcesPath4x = Path.Combine(settings.CuraProgramFilesPath, "resources");
+        string curaResourcesPath5x = Path.Combine(settings.CuraProgramFilesPath, "share", "cura", "resources");
+
         using var file = ZipFile.Open(fileName, ZipArchiveMode.Update);
         foreach (var cf in file.Entries.Where(x => x.FullName.StartsWith("Cura/", StringComparison.OrdinalIgnoreCase) && x.Length > 0).ToArray())
         {
@@ -177,8 +230,10 @@ public class CuraService : ICuraService
             {
                 var escapedCfName = Uri.EscapeDataString(cf.Name).Replace("%20", "+");
                 var of = Directory.EnumerateFiles(settings.CuraAppDataPath, escapedCfName, SearchOption.AllDirectories).FirstOrDefault();
-                if (of == null)
-                    of = Directory.EnumerateFiles(Path.Combine(settings.CuraProgramFilesPath, "resources"), escapedCfName, SearchOption.AllDirectories).FirstOrDefault();
+                if (of == null && Directory.Exists(curaResourcesPath4x))
+                    of = Directory.EnumerateFiles(curaResourcesPath4x, escapedCfName, SearchOption.AllDirectories).FirstOrDefault();
+                if (of == null && Directory.Exists(curaResourcesPath5x))
+                    of = Directory.EnumerateFiles(curaResourcesPath5x, escapedCfName, SearchOption.AllDirectories).FirstOrDefault();
                 if (of == null)
                     continue;
 

@@ -112,10 +112,10 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="PageHeader_PrintProjects" xml:space="preserve">
     <value>Print Projects</value>
@@ -377,7 +377,7 @@ After pressing the button, the application is restarted.</value>
     <value>Project was created</value>
   </data>
   <data name="Msg_CuraPathsNotConfigured" xml:space="preserve">
-    <value>The cura paths are not configured correctly. Please make sure that under the configured AppData path a "cura.cfg"-file and under the ProgramFiles path the "Cura.exe"-file exists.</value>
+    <value>The cura paths are not configured correctly. Please make sure that under the configured AppData path a "cura.cfg"-file and under the ProgramFiles path the "Cura.exe"- or "Ultimaker-Cura.exe"-file exists.</value>
   </data>
   <data name="Prog_CreateCuraProject" xml:space="preserve">
     <value>Creating Cura project...</value>

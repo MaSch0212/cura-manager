@@ -484,7 +484,7 @@ namespace CuraManager.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The cura paths are not configured correctly. Please make sure that under the configured AppData path a &quot;cura.cfg&quot;-file and under the ProgramFiles path the &quot;Cura.exe&quot;-file exists..
+        ///   Looks up a localized string similar to The cura paths are not configured correctly. Please make sure that under the configured AppData path a &quot;cura.cfg&quot;-file and under the ProgramFiles path the &quot;Cura.exe&quot;- or &quot;Ultimaker-Cura.exe&quot;-file exists..
         /// </summary>
         internal static string Msg_CuraPathsNotConfigured {
             get {

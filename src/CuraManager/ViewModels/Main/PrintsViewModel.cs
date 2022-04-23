@@ -286,8 +286,7 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
     private async Task ExecuteNewCuraProject(PrintElement project)
     {
         var settings = _settingsService.LoadSettings();
-        if (!Directory.Exists(settings.CuraAppDataPath) || !Directory.Exists(settings.CuraProgramFilesPath) ||
-            !File.Exists(Path.Combine(settings.CuraAppDataPath, "cura.cfg")) || !File.Exists(Path.Combine(settings.CuraProgramFilesPath, "Cura.exe")))
+        if (!_curaService.AreCuraPathsCorrect(settings))
         {
             MessageBox.Show(_translationManager.GetTranslation(nameof(StringTable.Msg_CuraPathsNotConfigured)), "CuraManager", AlertButton.Ok, AlertImage.Warning);
         }
