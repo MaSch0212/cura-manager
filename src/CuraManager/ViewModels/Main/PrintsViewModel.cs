@@ -603,7 +603,7 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
     {
         if (e.PropertyName == nameof(PrintElement.IsArchived))
         {
-            if (ShowArchivedElements && ShowNonArchivedElements)
+            if (ShowArchivedElements && ShowNonArchivedElements && Application.Current.Dispatcher.Thread.ManagedThreadId == Environment.CurrentManagedThreadId)
                 PrintElementsViewSource.View.Refresh();
         }
     }
