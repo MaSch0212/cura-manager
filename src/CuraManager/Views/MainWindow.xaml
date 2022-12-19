@@ -97,15 +97,26 @@
                 </StackPanel>
             </mv:SplitView.MenuInfoAreaCollapsedTop>
         </mv:SplitView>
-        <TextBlock x:Name="DebugHint"
-                   Margin="0,-35,0,0"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Top"
-                   FontSize="24"
-                   FontWeight="Light"
-                   Foreground="Red"
-                   IsHitTestVisible="False"
-                   Text="Debug-Mode"
-                   Visibility="{Binding IsInDebugMode, Converter={StaticResource BoolToVisibility}}" />
+        <StackPanel Margin="0,-35,0,0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Top"
+                    Orientation="Horizontal"
+                    Visibility="{Binding IsInDebugMode, Converter={StaticResource BoolToVisibility}}">
+            <mct:IconPresenter Width="16"
+                               Height="16"
+                               Foreground="Red"
+                               Icon="{m:MaterialDesignIcon Icon=Alert}" />
+            <TextBlock x:Name="DebugHint"
+                       Margin="10,0"
+                       FontSize="24"
+                       FontWeight="Black"
+                       Foreground="Red"
+                       IsHitTestVisible="False"
+                       Text="Debug-Mode" />
+            <mct:IconPresenter Width="16"
+                               Height="16"
+                               Foreground="Red"
+                               Icon="{m:MaterialDesignIcon Icon=Alert}" />
+        </StackPanel>
     </Grid>
 </mct:Window>
