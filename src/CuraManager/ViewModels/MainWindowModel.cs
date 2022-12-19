@@ -34,7 +34,7 @@ public partial class MainWindowModel : ObservableObject, IMainWindowModel_Props
     {
         Process.Start(
             new ProcessStartInfo("https://github.com/MaSch0212/cura-manager/releases/latest")
-            {  
+            {
                 UseShellExecute = true,
             });
     }
