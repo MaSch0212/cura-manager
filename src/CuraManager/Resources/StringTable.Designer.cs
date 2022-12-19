@@ -430,6 +430,15 @@ namespace CuraManager.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Latest supported Cura version.
+        /// </summary>
+        internal static string LatestSupportedCuraVersion {
+            get {
+                return ResourceManager.GetString("LatestSupportedCuraVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 3D Model Files.
         /// </summary>
         internal static string ModelFiles {
@@ -822,6 +831,15 @@ namespace CuraManager.Resources {
         internal static string Rename {
             get {
                 return ResourceManager.GetString("Rename", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Version of Cura in the provided path.
+        /// </summary>
+        internal static string SelectedCuraVersion {
+            get {
+                return ResourceManager.GetString("SelectedCuraVersion", resourceCulture);
             }
         }
         
@@ -1219,6 +1237,24 @@ namespace CuraManager.Resources {
         internal static string UseSystemLanguage {
             get {
                 return ResourceManager.GetString("UseSystemLanguage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The version of Cura installed in the provided path is higher than the latest supported version. This might not be an issue, but be aware that there might be unforseen issues when creating a new Cura Project. You can also check if there is a new Version of CuraManager available that supports that version..
+        /// </summary>
+        internal static string Warn_CuraVersionNotSupported {
+            get {
+                return ResourceManager.GetString("Warn_CuraVersionNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Cura version could not be detected using the provided path..
+        /// </summary>
+        internal static string Warn_NoCuraVersionFound {
+            get {
+                return ResourceManager.GetString("Warn_NoCuraVersionFound", resourceCulture);
             }
         }
         

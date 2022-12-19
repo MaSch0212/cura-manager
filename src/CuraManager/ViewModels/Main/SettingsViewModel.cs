@@ -18,12 +18,14 @@ namespace CuraManager.ViewModels.Main;
 internal interface ISettingsViewModel_Props
 {
     CuraManagerSettings Settings { get; set; }
+    Version SelectedCuraVersion { get; set; }
 }
 
 public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsViewModel_Props
 {
     private readonly ISettingsService _settingsService;
     private readonly ITranslationManager _translationManager;
+    private readonly ICuraService _curaService;
 
     public ObservableTuple<int?, string>[] AvailableLanguages { get; set; }
 
@@ -40,6 +42,11 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
         }
     }
 
+    public Version LatestSupportedCuraVersion => _curaService?.LatestSupportedCuraVersion;
+
+    [DependsOn(nameof(SelectedCuraVersion))]
+    public bool? IsSupportedCuraVersionSelected => LatestSupportedCuraVersion == null ? null : SelectedCuraVersion <= LatestSupportedCuraVersion;
+
     public ICommand UndoCommand { get; }
     public ICommand SaveCommand { get; }
 
@@ -51,6 +58,7 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
         {
             ServiceContext.GetService(out _settingsService);
             ServiceContext.GetService(out _translationManager);
+            ServiceContext.GetService(out _curaService);
         }
 
         UndoCommand = new DelegateCommand(ExecuteUndo);
@@ -82,6 +90,22 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
         else if (result == AlertResult.Cancel)
         {
             e.Cancel = true;
+        }
+    }
+
+    partial void OnSettingsChanged(CuraManagerSettings previous, CuraManagerSettings value)
+    {
+        if (previous != null)
+            previous.PropertyChanged -= Settings_PropertyChanged;
+        value.PropertyChanged += Settings_PropertyChanged;
+        SelectedCuraVersion = _curaService.GetCuraVersion(value.CuraProgramFilesPath);
+    }
+
+    private void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(CuraManagerSettings.CuraProgramFilesPath) && sender is CuraManagerSettings settings)
+        {
+            SelectedCuraVersion = _curaService.GetCuraVersion(settings.CuraProgramFilesPath);
         }
     }
 

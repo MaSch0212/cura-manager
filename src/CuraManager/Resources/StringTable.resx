@@ -511,4 +511,16 @@ After pressing the button, the application is restarted.</value>
   <data name="ToolTip_Filter" xml:space="preserve">
     <value>Filter</value>
   </data>
+  <data name="LatestSupportedCuraVersion" xml:space="preserve">
+    <value>Latest supported Cura version</value>
+  </data>
+  <data name="SelectedCuraVersion" xml:space="preserve">
+    <value>Version of Cura in the provided path</value>
+  </data>
+  <data name="Warn_CuraVersionNotSupported" xml:space="preserve">
+    <value>The version of Cura installed in the provided path is higher than the latest supported version. This might not be an issue, but be aware that there might be unforseen issues when creating a new Cura Project. You can also check if there is a new Version of CuraManager available that supports that version.</value>
+  </data>
+  <data name="Warn_NoCuraVersionFound" xml:space="preserve">
+    <value>The Cura version could not be detected using the provided path.</value>
+  </data>
 </root>

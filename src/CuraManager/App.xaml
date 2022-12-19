@@ -44,6 +44,8 @@
             </DataTemplate>
 
             <Color x:Key="RedColor">#F01900</Color>
+            <Color x:Key="OrangeColor">#F4B300</Color>
+            <SolidColorBrush x:Key="OrangeBrush" Color="{DynamicResource OrangeColor}" />
 
             <DataTemplate x:Key="DefaultGridViewColumnHeader">
                 <TextBlock Margin="8,4" Text="{Binding}" />

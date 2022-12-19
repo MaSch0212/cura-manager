@@ -14,6 +14,8 @@ public class CuraService : ICuraService
 {
     private readonly ISettingsService _settingsService;
 
+    public Version LatestSupportedCuraVersion { get; } = new Version(5, 2, 1, 0);
+
     internal CuraService()
         : this(ServiceContext.GetService<ISettingsService>())
     {
@@ -46,7 +48,7 @@ public class CuraService : ICuraService
 
         SetCuraSaveDialogPath(element.DirectoryLocation, settings);
 
-        var curaPath = GetCuraExecutableFilePath(settings) ?? throw new FileNotFoundException("Could not find cura executable.");
+        var curaPath = GetCuraExecutableFilePath(settings.CuraProgramFilesPath) ?? throw new FileNotFoundException("Could not find cura executable.");
         var curaFileName = Path.GetFileNameWithoutExtension(curaPath);
 
         var p = Process.Start(new ProcessStartInfo
@@ -119,9 +121,29 @@ public class CuraService : ICuraService
 
         Process.Start(new ProcessStartInfo
         {
-            FileName = GetCuraExecutableFilePath(settings) ?? throw new FileNotFoundException("Could not find cura executable."),
+            FileName = GetCuraExecutableFilePath(settings.CuraProgramFilesPath) ?? throw new FileNotFoundException("Could not find cura executable."),
             Arguments = $"\"{fileName}\"",
         });
+    }
+
+    public Version GetCuraVersion(string curaPath)
+    {
+        if (curaPath is null or "")
+            return null;
+
+        var exePath = GetCuraExecutableFilePath(curaPath);
+        if (exePath is null)
+            return null;
+
+        var exeName = Path.GetFileName(exePath);
+        var versionFilePath = exePath;
+
+        if (!string.Equals(exeName, "cura.exe", StringComparison.OrdinalIgnoreCase))
+            versionFilePath = Path.Combine(Path.GetDirectoryName(exePath), "uninstall.exe");
+
+        if (!File.Exists(versionFilePath))
+            return null;
+        return Version.TryParse(FileVersionInfo.GetVersionInfo(versionFilePath).FileVersion, out Version v) ? v : null;
     }
 
     public bool AreCuraPathsCorrect(CuraManagerSettings settings)
@@ -132,11 +154,11 @@ public class CuraService : ICuraService
             && (File.Exists(Path.Combine(settings.CuraProgramFilesPath, "Cura.exe")) || File.Exists(Path.Combine(settings.CuraProgramFilesPath, "Ultimaker-Cura.exe")));
     }
 
-    private static string GetCuraExecutableFilePath(CuraManagerSettings settings)
+    private static string GetCuraExecutableFilePath(string curaPath)
     {
-        string curaExecutableFile = Path.Combine(settings.CuraProgramFilesPath, "Ultimaker-Cura.exe");
+        string curaExecutableFile = Path.Combine(curaPath, "Ultimaker-Cura.exe");
         if (!File.Exists(curaExecutableFile))
-            curaExecutableFile = Path.Combine(settings.CuraProgramFilesPath, "Cura.exe");
+            curaExecutableFile = Path.Combine(curaPath, "Cura.exe");
         if (!File.Exists(curaExecutableFile))
             curaExecutableFile = null;
         return curaExecutableFile;
