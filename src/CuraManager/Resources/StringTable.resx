@@ -523,4 +523,10 @@ After pressing the button, the application is restarted.</value>
   <data name="Warn_NoCuraVersionFound" xml:space="preserve">
     <value>The Cura version could not be detected using the provided path.</value>
   </data>
+  <data name="DownloadLatestVersion" xml:space="preserve">
+    <value>Update</value>
+  </data>
+  <data name="LatestVersion" xml:space="preserve">
+    <value>Latest version</value>
+  </data>
 </root>

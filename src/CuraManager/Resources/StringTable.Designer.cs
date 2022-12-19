@@ -304,6 +304,15 @@ namespace CuraManager.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Update.
+        /// </summary>
+        internal static string DownloadLatestVersion {
+            get {
+                return ResourceManager.GetString("DownloadLatestVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Drop some files here or use the plus button in the top right..
         /// </summary>
         internal static string DropFilesHereOrUseButton {
@@ -435,6 +444,15 @@ namespace CuraManager.Resources {
         internal static string LatestSupportedCuraVersion {
             get {
                 return ResourceManager.GetString("LatestSupportedCuraVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Latest version.
+        /// </summary>
+        internal static string LatestVersion {
+            get {
+                return ResourceManager.GetString("LatestVersion", resourceCulture);
             }
         }
         

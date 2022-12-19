@@ -61,15 +61,39 @@
                                Foreground="{m:ThemeValue Key=DisabledForegroundBrush}">
                         <Span xml:space="preserve"><Run Text="{m:Translation CurrentVersion}" />: <Run Text="{Binding Version}" /></Span>
                     </TextBlock>
+                    <StackPanel Visibility="{Binding IsUpdateAvailable, Converter={StaticResource BoolToVisibility}}">
+                        <TextBlock x:Name="LatestVersionNumber"
+                                   Margin="0,0,0,5"
+                                   HorizontalAlignment="Center"
+                                   FontSize="10"
+                                   Foreground="{m:ThemeValue Key=DisabledForegroundBrush}">
+                            <Span xml:space="preserve"><Run Text="{m:Translation LatestVersion}" />: <Run Text="{Binding LatestVersion}" /></Span>
+                        </TextBlock>
+                        <Button HorizontalAlignment="Center"
+                                Command="{Binding OpenLatestGithubReleaseCommand}"
+                                Content="{m:Translation DownloadLatestVersion}" />
+                    </StackPanel>
                 </StackPanel>
             </mv:SplitView.MenuInfoAreaExpandedTop>
             <mv:SplitView.MenuInfoAreaCollapsedTop>
                 <StackPanel Grid.Row="0">
                     <TextBlock Margin="0,5"
+                               HorizontalAlignment="Center"
                                FontSize="10"
                                Foreground="{m:ThemeValue Key=DisabledForegroundBrush}"
                                Text="{Binding Version}"
                                TextAlignment="Center" />
+                    <StackPanel Visibility="{Binding IsUpdateAvailable, Converter={StaticResource BoolToVisibility}}">
+                        <TextBlock Margin="0,0,0,5"
+                                   HorizontalAlignment="Center"
+                                   FontSize="10"
+                                   Foreground="{m:ThemeValue Key=DisabledForegroundBrush}"
+                                   Text="{Binding LatestVersion}" />
+                        <mct:IconButton Padding="10"
+                                        HorizontalAlignment="Center"
+                                        Command="{Binding OpenLatestGithubReleaseCommand}"
+                                        Icon="{m:MaterialDesignIcon Icon=CloudDownload}" />
+                    </StackPanel>
                 </StackPanel>
             </mv:SplitView.MenuInfoAreaCollapsedTop>
         </mv:SplitView>

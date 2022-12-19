@@ -523,4 +523,10 @@ Nach dem Drücken der Schaltfläche wird die Anwendung neu gestartet.</value>
   <data name="Warn_NoCuraVersionFound" xml:space="preserve">
     <value>Die Cura-Version konnte anhand des angegebenen Pfades nicht ermittelt werden.</value>
   </data>
+  <data name="DownloadLatestVersion" xml:space="preserve">
+    <value>Aktualisieren</value>
+  </data>
+  <data name="LatestVersion" xml:space="preserve">
+    <value>Neueste Version</value>
+  </data>
 </root>

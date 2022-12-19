@@ -6,6 +6,7 @@ The following changes were made in this version:
 | bugfix | Fixed an error that occured when reloading all models. |
 | feature | Added Cura version check to the setting page. |
 | feature | CuraManager now officially supports Cura version 5.2.1. |
+| feature | CuraManager now checks if a newer version is available on startup. |
 
 
 [comment]: # (Use one of the following types: feature, bugfix, tech)
