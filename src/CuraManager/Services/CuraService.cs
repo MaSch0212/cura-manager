@@ -100,7 +100,7 @@ public class CuraService : ICuraService
             bool CheckWindow(TreeWalker treeWalker, AutomationElement e)
             {
                 return e.Current.ProcessId == p.Id &&
-                       e.Current.Name?.Contains("Ultimaker Cura") == true;
+                       e.Current.Name?.Contains("Ultimaker Cura", StringComparison.OrdinalIgnoreCase) == true;
             }
 
             bool CheckEditNameButton(TreeWalker treeWalker, AutomationElement e)
