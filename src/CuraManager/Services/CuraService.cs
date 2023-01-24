@@ -14,7 +14,7 @@ public class CuraService : ICuraService
 {
     private readonly ISettingsService _settingsService;
 
-    public Version LatestSupportedCuraVersion { get; } = new Version(5, 2, 1, 0);
+    public Version LatestSupportedCuraVersion { get; } = new Version(5, 2, 2, 0);
 
     internal CuraService()
         : this(ServiceContext.GetService<ISettingsService>())
