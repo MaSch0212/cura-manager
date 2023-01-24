@@ -16,7 +16,7 @@
     <ApplicationIcon>../../resources/CuraManager.ico</ApplicationIcon>
     
     <!-- Package Info -->
-    <Version>1.4.2</Version>
+    <Version>1.5.0</Version>
     <Authors>Marc Schmidt</Authors>
     <Copyright>Copyright © 2019 - $([System.DateTime]::Now.ToString('yyyy')) $(Authors)</Copyright>
     <SupportedOSPlatform>windows</SupportedOSPlatform>
