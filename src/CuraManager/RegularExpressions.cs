@@ -13,5 +13,8 @@
 
         [GeneratedRegex("""https?:\/\/(www\.)?thingiverse\.com\/thing:\d+""")]
         public static partial Regex ThingiverseUrl();
+
+        [GeneratedRegex("""\d+(\.\d+){0,3}""")]
+        public static partial Regex Version();
     }
 }

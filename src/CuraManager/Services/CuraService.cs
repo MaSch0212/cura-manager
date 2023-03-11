@@ -143,7 +143,7 @@ public class CuraService : ICuraService
             versionFilePath = Path.Combine(Path.GetDirectoryName(exePath), "uninstall.exe");
 
         if (File.Exists(versionFilePath))
-            return Version.TryParse(FileVersionInfo.GetVersionInfo(versionFilePath).FileVersion, out Version v) ? v : null;
+            return VersionExtensions.SafeParse(FileVersionInfo.GetVersionInfo(versionFilePath).FileVersion);
 
         var curaVersionPy = Path.Combine(Path.GetDirectoryName(exePath), "cura", "CuraVersion.py");
         if (File.Exists(curaVersionPy))

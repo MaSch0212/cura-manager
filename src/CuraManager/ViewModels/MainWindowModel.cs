@@ -55,8 +55,8 @@ public partial class MainWindowModel : ObservableObject, IMainWindowModel_Props
         if (!match.Success)
             return;
 
-        var current = System.Version.TryParse(Version, out var cv) ? cv.Normalize() : null;
-        var latest = System.Version.TryParse(match.Groups["version"].Value, out var lv) ? lv.Normalize() : null;
+        var current = VersionExtensions.SafeParse(Version);
+        var latest = VersionExtensions.SafeParse(match.Groups["version"].Value);
 
         Application.Current.Dispatcher.Invoke(() =>
         {
