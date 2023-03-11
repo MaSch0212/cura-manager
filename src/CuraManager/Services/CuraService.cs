@@ -13,6 +13,9 @@ namespace CuraManager.Services;
 
 public class CuraService : ICuraService
 {
+    private static readonly string ProgramFilesDir = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+    private static readonly string AppDataDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+
     private readonly ISettingsService _settingsService;
 
     public Version LatestSupportedCuraVersion { get; } = new Version(5, 3, 0, 0);
@@ -158,10 +161,46 @@ public class CuraService : ICuraService
 
     public bool AreCuraPathsCorrect(CuraManagerSettings settings)
     {
-        return Directory.Exists(settings.CuraAppDataPath)
-            && Directory.Exists(settings.CuraProgramFilesPath)
-            && File.Exists(Path.Combine(settings.CuraAppDataPath, "cura.cfg"))
-            && (File.Exists(Path.Combine(settings.CuraProgramFilesPath, "Cura.exe")) || File.Exists(Path.Combine(settings.CuraProgramFilesPath, "Ultimaker-Cura.exe")));
+        return CheckCuraAppDataPath(settings.CuraAppDataPath)
+            && CheckCuraProgramFilesPath(settings.CuraProgramFilesPath);
+    }
+
+    public IEnumerable<CuraVersion> FindAvailableCuraVersions()
+    {
+        return from programDir in Directory.EnumerateDirectories(ProgramFilesDir)
+               let programName = Path.GetFileName(programDir)
+               where programName.Contains("ultimaker", StringComparison.OrdinalIgnoreCase)
+                  && programName.Contains("cura", StringComparison.OrdinalIgnoreCase)
+                  && CheckCuraProgramFilesPath(programDir)
+               let curaVersion = GetCuraVersion(programDir)
+               where curaVersion != null
+               let curaAppDataPath = FindAppDataDir(curaVersion)
+               where curaAppDataPath != null
+               select new CuraVersion(curaVersion, programName, programDir, curaAppDataPath, curaVersion <= LatestSupportedCuraVersion);
+
+        static string FindAppDataDir(Version curaVersion)
+        {
+            for (int i = 4; i > 0; i--)
+            {
+                var path = Path.Combine(AppDataDir, "cura", curaVersion.ToString(i));
+                if (CheckCuraAppDataPath(path))
+                    return path;
+            }
+
+            return null;
+        }
+    }
+
+    private static bool CheckCuraAppDataPath(string appDataPath)
+    {
+        return Directory.Exists(appDataPath)
+            && File.Exists(Path.Combine(appDataPath, "cura.cfg"));
+    }
+
+    private static bool CheckCuraProgramFilesPath(string programFilesPath)
+    {
+        return Directory.Exists(programFilesPath)
+            && (File.Exists(Path.Combine(programFilesPath, "Cura.exe")) || File.Exists(Path.Combine(programFilesPath, "Ultimaker-Cura.exe")));
     }
 
     private static string GetCuraExecutableFilePath(string curaPath)

@@ -11,4 +11,5 @@ public interface ICuraService
     void OpenCuraProject(string fileName);
     bool AreCuraPathsCorrect(CuraManagerSettings settings);
     Version GetCuraVersion(string curaPath);
+    IEnumerable<CuraVersion> FindAvailableCuraVersions();
 }

@@ -19,6 +19,10 @@ internal interface ISettingsViewModel_Props
 {
     CuraManagerSettings Settings { get; set; }
     Version SelectedCuraVersion { get; set; }
+
+    CuraVersion[] AvailableVersions { get; set; }
+    CuraVersion SelectedAvailableVersion { get; set; }
+    bool IsLoadingVersions { get; set; }
 }
 
 public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsViewModel_Props
@@ -51,6 +55,7 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
     public ICommand SaveCommand { get; }
 
     public ICommand BrowseDirectoryCommand { get; }
+    public ICommand ReloadAvailableVersionsCommand { get; }
 
     public SettingsViewModel()
     {
@@ -64,14 +69,14 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
         UndoCommand = new DelegateCommand(ExecuteUndo);
         SaveCommand = new DelegateCommand(ExecuteSave);
         BrowseDirectoryCommand = new DelegateCommand<string>(ExecuteBrowseDirectory);
+        ReloadAvailableVersionsCommand = new AsyncDelegateCommand(async () => await RebuildAvailableVersionsAsync(true));
     }
 
     public override async Task OnOpen(CancelEventArgs e)
     {
         RebuildAvailableLanguages();
-
         Settings = _settingsService.LoadSettings();
-
+        await RebuildAvailableVersionsAsync(false);
         await base.OnOpen(e);
     }
 
@@ -99,6 +104,15 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
             previous.PropertyChanged -= Settings_PropertyChanged;
         value.PropertyChanged += Settings_PropertyChanged;
         SelectedCuraVersion = _curaService.GetCuraVersion(value.CuraProgramFilesPath);
+    }
+
+    partial void OnSelectedAvailableVersionChanged(CuraVersion previous, CuraVersion value)
+    {
+        if (value?.Version != null)
+        {
+            Settings.CuraAppDataPath = value.AppDataPath;
+            Settings.CuraProgramFilesPath = value.ProgramFilesPath;
+        }
     }
 
     private void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -172,6 +186,26 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
         else
         {
             AvailableLanguages[0].Item2 = osLangEntry;
+        }
+    }
+
+    private async Task RebuildAvailableVersionsAsync(bool force)
+    {
+        if (AvailableVersions != null && !force)
+            return;
+
+        IsLoadingVersions = true;
+        try
+        {
+            AvailableVersions = await _curaService.FindAvailableCuraVersions().Prepend(new CuraVersion(null, null, null, null, true)).ToArrayAsync();
+            SelectedAvailableVersion = AvailableVersions.FirstOrDefault(x =>
+                string.Equals(x.AppDataPath, Settings.CuraAppDataPath, StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(x.ProgramFilesPath, Settings.CuraProgramFilesPath, StringComparison.OrdinalIgnoreCase))
+                ?? AvailableVersions[0];
+        }
+        finally
+        {
+            IsLoadingVersions = false;
         }
     }
 

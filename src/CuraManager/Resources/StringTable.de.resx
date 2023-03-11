@@ -529,4 +529,19 @@ Nach dem Drücken der Schaltfläche wird die Anwendung neu gestartet.</value>
   <data name="LatestVersion" xml:space="preserve">
     <value>Neueste Version</value>
   </data>
+  <data name="ApplicationSettings" xml:space="preserve">
+    <value>Anwendungseinstellungen</value>
+  </data>
+  <data name="CuraSettings" xml:space="preserve">
+    <value>Cura-Einstellungen</value>
+  </data>
+  <data name="CustomCuraVersion" xml:space="preserve">
+    <value>Benutzerdefinierte Version</value>
+  </data>
+  <data name="CuraVersion" xml:space="preserve">
+    <value>Cura Version</value>
+  </data>
+  <data name="UnsupportedCuraVersion" xml:space="preserve">
+    <value>Diese Cura Version wird nicht offiziell unterstützt.</value>
+  </data>
 </root>

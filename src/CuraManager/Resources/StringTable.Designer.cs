@@ -70,6 +70,15 @@ namespace CuraManager.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Application Settings.
+        /// </summary>
+        internal static string ApplicationSettings {
+            get {
+                return ResourceManager.GetString("ApplicationSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Application Theme.
         /// </summary>
         internal static string ApplicationTheme {
@@ -214,11 +223,38 @@ namespace CuraManager.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cura Settings.
+        /// </summary>
+        internal static string CuraSettings {
+            get {
+                return ResourceManager.GetString("CuraSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cura Version.
+        /// </summary>
+        internal static string CuraVersion {
+            get {
+                return ResourceManager.GetString("CuraVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Current version.
         /// </summary>
         internal static string CurrentVersion {
             get {
                 return ResourceManager.GetString("CurrentVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Custom Version.
+        /// </summary>
+        internal static string CustomCuraVersion {
+            get {
+                return ResourceManager.GetString("CustomCuraVersion", resourceCulture);
             }
         }
         
@@ -1200,6 +1236,15 @@ namespace CuraManager.Resources {
         internal static string ToolTip_UndoAll {
             get {
                 return ResourceManager.GetString("ToolTip_UndoAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This Cura version is not officially supported..
+        /// </summary>
+        internal static string UnsupportedCuraVersion {
+            get {
+                return ResourceManager.GetString("UnsupportedCuraVersion", resourceCulture);
             }
         }
         
