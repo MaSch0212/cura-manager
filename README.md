@@ -10,10 +10,12 @@ Just download and extract the ZIP file from the [latest release](https://github.
 The first time you start the application, you need to provide the following settings:
 - **Print projects folder location**<br>
   Select a folder in which the print projects and all 3D models should be created. This can be some local folder, a Windows share or a folder that is used for some cloud storage provider like Microsoft OneDrive.
-- **Cura AppData location**<br>
-  Select the AppData folder to the Cura version you want to use with CuraManager. This is normally in a folder like this: `C:\Users\<username>\AppData\Roaming\cura\<version>`.
-- **Cura ProgramFiles location**<br>
-  Select the installation directory of the Cura version you want to use with CuraManager. This is normally in a folder like this: `C:\Program Files\Ultimaker Cura <version>`.
+- **Cura version**<br>
+  Select the version of UltiMaker Cura that should be used by CuraManager. If the version you want to use is not listed, you can also select "Custom Version" and then provide the following paths manually:
+  - **Cura AppData location**<br>
+    Select the AppData folder to the Cura version you want to use with CuraManager. This is normally in a folder like this: `C:\Users\<username>\AppData\Roaming\cura\<version>`.
+  - **Cura ProgramFiles location**<br>
+    Select the installation directory of the Cura version you want to use with CuraManager. This is normally in a folder like this: `C:\Program Files\Ultimaker Cura <version>`.
 
 ![Settings](resources/images/settings.png)
 
