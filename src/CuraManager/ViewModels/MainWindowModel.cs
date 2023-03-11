@@ -1,4 +1,5 @@
-﻿using MaSch.Presentation.Wpf.Commands;
+﻿using CuraManager.Extensions;
+using MaSch.Presentation.Wpf.Commands;
 using System.Net.Http;
 using System.Windows;
 using System.Windows.Input;
@@ -50,29 +51,17 @@ public partial class MainWindowModel : ObservableObject, IMainWindowModel_Props
         if (location is null)
             return;
 
-        var match = Regex.Match(location, @"release-(?<version>[0-9]+(\.[0-9]+){0,3})$");
+        var match = RegularExpressions.ExtractVersionFromReleaseTag().Match(location);
         if (!match.Success)
             return;
 
-        var current = Normalize(Version);
-        var latest = Normalize(match.Groups["version"].Value);
+        var current = System.Version.TryParse(Version, out var cv) ? cv.Normalize() : null;
+        var latest = System.Version.TryParse(match.Groups["version"].Value, out var lv) ? lv.Normalize() : null;
 
         Application.Current.Dispatcher.Invoke(() =>
         {
             LatestVersion = latest.ToString(latest.Revision > 0 ? 4 : 3);
             IsUpdateAvailable = latest > current;
         });
-    }
-
-    private Version Normalize(string version)
-    {
-        if (!System.Version.TryParse(version, out var v))
-            return null;
-
-        return new Version(
-            Math.Max(v.Major, 0),
-            Math.Max(v.Minor, 0),
-            Math.Max(v.Build, 0),
-            Math.Max(v.Revision, 0));
     }
 }

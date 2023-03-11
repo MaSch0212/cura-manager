@@ -11,7 +11,6 @@ namespace CuraManager.Services.WebProviders;
 
 public class ThingiverseProvider : IWebProvider
 {
-    private static readonly Regex LinkRegex = new(@"https?:\/\/(www\.)?thingiverse\.com\/thing:[0-9]+", RegexOptions.Compiled);
     private readonly HttpClient _httpClient = new();
 
     public ICollection<string> SupportedHosts { get; } = new[] { "www.thingiverse.com" };
@@ -43,7 +42,7 @@ public class ThingiverseProvider : IWebProvider
 
     private static Uri GetDownloadUrl(Uri webAddress)
     {
-        var match = LinkRegex.Match(webAddress.AbsoluteUri);
+        var match = RegularExpressions.ThingiverseUrl().Match(webAddress.AbsoluteUri);
         if (!match.Success)
             throw new WebProviderException(ServiceContext.GetService<ITranslationManager>().GetTranslation(nameof(StringTable.Msg_WrongThingiverseUrl)));
 

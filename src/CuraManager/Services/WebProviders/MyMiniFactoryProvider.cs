@@ -11,7 +11,6 @@ namespace CuraManager.Services.WebProviders;
 
 public class MyMiniFactoryProvider : IWebProvider
 {
-    private static readonly Regex IdRegex = new(@"(?<id>[0-9]+)\/?\Z", RegexOptions.Compiled);
     private readonly WebClient _webClient = new();
 
     public ICollection<string> SupportedHosts { get; } = new[] { "www.myminifactory.com" };
@@ -56,7 +55,7 @@ public class MyMiniFactoryProvider : IWebProvider
     {
         var builder = new UriBuilder(webAddress);
 
-        var id = IdRegex.Match(webAddress.AbsoluteUri).Groups["id"].Value;
+        var id = RegularExpressions.MyMiniFactoryId().Match(webAddress.AbsoluteUri).Groups["id"].Value;
         builder.Path = $"/download/{id}";
 
         return builder.Uri;

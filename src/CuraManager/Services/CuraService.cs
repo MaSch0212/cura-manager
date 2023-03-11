@@ -1,4 +1,5 @@
-﻿using CuraManager.Models;
+﻿using CuraManager.Extensions;
+using CuraManager.Models;
 using CuraManager.Views;
 using IniParser;
 using IniParser.Model;
@@ -14,7 +15,7 @@ public class CuraService : ICuraService
 {
     private readonly ISettingsService _settingsService;
 
-    public Version LatestSupportedCuraVersion { get; } = new Version(5, 2, 2, 0);
+    public Version LatestSupportedCuraVersion { get; } = new Version(5, 3, 0, 0);
 
     internal CuraService()
         : this(ServiceContext.GetService<ISettingsService>())
@@ -141,9 +142,18 @@ public class CuraService : ICuraService
         if (!string.Equals(exeName, "cura.exe", StringComparison.OrdinalIgnoreCase))
             versionFilePath = Path.Combine(Path.GetDirectoryName(exePath), "uninstall.exe");
 
-        if (!File.Exists(versionFilePath))
-            return null;
-        return Version.TryParse(FileVersionInfo.GetVersionInfo(versionFilePath).FileVersion, out Version v) ? v : null;
+        if (File.Exists(versionFilePath))
+            return Version.TryParse(FileVersionInfo.GetVersionInfo(versionFilePath).FileVersion, out Version v) ? v : null;
+
+        var curaVersionPy = Path.Combine(Path.GetDirectoryName(exePath), "cura", "CuraVersion.py");
+        if (File.Exists(curaVersionPy))
+        {
+            var versionMatch = RegularExpressions.ExtractCuraVersionFromPython().Match(File.ReadAllText(curaVersionPy));
+            if (versionMatch.Success)
+                return Version.Parse(versionMatch.Groups["version"].Value).Normalize();
+        }
+
+        return null;
     }
 
     public bool AreCuraPathsCorrect(CuraManagerSettings settings)
