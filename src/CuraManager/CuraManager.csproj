@@ -16,9 +16,9 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <OutputType>WinExe</OutputType>
     <ApplicationIcon>../../resources/CuraManager.ico</ApplicationIcon>
-    
+
     <!-- Package Info -->
-    <Version>1.6.3</Version>
+    <Version>1.7.0</Version>
     <Authors>Marc Schmidt</Authors>
     <Copyright>Copyright © 2019 - $([System.DateTime]::Now.ToString('yyyy')) $(Authors)</Copyright>
     <SupportedOSPlatform>windows</SupportedOSPlatform>
@@ -57,7 +57,7 @@
     <PackageReference Include="MaSch.Presentation.Wpf.MaterialDesign" Version="0.3.0" />
     <PackageReference Include="MaSch.Presentation.Wpf.Themes" Version="0.2.1" />
   </ItemGroup>
-  
+
   <ItemGroup Condition=" '$(MASCH_SOURCES)' != '' and '$(Configuration)' == 'Debug_MaSchLocal' ">
     <ProjectReference Include="$(MASCH_SOURCES)\src\Generators\MaSch.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="$(MASCH_SOURCES)\src\Native.Windows\MaSch.Native.Windows.csproj" />
@@ -67,7 +67,7 @@
     <ProjectReference Include="$(MASCH_SOURCES)\src\Presentation.Wpf.MaterialDesign\MaSch.Presentation.Wpf.MaterialDesign.csproj" />
     <ProjectReference Include="$(MASCH_SOURCES)\src\Presentation.Wpf.Themes\MaSch.Presentation.Wpf.Themes.csproj" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="CSharpier.MsBuild" Version="0.28.0">
       <PrivateAssets>all</PrivateAssets>
