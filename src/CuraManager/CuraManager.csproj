@@ -48,12 +48,12 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(MASCH_SOURCES)' == '' or '$(Configuration)' != 'Debug_MaSchLocal' ">
-    <PackageReference Include="MaSch.Generators" Version="0.3.2" />
-    <PackageReference Include="MaSch.Native.Windows" Version="0.1.2" />
-    <PackageReference Include="MaSch.Presentation" Version="0.2.3" />
-    <PackageReference Include="MaSch.Presentation.Wpf.Controls" Version="0.2.5" />
-    <PackageReference Include="MaSch.Presentation.Wpf.MaterialDesign" Version="0.1.7" />
-    <PackageReference Include="MaSch.Presentation.Wpf.Themes" Version="0.1.11" />
+    <PackageReference Include="MaSch.Generators" Version="0.3.4" />
+    <PackageReference Include="MaSch.Native.Windows" Version="0.1.4" />
+    <PackageReference Include="MaSch.Presentation" Version="0.2.5" />
+    <PackageReference Include="MaSch.Presentation.Wpf.Controls" Version="0.2.9" />
+    <PackageReference Include="MaSch.Presentation.Wpf.MaterialDesign" Version="0.3.0" />
+    <PackageReference Include="MaSch.Presentation.Wpf.Themes" Version="0.2.1" />
   </ItemGroup>
   
   <ItemGroup Condition=" '$(MASCH_SOURCES)' != '' and '$(Configuration)' == 'Debug_MaSchLocal' ">
@@ -67,19 +67,19 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="6.0.0">
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.39" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.60" />
     <PackageReference Include="ini-parser-netstandard" Version="2.5.2" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.376">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="System.IO.Compression" Version="4.3.0" />
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="8.0.4" />
   </ItemGroup>
 
   <ItemGroup>
