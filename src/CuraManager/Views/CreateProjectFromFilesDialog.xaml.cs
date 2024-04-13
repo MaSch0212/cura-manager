@@ -1,11 +1,11 @@
-﻿using CuraManager.Models;
-using CuraManager.Resources;
-using MaSch.Presentation.Translation;
-using Microsoft.Win32;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
+using CuraManager.Models;
+using CuraManager.Resources;
+using MaSch.Presentation.Translation;
+using Microsoft.Win32;
 using MessageBox = MaSch.Presentation.Wpf.MessageBox;
 
 namespace CuraManager.Views;
@@ -28,7 +28,9 @@ public partial class CreateProjectFromFilesDialog : ICreateProjectFromFilesDialo
         ServiceContext.GetService(out _translationManager);
 
         _targetPath = targetPath;
-        Files = new ObservableCollection<PrintElementFile>(files?.Select(x => new PrintElementFile(x)) ?? Array.Empty<PrintElementFile>());
+        Files = new ObservableCollection<PrintElementFile>(
+            files?.Select(x => new PrintElementFile(x)) ?? Array.Empty<PrintElementFile>()
+        );
 
         InitializeComponent();
     }
@@ -37,19 +39,48 @@ public partial class CreateProjectFromFilesDialog : ICreateProjectFromFilesDialo
     {
         if (string.IsNullOrEmpty(ProjectName))
         {
-            MessageBox.Show(this, _translationManager.GetTranslation(nameof(StringTable.Msg_SpecifyProjectName)), "CuraManager", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(
+                this,
+                _translationManager.GetTranslation(nameof(StringTable.Msg_SpecifyProjectName)),
+                "CuraManager",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information
+            );
             return;
         }
 
         if (!Files.Any())
         {
-            MessageBox.Show(this, _translationManager.GetTranslation(nameof(StringTable.Msg_AddAtLeastOneFileToProject)), "CuraManager", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(
+                this,
+                _translationManager.GetTranslation(
+                    nameof(StringTable.Msg_AddAtLeastOneFileToProject)
+                ),
+                "CuraManager",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information
+            );
             return;
         }
 
-        if (Directory.EnumerateDirectories(_targetPath, "*", SearchOption.TopDirectoryOnly).Any(x => string.Equals(Path.GetFileName(x), ProjectName)))
+        if (
+            Directory
+                .EnumerateDirectories(_targetPath, "*", SearchOption.TopDirectoryOnly)
+                .Any(x => string.Equals(Path.GetFileName(x), ProjectName))
+        )
         {
-            MessageBox.Show(this, string.Format(_translationManager.GetTranslation(nameof(StringTable.Msg_ProjectAlreadyExists)), ProjectName), "CuraManager", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(
+                this,
+                string.Format(
+                    _translationManager.GetTranslation(
+                        nameof(StringTable.Msg_ProjectAlreadyExists)
+                    ),
+                    ProjectName
+                ),
+                "CuraManager",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information
+            );
             return;
         }
 
@@ -73,10 +104,7 @@ public partial class CreateProjectFromFilesDialog : ICreateProjectFromFilesDialo
 
     private void AddFilesButton_OnClick(object sender, RoutedEventArgs e)
     {
-        var ofd = new OpenFileDialog
-        {
-            Multiselect = true,
-        };
+        var ofd = new OpenFileDialog { Multiselect = true, };
         if (ofd.ShowDialog(Application.Current.MainWindow) == true)
         {
             Files.Add(ofd.FileNames.Select(x => new PrintElementFile(x)));
@@ -106,10 +134,18 @@ public partial class CreateProjectFromFilesDialog : ICreateProjectFromFilesDialo
 
         foreach (var file in Files)
         {
-            var targetPath = Path.Combine(result.DirectoryLocation, Path.GetFileName(file.FilePath) ?? string.Empty);
+            var targetPath = Path.Combine(
+                result.DirectoryLocation,
+                Path.GetFileName(file.FilePath) ?? string.Empty
+            );
             for (int i = 2; File.Exists(targetPath); i++)
             {
-                targetPath = Path.Combine(result.DirectoryLocation, Path.GetFileNameWithoutExtension(file.FilePath) + $" ({i})" + Path.GetExtension(file.FilePath));
+                targetPath = Path.Combine(
+                    result.DirectoryLocation,
+                    Path.GetFileNameWithoutExtension(file.FilePath)
+                        + $" ({i})"
+                        + Path.GetExtension(file.FilePath)
+                );
             }
 
             await Task.Run(() => File.Copy(file.FilePath, targetPath));

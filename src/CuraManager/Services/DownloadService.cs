@@ -1,4 +1,4 @@
-﻿using CuraManager.Models;
+using CuraManager.Models;
 using CuraManager.Services.WebProviders;
 
 namespace CuraManager.Services;
@@ -11,10 +11,12 @@ public class DownloadService : IDownloadService
 
     public DownloadService(IEnumerable<IWebProvider> providers)
     {
-        _providers = (from p in providers
-                      from h in p.SupportedHosts
-                      group p by h into g
-                      select (key: g.Key.ToLower(), value: g.First())).ToDictionary(x => x.key, x => x.value);
+        _providers = (
+            from p in providers
+            from h in p.SupportedHosts
+            group p by h into g
+            select (key: g.Key.ToLower(), value: g.First())
+        ).ToDictionary(x => x.key, x => x.value);
     }
 
     public Task<string> GetProjectName(Uri webAddress)

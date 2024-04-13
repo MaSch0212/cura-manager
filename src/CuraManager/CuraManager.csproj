@@ -7,8 +7,10 @@
     <UseWindowsForms>true</UseWindowsForms>
     <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
     <OutputPath>../../bin/$(Configuration)</OutputPath>
-    <CodeAnalysisRuleSet>../../build/CuraManager.ruleset</CodeAnalysisRuleSet>
     <Nullable>disable</Nullable>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1591</NoWarn>
 
     <!-- Output info -->
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -67,6 +69,10 @@
   </ItemGroup>
   
   <ItemGroup>
+    <PackageReference Include="CSharpier.MsBuild" Version="0.28.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -74,10 +80,6 @@
     <PackageReference Include="HtmlAgilityPack" Version="1.11.60" />
     <PackageReference Include="ini-parser-netstandard" Version="2.5.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.376">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="System.IO.Compression" Version="4.3.0" />
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="8.0.4" />
   </ItemGroup>

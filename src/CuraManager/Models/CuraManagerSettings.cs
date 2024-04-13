@@ -1,4 +1,4 @@
-﻿using MaSch.Presentation.Wpf;
+using MaSch.Presentation.Wpf;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -13,11 +13,14 @@ internal interface ICuraManagerSettings_Props
     bool UpdateCuraProjectsOnOpen { get; set; }
     int? Language { get; set; }
     bool ShowWebDialogWhenAddingLink { get; set; }
+
     [JsonConverter(typeof(StringEnumConverter))]
     DefaultTheme Theme { get; set; }
 }
 
-public partial class CuraManagerSettings : ObservableChangeTrackingObject, ICuraManagerSettings_Props
+public partial class CuraManagerSettings
+    : ObservableChangeTrackingObject,
+        ICuraManagerSettings_Props
 {
     public CuraManagerSettings()
     {

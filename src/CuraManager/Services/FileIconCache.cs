@@ -1,14 +1,15 @@
-﻿using CuraManager.Extensions;
-using MaSch.Native.Windows.Explorer;
 using System.IO;
 using System.Windows.Media;
+using CuraManager.Extensions;
+using MaSch.Native.Windows.Explorer;
 
 namespace CuraManager.Services;
 
 public class FileIconCache : IFileIconCache
 {
     private readonly object _cacheLock = new object();
-    private readonly IDictionary<string, ImageSource> _cache = new Dictionary<string, ImageSource>();
+    private readonly IDictionary<string, ImageSource> _cache =
+        new Dictionary<string, ImageSource>();
 
     public ImageSource GetFileIcon(string filePath)
     {
@@ -19,7 +20,10 @@ public class FileIconCache : IFileIconCache
         {
             if (!_cache.TryGetValue(extension, out result))
             {
-                var icon = MaSch.Native.Windows.Explorer.FileInfo.GetIconFromFile(filePath, IconSize.Jumbo);
+                var icon = MaSch.Native.Windows.Explorer.FileInfo.GetIconFromFile(
+                    filePath,
+                    IconSize.Jumbo
+                );
                 result = icon.ToImageSource();
                 _cache.Add(extension, result);
             }

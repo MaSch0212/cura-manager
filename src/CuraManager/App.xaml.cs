@@ -1,12 +1,12 @@
-﻿using CuraManager.Resources;
+using System.Windows;
+using System.Windows.Markup;
+using CuraManager.Resources;
 using CuraManager.Services;
 using CuraManager.Services.WebProviders;
 using CuraManager.Views;
 using MaSch.Presentation;
 using MaSch.Presentation.Translation;
 using MaSch.Presentation.Wpf;
-using System.Windows;
-using System.Windows.Markup;
 using MessageBox = System.Windows.MessageBox;
 
 namespace CuraManager;
@@ -34,14 +34,14 @@ public partial class App
         }
     }
 
-    private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+    private void App_DispatcherUnhandledException(
+        object sender,
+        System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e
+    )
     {
         try
         {
-            var wdw = new ExceptionView
-            {
-                ExceptionToDisplay = e.Exception,
-            };
+            var wdw = new ExceptionView { ExceptionToDisplay = e.Exception, };
             wdw.ShowDialog();
         }
         catch
@@ -76,18 +76,22 @@ public partial class App
         ServiceContext.AddService<IPrintsService>(new PrintsService());
         ServiceContext.AddService<IFileIconCache>(new FileIconCache());
 
-        ServiceContext.AddService<IDownloadService>(new DownloadService(new IWebProvider[]
-        {
-            new ThingiverseProvider(),
-
-            // Disabled MyMiniFactory because it requires a login now for direct download links.
-            // new MyMiniFactoryProvider(),
-            new YouMagineProvider(),
-        }));
+        ServiceContext.AddService<IDownloadService>(
+            new DownloadService(
+                new IWebProvider[]
+                {
+                    new ThingiverseProvider(),
+                    // Disabled MyMiniFactory because it requires a login now for direct download links.
+                    // new MyMiniFactoryProvider(),
+                    new YouMagineProvider(),
+                }
+            )
+        );
 
         var settings = settingsService.LoadSettings();
         if (settings.Language.HasValue)
-            ServiceContext.GetService<ITranslationManager>().CurrentLanguage = CultureInfo.GetCultureInfo(settings.Language.Value);
+            ServiceContext.GetService<ITranslationManager>().CurrentLanguage =
+                CultureInfo.GetCultureInfo(settings.Language.Value);
     }
 
     private void InitializeTranslationManager()
@@ -105,7 +109,12 @@ public partial class App
                 _ => "English",
             };
 
-            var resourceDictionary = new ResourceDictionary { Source = new Uri($"pack://application:,,,/MaSch.Presentation.Wpf.Themes;component/Languages/{langName}.xaml") };
+            var resourceDictionary = new ResourceDictionary
+            {
+                Source = new Uri(
+                    $"pack://application:,,,/MaSch.Presentation.Wpf.Themes;component/Languages/{langName}.xaml"
+                )
+            };
             if (_languageResDictIndex < 0)
             {
                 Resources.MergedDictionaries.Add(resourceDictionary);
@@ -125,7 +134,9 @@ public partial class App
 
     public static string GetCurrentVersion(bool formatted)
     {
-        var v = Version.Parse(AssemblyVersionType.AssemblyFileVersion.GetVersion(typeof(App).Assembly));
+        var v = Version.Parse(
+            AssemblyVersionType.AssemblyFileVersion.GetVersion(typeof(App).Assembly)
+        );
         if (!formatted)
             return v.ToString();
         if (v.Revision > 0)

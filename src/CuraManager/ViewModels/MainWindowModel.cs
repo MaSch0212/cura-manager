@@ -1,8 +1,8 @@
-﻿using CuraManager.Extensions;
-using MaSch.Presentation.Wpf.Commands;
 using System.Net.Http;
 using System.Windows;
 using System.Windows.Input;
+using CuraManager.Extensions;
+using MaSch.Presentation.Wpf.Commands;
 
 namespace CuraManager.ViewModels;
 
@@ -37,7 +37,8 @@ public partial class MainWindowModel : ObservableObject, IMainWindowModel_Props
             new ProcessStartInfo("https://github.com/MaSch0212/cura-manager/releases/latest")
             {
                 UseShellExecute = true,
-            });
+            }
+        );
     }
 
     private async Task SearchForUpdateAsync()
@@ -45,7 +46,9 @@ public partial class MainWindowModel : ObservableObject, IMainWindowModel_Props
         var clientHandler = new HttpClientHandler { AllowAutoRedirect = false };
         var httpClient = new HttpClient(clientHandler);
 
-        var response = await httpClient.GetAsync("https://github.com/MaSch0212/cura-manager/releases/latest");
+        var response = await httpClient.GetAsync(
+            "https://github.com/MaSch0212/cura-manager/releases/latest"
+        );
         var location = response.Headers.Location?.ToString();
 
         if (location is null)

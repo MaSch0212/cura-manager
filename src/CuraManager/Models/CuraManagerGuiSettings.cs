@@ -1,4 +1,4 @@
-﻿using MaSch.Presentation.Wpf.Common;
+using MaSch.Presentation.Wpf.Common;
 
 namespace CuraManager.Models;
 

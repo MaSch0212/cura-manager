@@ -1,8 +1,8 @@
-﻿using CuraManager.Models;
-using CuraManager.Views;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
+using CuraManager.Models;
+using CuraManager.Views;
 
 // Will not fix this because MyMiniFactory Provider is currently not used
 #pragma warning disable SYSLIB0014 // Type or member is obsolete
@@ -31,13 +31,17 @@ public class MyMiniFactoryProvider : IWebProvider
         {
             using (var zipFile = ZipFile.OpenRead(zipFilePath))
             {
-                await CreateProjectFromArchiveDialog.GetFilesToExtract(zipFile, printElement.DirectoryLocation)
+                await CreateProjectFromArchiveDialog
+                    .GetFilesToExtract(zipFile, printElement.DirectoryLocation)
                     .ForEachAsync(x => Task.Run(() => x.Entry.ExtractToFile(x.TargetPath)));
             }
         }
         else
         {
-            File.Copy(zipFilePath, Path.Combine(printElement.DirectoryLocation, Path.GetFileName(fileUri.ToString())));
+            File.Copy(
+                zipFilePath,
+                Path.Combine(printElement.DirectoryLocation, Path.GetFileName(fileUri.ToString()))
+            );
         }
 
         File.Delete(zipFilePath);
@@ -55,7 +59,11 @@ public class MyMiniFactoryProvider : IWebProvider
     {
         var builder = new UriBuilder(webAddress);
 
-        var id = RegularExpressions.MyMiniFactoryId().Match(webAddress.AbsoluteUri).Groups["id"].Value;
+        var id = RegularExpressions
+            .MyMiniFactoryId()
+            .Match(webAddress.AbsoluteUri)
+            .Groups["id"]
+            .Value;
         builder.Path = $"/download/{id}";
 
         return builder.Uri;

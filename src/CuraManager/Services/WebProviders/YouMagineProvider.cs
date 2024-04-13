@@ -1,10 +1,10 @@
-﻿using CuraManager.Models;
-using CuraManager.Views;
-using Newtonsoft.Json.Linq;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using CuraManager.Models;
+using CuraManager.Views;
+using Newtonsoft.Json.Linq;
 
 namespace CuraManager.Services.WebProviders;
 
@@ -15,7 +15,9 @@ public class YouMagineProvider : IWebProvider
     public YouMagineProvider()
     {
         _httpClient = new HttpClient();
-        _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        _httpClient.DefaultRequestHeaders.Accept.Add(
+            new MediaTypeWithQualityHeaderValue("application/json")
+        );
     }
 
     public ICollection<string> SupportedHosts { get; } = new[] { "www.youmagine.com" };
@@ -36,13 +38,20 @@ public class YouMagineProvider : IWebProvider
         if (Path.GetExtension(fileUri.ToString()).ToLower() == ".zip")
         {
             using var zipFile = ZipFile.OpenRead(zipFilePath);
-            await CreateProjectFromArchiveDialog.GetFilesToExtract(zipFile, printElement.DirectoryLocation)
-                .Where(x => !x.Entry.Name.ToLower().In("license.html", "readme.pdf") && !x.Entry.Name.ToLower().EndsWith("-attribution.pdf"))
+            await CreateProjectFromArchiveDialog
+                .GetFilesToExtract(zipFile, printElement.DirectoryLocation)
+                .Where(x =>
+                    !x.Entry.Name.ToLower().In("license.html", "readme.pdf")
+                    && !x.Entry.Name.ToLower().EndsWith("-attribution.pdf")
+                )
                 .ForEachAsync(x => Task.Run(() => x.Entry.ExtractToFile(x.TargetPath)));
         }
         else
         {
-            File.Copy(zipFilePath, Path.Combine(printElement.DirectoryLocation, Path.GetFileName(fileUri.ToString())));
+            File.Copy(
+                zipFilePath,
+                Path.Combine(printElement.DirectoryLocation, Path.GetFileName(fileUri.ToString()))
+            );
         }
 
         File.Delete(zipFilePath);

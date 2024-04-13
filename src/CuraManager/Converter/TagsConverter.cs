@@ -1,7 +1,7 @@
-﻿using CuraManager.Models;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Windows.Data;
+using CuraManager.Models;
 
 namespace CuraManager.Converter;
 
@@ -12,10 +12,15 @@ public class TagsConverter : IMultiValueConverter
         if (values.Length != 2)
             return null;
 
-        if (values[0] is not ObservableCollection<string> availableTags || values[1] is not ObservableCollection<string> tags)
+        if (
+            values[0] is not ObservableCollection<string> availableTags
+            || values[1] is not ObservableCollection<string> tags
+        )
             return null;
 
-        var result = new ObservableCollection<ObservableTag>(availableTags.Select(x => new ObservableTag(x, tags)));
+        var result = new ObservableCollection<ObservableTag>(
+            availableTags.Select(x => new ObservableTag(x, tags))
+        );
         availableTags.CollectionChanged += (s, e) =>
         {
             if (e.Action == NotifyCollectionChangedAction.Reset)
@@ -33,6 +38,10 @@ public class TagsConverter : IMultiValueConverter
         return result;
     }
 
-    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
-        => throw new NotSupportedException();
+    public object[] ConvertBack(
+        object value,
+        Type[] targetTypes,
+        object parameter,
+        CultureInfo culture
+    ) => throw new NotSupportedException();
 }

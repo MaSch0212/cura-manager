@@ -1,9 +1,3 @@
-﻿using CuraManager.Models;
-using CuraManager.Resources;
-using CuraManager.Services;
-using CuraManager.ViewModels.Main;
-using MaSch.Presentation.Translation;
-using MaSch.Presentation.Wpf.MaterialDesign;
 using System.ComponentModel;
 using System.IO;
 using System.Windows;
@@ -11,6 +5,12 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
+using CuraManager.Models;
+using CuraManager.Resources;
+using CuraManager.Services;
+using CuraManager.ViewModels.Main;
+using MaSch.Presentation.Translation;
+using MaSch.Presentation.Wpf.MaterialDesign;
 
 namespace CuraManager.Views.Main;
 
@@ -20,8 +20,12 @@ public partial class PrintsView
     private Point? _lastDragPoint;
     private bool _isInitialized = false;
 
-    public static readonly DependencyProperty PanelWidthProperty =
-        DependencyProperty.Register("PanelWidth", typeof(int), typeof(PrintsView), new PropertyMetadata(350));
+    public static readonly DependencyProperty PanelWidthProperty = DependencyProperty.Register(
+        "PanelWidth",
+        typeof(int),
+        typeof(PrintsView),
+        new PropertyMetadata(350)
+    );
 
     public int PanelWidth
     {
@@ -55,11 +59,21 @@ public partial class PrintsView
 
     private async void ProjectDetailsPane_Drop(object sender, DragEventArgs e)
     {
-        if (e.Data.GetDataPresent(DataFormats.FileDrop) && DataContext is PrintsViewModel viewModel && viewModel.SelectedElement != null)
+        if (
+            e.Data.GetDataPresent(DataFormats.FileDrop)
+            && DataContext is PrintsViewModel viewModel
+            && viewModel.SelectedElement != null
+        )
         {
             var files = (string[])e.Data.GetData(DataFormats.FileDrop);
 
-            if (files != null && !(files.Length == 1 && viewModel.SelectedElement.AllFiles.Any(x => x.FilePath == files[0])))
+            if (
+                files != null
+                && !(
+                    files.Length == 1
+                    && viewModel.SelectedElement.AllFiles.Any(x => x.FilePath == files[0])
+                )
+            )
                 await viewModel.AddFilesToProject(viewModel.SelectedElement, files);
         }
     }
@@ -72,7 +86,13 @@ public partial class PrintsView
             {
                 var files = (string[])e.Data.GetData(DataFormats.FileDrop);
 
-                if (files != null && !(files.Length == 1 && viewModel.PrintElements.Any(x => x.DirectoryLocation == files[0])))
+                if (
+                    files != null
+                    && !(
+                        files.Length == 1
+                        && viewModel.PrintElements.Any(x => x.DirectoryLocation == files[0])
+                    )
+                )
                     await viewModel.CreateProjectFromFileDrop(files);
             }
             else if (e.Data.GetDataPresent(DataFormats.StringFormat))
@@ -86,36 +106,60 @@ public partial class PrintsView
 
     private async void DataGrid_OnMouseMove(object sender, MouseEventArgs e)
     {
-        if (e.LeftButton == MouseButtonState.Pressed && sender is FrameworkElement control && control.DataContext is PrintElement element)
+        if (
+            e.LeftButton == MouseButtonState.Pressed
+            && sender is FrameworkElement control
+            && control.DataContext is PrintElement element
+        )
         {
-            await DoDrag(e, () =>
-            {
-                var dataObject = new DataObject(DataFormats.FileDrop, new[] { element.DirectoryLocation });
-                DragDrop.DoDragDrop(control, dataObject, DragDropEffects.Copy);
-            });
+            await DoDrag(
+                e,
+                () =>
+                {
+                    var dataObject = new DataObject(
+                        DataFormats.FileDrop,
+                        new[] { element.DirectoryLocation }
+                    );
+                    DragDrop.DoDragDrop(control, dataObject, DragDropEffects.Copy);
+                }
+            );
         }
     }
 
     private async void ProjectDetailsPane_OnMouseMove(object sender, MouseEventArgs e)
     {
-        if (e.LeftButton == MouseButtonState.Pressed && e.OriginalSource is FrameworkElement depObj && depObj.DataContext is PrintElementFile file)
+        if (
+            e.LeftButton == MouseButtonState.Pressed
+            && e.OriginalSource is FrameworkElement depObj
+            && depObj.DataContext is PrintElementFile file
+        )
         {
-            await DoDrag(e, () =>
-            {
-                var dataObject = new DataObject(DataFormats.FileDrop, new[] { file.FilePath });
-                DragDrop.DoDragDrop(depObj, dataObject, DragDropEffects.Copy);
-            });
+            await DoDrag(
+                e,
+                () =>
+                {
+                    var dataObject = new DataObject(DataFormats.FileDrop, new[] { file.FilePath });
+                    DragDrop.DoDragDrop(depObj, dataObject, DragDropEffects.Copy);
+                }
+            );
         }
     }
 
     private void PrintElementFileContextMenu_OnOpened(object sender, RoutedEventArgs e)
     {
-        if (sender is ContextMenu contextMenu && contextMenu.DataContext is PrintElementFile file && DataContext is PrintsViewModel viewModel)
+        if (
+            sender is ContextMenu contextMenu
+            && contextMenu.DataContext is PrintElementFile file
+            && DataContext is PrintsViewModel viewModel
+        )
         {
             var translationManager = ServiceContext.GetService<ITranslationManager>();
             if (string.Equals(file.FileExtension, ".gcode", StringComparison.OrdinalIgnoreCase))
             {
-                var drives = DriveInfo.GetDrives().Where(x => x.DriveType == DriveType.Removable && IsDriveReady(x)).ToArray();
+                var drives = DriveInfo
+                    .GetDrives()
+                    .Where(x => x.DriveType == DriveType.Removable && IsDriveReady(x))
+                    .ToArray();
                 contextMenu.Items.RemoveWhere(x => x is FrameworkElement item && item.Tag != null);
                 if (drives.Length > 0)
                     contextMenu.Items.Add(new Separator { Tag = "Dump it!" });
@@ -128,9 +172,15 @@ public partial class PrintsView
                     var item = new MenuItem
                     {
                         Icon = new MaterialDesignIcon(MaterialDesignIconCode.ContentCopy),
-                        Header = string.Format(translationManager.GetTranslation(nameof(StringTable.CopyTo)), $"{volumeName} ({drive.Name.TrimEnd('/', '\\')})"),
+                        Header = string.Format(
+                            translationManager.GetTranslation(nameof(StringTable.CopyTo)),
+                            $"{volumeName} ({drive.Name.TrimEnd('/', '\\')})"
+                        ),
                         Command = viewModel.CopyProjectFileToCommand,
-                        CommandParameter = new Tuple<PrintElementFile, string>(file, drive.RootDirectory.FullName),
+                        CommandParameter = new Tuple<PrintElementFile, string>(
+                            file,
+                            drive.RootDirectory.FullName
+                        ),
                         Tag = drive,
                     };
                     contextMenu.Items.Add(item);
@@ -150,7 +200,10 @@ public partial class PrintsView
 
         try
         {
-            while (Mouse.LeftButton == MouseButtonState.Pressed && (Mouse.GetPosition(this) - _lastDragPoint.Value).Length < 3)
+            while (
+                Mouse.LeftButton == MouseButtonState.Pressed
+                && (Mouse.GetPosition(this) - _lastDragPoint.Value).Length < 3
+            )
                 await Task.Delay(10);
 
             if (Mouse.LeftButton != MouseButtonState.Pressed)
@@ -203,14 +256,31 @@ public partial class PrintsView
 
     private void PrintsDataGrid_Sorting(object sender, DataGridSortingEventArgs e)
     {
-        Dispatcher.BeginInvoke(new Action(() =>
-        {
-            var dataGrid = (DataGrid)sender;
-            var collectionView = CollectionViewSource.GetDefaultView(dataGrid.ItemsSource);
-            if (!collectionView.SortDescriptions.Any(x => x.PropertyName == nameof(PrintElement.IsArchived)))
-                collectionView.SortDescriptions.Add(new SortDescription(nameof(PrintElement.IsArchived), ListSortDirection.Ascending));
-            if (!collectionView.SortDescriptions.Any(x => x.PropertyName == nameof(PrintElement.Name)))
-                collectionView.SortDescriptions.Add(new SortDescription(nameof(PrintElement.Name), ListSortDirection.Ascending));
-        }));
+        Dispatcher.BeginInvoke(
+            new Action(() =>
+            {
+                var dataGrid = (DataGrid)sender;
+                var collectionView = CollectionViewSource.GetDefaultView(dataGrid.ItemsSource);
+                if (
+                    !collectionView.SortDescriptions.Any(x =>
+                        x.PropertyName == nameof(PrintElement.IsArchived)
+                    )
+                )
+                    collectionView.SortDescriptions.Add(
+                        new SortDescription(
+                            nameof(PrintElement.IsArchived),
+                            ListSortDirection.Ascending
+                        )
+                    );
+                if (
+                    !collectionView.SortDescriptions.Any(x =>
+                        x.PropertyName == nameof(PrintElement.Name)
+                    )
+                )
+                    collectionView.SortDescriptions.Add(
+                        new SortDescription(nameof(PrintElement.Name), ListSortDirection.Ascending)
+                    );
+            })
+        );
     }
 }

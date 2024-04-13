@@ -1,6 +1,6 @@
-﻿using CuraManager.Services;
-using MaSch.Presentation.Wpf.Common;
 using System.IO;
+using CuraManager.Services;
+using MaSch.Presentation.Wpf.Common;
 
 namespace CuraManager.Views;
 

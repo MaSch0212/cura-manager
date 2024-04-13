@@ -1,4 +1,4 @@
-﻿using System.Media;
+using System.Media;
 using System.Windows;
 
 namespace CuraManager.Views;

@@ -1,8 +1,8 @@
-﻿using CuraManager.Services;
 using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
+using CuraManager.Services;
 
 namespace CuraManager.Models;
 
@@ -33,6 +33,7 @@ public partial class PrintElementFile : ObservableObject, IPrintElementFile_Prop
             {
                 Icon = ServiceContext.GetService<IFileIconCache>().GetFileIcon(filePath);
             },
-            DispatcherPriority.ApplicationIdle);
+            DispatcherPriority.ApplicationIdle
+        );
     }
 }

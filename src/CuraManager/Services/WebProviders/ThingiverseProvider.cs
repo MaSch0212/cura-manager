@@ -1,11 +1,11 @@
-﻿using CuraManager.Common;
+using System.IO;
+using System.IO.Compression;
+using System.Net.Http;
+using CuraManager.Common;
 using CuraManager.Models;
 using CuraManager.Resources;
 using CuraManager.Views;
 using MaSch.Presentation.Translation;
-using System.IO;
-using System.IO.Compression;
-using System.Net.Http;
 
 namespace CuraManager.Services.WebProviders;
 
@@ -19,7 +19,9 @@ public class ThingiverseProvider : IWebProvider
     {
         using var request = new HttpRequestMessage(HttpMethod.Head, GetDownloadUrl(webAddress));
         using var response = await _httpClient.SendAsync(request);
-        return Path.GetFileNameWithoutExtension(Uri.UnescapeDataString(response.RequestMessage.RequestUri.ToString()))
+        return Path.GetFileNameWithoutExtension(
+                Uri.UnescapeDataString(response.RequestMessage.RequestUri.ToString())
+            )
             .Replace('_', ' ')
             .Replace('+', ' ');
     }
@@ -33,7 +35,8 @@ public class ThingiverseProvider : IWebProvider
 
         using (var zipFile = ZipFile.OpenRead(zipFilePath))
         {
-            await CreateProjectFromArchiveDialog.GetFilesToExtract(zipFile, printElement.DirectoryLocation)
+            await CreateProjectFromArchiveDialog
+                .GetFilesToExtract(zipFile, printElement.DirectoryLocation)
                 .ForEachAsync(x => Task.Run(() => x.Entry.ExtractToFile(x.TargetPath)));
         }
 
@@ -44,7 +47,11 @@ public class ThingiverseProvider : IWebProvider
     {
         var match = RegularExpressions.ThingiverseUrl().Match(webAddress.AbsoluteUri);
         if (!match.Success)
-            throw new WebProviderException(ServiceContext.GetService<ITranslationManager>().GetTranslation(nameof(StringTable.Msg_WrongThingiverseUrl)));
+            throw new WebProviderException(
+                ServiceContext
+                    .GetService<ITranslationManager>()
+                    .GetTranslation(nameof(StringTable.Msg_WrongThingiverseUrl))
+            );
 
         var builder = new UriBuilder(match.Value);
 

@@ -1,9 +1,9 @@
-﻿using CuraManager.Models;
-using CuraManager.Resources;
-using MaSch.Presentation.Translation;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
+using CuraManager.Models;
+using CuraManager.Resources;
+using MaSch.Presentation.Translation;
 using MessageBox = MaSch.Presentation.Wpf.MessageBox;
 
 namespace CuraManager.Views;
@@ -25,8 +25,12 @@ public partial class CreateCuraProjectDialog : ICreateCuraProjectDialog_Props
     {
         ServiceContext.GetService(out _translationManager);
 
-        Models = new ObservableCollection<PrintElementFileSelection>(element?.ModelFiles.Select(x => new PrintElementFileSelection(x)) ?? new List<PrintElementFileSelection>());
-        ProjectName = element?.Name ?? _translationManager.GetTranslation(nameof(StringTable.Untitled));
+        Models = new ObservableCollection<PrintElementFileSelection>(
+            element?.ModelFiles.Select(x => new PrintElementFileSelection(x))
+                ?? new List<PrintElementFileSelection>()
+        );
+        ProjectName =
+            element?.Name ?? _translationManager.GetTranslation(nameof(StringTable.Untitled));
 
         InitializeComponent();
     }
@@ -35,7 +39,13 @@ public partial class CreateCuraProjectDialog : ICreateCuraProjectDialog_Props
     {
         if (!Models.Any(x => x.IsEnabled && x.Amount > 0))
         {
-            MessageBox.Show(this, _translationManager.GetTranslation(nameof(StringTable.Msg_SelectAtLeastOneModel)), "CuraManager", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(
+                this,
+                _translationManager.GetTranslation(nameof(StringTable.Msg_SelectAtLeastOneModel)),
+                "CuraManager",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information
+            );
             return;
         }
 
@@ -53,7 +63,9 @@ public partial class CreateCuraProjectDialog : ICreateCuraProjectDialog_Props
     {
         Models.ForEach(x => x.IsEnabled = !_disableAll);
         _disableAll ^= true;
-        DisableAllButton.Content = _disableAll ? _translationManager.GetTranslation(nameof(StringTable.DisableAll)) : _translationManager.GetTranslation(nameof(StringTable.EnableAll));
+        DisableAllButton.Content = _disableAll
+            ? _translationManager.GetTranslation(nameof(StringTable.DisableAll))
+            : _translationManager.GetTranslation(nameof(StringTable.EnableAll));
     }
 
     private void ProjectNameTextBoxOnKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
@@ -71,7 +83,11 @@ internal interface IPrintElementFileSelection_Props
     int Amount { get; set; }
 }
 
-[SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:File may only contain a single type", Justification = "Is part of the dialog.")]
+[SuppressMessage(
+    "StyleCop.CSharp.MaintainabilityRules",
+    "SA1402:File may only contain a single type",
+    Justification = "Is part of the dialog."
+)]
 public partial class PrintElementFileSelection : ObservableObject, IPrintElementFileSelection_Props
 {
     public PrintElementFileSelection(PrintElementFile element)

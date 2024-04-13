@@ -1,4 +1,4 @@
-﻿namespace CuraManager.Models;
+namespace CuraManager.Models;
 
 public class PrintElementMetadata
 {

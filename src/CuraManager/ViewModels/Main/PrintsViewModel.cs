@@ -1,4 +1,10 @@
-﻿using CuraManager.Models;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.IO;
+using System.Windows;
+using System.Windows.Data;
+using System.Windows.Input;
+using CuraManager.Models;
 using CuraManager.Resources;
 using CuraManager.Services;
 using CuraManager.Views;
@@ -10,12 +16,6 @@ using MaSch.Presentation.Wpf.Controls;
 using MaSch.Presentation.Wpf.MaterialDesign;
 using MaSch.Presentation.Wpf.Views.SplitView;
 using Microsoft.Win32;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.IO;
-using System.Windows;
-using System.Windows.Data;
-using System.Windows.Input;
 
 namespace CuraManager.ViewModels.Main;
 
@@ -84,11 +84,17 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
 
         PrintElementsViewSource = new CollectionViewSource();
         PrintElementsViewSource.Filter += PrintElementsViewSource_OnFilter;
-        PrintElementsViewSource.SortDescriptions.Add(new SortDescription(nameof(PrintElement.IsArchived), ListSortDirection.Ascending));
-        PrintElementsViewSource.SortDescriptions.Add(new SortDescription(nameof(PrintElement.Name), ListSortDirection.Ascending));
+        PrintElementsViewSource.SortDescriptions.Add(
+            new SortDescription(nameof(PrintElement.IsArchived), ListSortDirection.Ascending)
+        );
+        PrintElementsViewSource.SortDescriptions.Add(
+            new SortDescription(nameof(PrintElement.Name), ListSortDirection.Ascending)
+        );
         AvailableTags = new ObservableCollection<string>();
         AvailableTagsViewSource = new CollectionViewSource { Source = AvailableTags };
-        AvailableTagsViewSource.SortDescriptions.Add(new SortDescription(null, ListSortDirection.Ascending));
+        AvailableTagsViewSource.SortDescriptions.Add(
+            new SortDescription(null, ListSortDirection.Ascending)
+        );
         VisibleTags = new ObservableCollection<string>();
         VisibleTags.CollectionChanged += (s, e) => PrintElementsViewSource.View.Refresh();
 
@@ -103,18 +109,48 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
         ReloadModelsCommand = new AsyncDelegateCommand(ExecuteReloadModels);
         RefreshFilterCommand = new DelegateCommand(ExecuteRefreshFilter);
 
-        AddFilesToProjectCommand = new AsyncDelegateCommand<PrintElement>(x => x != null, ExecuteAddFilesToProject);
-        NewCuraProjectCommand = new AsyncDelegateCommand<PrintElement>(x => x != null, ExecuteNewCuraProject);
-        OpenProjectFolderCommand = new DelegateCommand<PrintElement>(x => x != null, ExecuteOpenProjectFolder);
-        OpenProjectWebsiteCommand = new DelegateCommand<PrintElement>(x => x != null && !string.IsNullOrEmpty(x.Metadata.Website), ExecuteOpenProjectWebsite);
-        DeleteProjectCommand = new AsyncDelegateCommand<PrintElement>(x => x != null, ExecuteDeleteProject);
-        RenameProjectCommand = new DelegateCommand<PrintElement>(x => x != null, ExecuteRenameProject);
+        AddFilesToProjectCommand = new AsyncDelegateCommand<PrintElement>(
+            x => x != null,
+            ExecuteAddFilesToProject
+        );
+        NewCuraProjectCommand = new AsyncDelegateCommand<PrintElement>(
+            x => x != null,
+            ExecuteNewCuraProject
+        );
+        OpenProjectFolderCommand = new DelegateCommand<PrintElement>(
+            x => x != null,
+            ExecuteOpenProjectFolder
+        );
+        OpenProjectWebsiteCommand = new DelegateCommand<PrintElement>(
+            x => x != null && !string.IsNullOrEmpty(x.Metadata.Website),
+            ExecuteOpenProjectWebsite
+        );
+        DeleteProjectCommand = new AsyncDelegateCommand<PrintElement>(
+            x => x != null,
+            ExecuteDeleteProject
+        );
+        RenameProjectCommand = new DelegateCommand<PrintElement>(
+            x => x != null,
+            ExecuteRenameProject
+        );
         CreateTagCommand = new DelegateCommand<PrintElement>(x => x != null, ExecuteCreateTag);
 
-        OpenProjectFileCommand = new DelegateCommand<PrintElementFile>(x => x != null, ExecuteOpenProjectFile);
-        DeleteProjectFileCommand = new DelegateCommand<PrintElementFile>(x => x != null, ExecuteDeleteProjectFile);
-        RenameProjectFileCommand = new DelegateCommand<PrintElementFile>(x => x != null, ExecuteRenameProjectFile);
-        CopyProjectFileToCommand = new AsyncDelegateCommand<Tuple<PrintElementFile, string>>(x => x?.Item1 != null && !string.IsNullOrEmpty(x?.Item2), ExecuteCopyProjectFileTo);
+        OpenProjectFileCommand = new DelegateCommand<PrintElementFile>(
+            x => x != null,
+            ExecuteOpenProjectFile
+        );
+        DeleteProjectFileCommand = new DelegateCommand<PrintElementFile>(
+            x => x != null,
+            ExecuteDeleteProjectFile
+        );
+        RenameProjectFileCommand = new DelegateCommand<PrintElementFile>(
+            x => x != null,
+            ExecuteRenameProjectFile
+        );
+        CopyProjectFileToCommand = new AsyncDelegateCommand<Tuple<PrintElementFile, string>>(
+            x => x?.Item1 != null && !string.IsNullOrEmpty(x?.Item2),
+            ExecuteCopyProjectFileTo
+        );
     }
 
     #region Change Handlers
@@ -166,7 +202,14 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
         var settings = _settingsService.LoadSettings();
         if (!Directory.Exists(settings.PrintsPath))
         {
-            MessageBox.Show(_translationManager.GetTranslation(nameof(StringTable.Msg_PrintProjectsFolderNotConfigured)), "CuraManager", AlertButton.Ok, AlertImage.Information);
+            MessageBox.Show(
+                _translationManager.GetTranslation(
+                    nameof(StringTable.Msg_PrintProjectsFolderNotConfigured)
+                ),
+                "CuraManager",
+                AlertButton.Ok,
+                AlertImage.Information
+            );
             e.Cancel = true;
         }
         else
@@ -179,7 +222,9 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
                 PrintElements.Clear();
             }
 
-            var newElements = await _printsService.GetNewPrintElements(_cache, PrintElements).ToListAsync();
+            var newElements = await _printsService
+                .GetNewPrintElements(_cache, PrintElements)
+                .ToListAsync();
             newElements.ForEach(x => AvailableTags.AddIfNotExists(x.Tags));
             PrintElements.Add(newElements);
             PrintElementsViewSource.View.Refresh();
@@ -198,33 +243,61 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
         if (filesToAdd.Count == 0)
             return;
 
-        var progressMessage = _translationManager.GetTranslation(filesToAdd.Count > 1 ? nameof(StringTable.Prog_AddMultipleFilesToProject) : nameof(StringTable.Prog_AddOneFileToProject));
-        var failedMessage = _translationManager.GetTranslation(filesToAdd.Count > 1 ? nameof(StringTable.Fail_AddMultipleFilesToProject) : nameof(StringTable.Fail_AddOneFileToProject));
-        var successMessage = _translationManager.GetTranslation(filesToAdd.Count > 1 ? nameof(StringTable.Suc_AddMultipleFilesToProject) : nameof(StringTable.Suc_AddOneFileToProject));
+        var progressMessage = _translationManager.GetTranslation(
+            filesToAdd.Count > 1
+                ? nameof(StringTable.Prog_AddMultipleFilesToProject)
+                : nameof(StringTable.Prog_AddOneFileToProject)
+        );
+        var failedMessage = _translationManager.GetTranslation(
+            filesToAdd.Count > 1
+                ? nameof(StringTable.Fail_AddMultipleFilesToProject)
+                : nameof(StringTable.Fail_AddOneFileToProject)
+        );
+        var successMessage = _translationManager.GetTranslation(
+            filesToAdd.Count > 1
+                ? nameof(StringTable.Suc_AddMultipleFilesToProject)
+                : nameof(StringTable.Suc_AddOneFileToProject)
+        );
         await ExecuteLoadingAction(
             progressMessage,
             async () =>
             {
                 foreach (var file in filesToAdd.Where(File.Exists))
                 {
-                    var targetPath = Path.Combine(project.DirectoryLocation, Path.GetFileName(file) ?? string.Empty);
+                    var targetPath = Path.Combine(
+                        project.DirectoryLocation,
+                        Path.GetFileName(file) ?? string.Empty
+                    );
                     for (int i = 2; File.Exists(targetPath); i++)
                     {
-                        targetPath = Path.Combine(project.DirectoryLocation, Path.GetFileNameWithoutExtension(file) + $" ({i})" + Path.GetExtension(file));
+                        targetPath = Path.Combine(
+                            project.DirectoryLocation,
+                            Path.GetFileNameWithoutExtension(file)
+                                + $" ({i})"
+                                + Path.GetExtension(file)
+                        );
                     }
 
                     await Task.Run(() => File.Copy(file, targetPath));
                 }
             },
             successMessage,
-            failedMessage);
+            failedMessage
+        );
     }
 
     public async Task CreateProjectFromFileDrop(string[] files)
     {
         if (files.Length == 0)
             return;
-        if (files.Length == 1 && string.Equals(Path.GetExtension(files[0]), ".zip", StringComparison.OrdinalIgnoreCase))
+        if (
+            files.Length == 1
+            && string.Equals(
+                Path.GetExtension(files[0]),
+                ".zip",
+                StringComparison.OrdinalIgnoreCase
+            )
+        )
             await CreateProjectFromArchive(files[0]);
         else
             await CreateProjectFromModels(files);
@@ -263,20 +336,26 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
 
     private async Task ExecuteNewProjectFromClipboard()
     {
-        if (Clipboard.ContainsText() && Uri.TryCreate(Clipboard.GetText(), UriKind.Absolute, out var link) && _downloadService.IsLinkSupported(link))
+        if (
+            Clipboard.ContainsText()
+            && Uri.TryCreate(Clipboard.GetText(), UriKind.Absolute, out var link)
+            && _downloadService.IsLinkSupported(link)
+        )
             await CreateProjectFromWeb(link.ToString());
         else if (Clipboard.ContainsFileDropList())
             await CreateProjectFromFileDrop(Clipboard.GetFileDropList().OfType<string>().ToArray());
         else
-            MessageBox.Show(_translationManager.GetTranslation(nameof(StringTable.Msg_NothingValidInClipboard)), "CuraManager", AlertButton.Ok, AlertImage.Information);
+            MessageBox.Show(
+                _translationManager.GetTranslation(nameof(StringTable.Msg_NothingValidInClipboard)),
+                "CuraManager",
+                AlertButton.Ok,
+                AlertImage.Information
+            );
     }
 
     private async Task ExecuteAddFilesToProject(PrintElement project)
     {
-        var ofd = new OpenFileDialog
-        {
-            Multiselect = true,
-        };
+        var ofd = new OpenFileDialog { Multiselect = true, };
         if (ofd.ShowDialog(Application.Current.MainWindow) == true)
         {
             await AddFilesToProject(project, ofd.FileNames);
@@ -288,7 +367,12 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
         var settings = _settingsService.LoadSettings();
         if (!_curaService.AreCuraPathsCorrect(settings))
         {
-            MessageBox.Show(_translationManager.GetTranslation(nameof(StringTable.Msg_CuraPathsNotConfigured)), "CuraManager", AlertButton.Ok, AlertImage.Warning);
+            MessageBox.Show(
+                _translationManager.GetTranslation(nameof(StringTable.Msg_CuraPathsNotConfigured)),
+                "CuraManager",
+                AlertButton.Ok,
+                AlertImage.Warning
+            );
         }
         else
         {
@@ -296,36 +380,48 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
                 _translationManager.GetTranslation(nameof(StringTable.Prog_CreateCuraProject)),
                 async () => await _curaService.CreateCuraProject(project),
                 _translationManager.GetTranslation(nameof(StringTable.Suc_CreateCuraProject)),
-                _translationManager.GetTranslation(nameof(StringTable.Fail_CreateCuraProject)));
+                _translationManager.GetTranslation(nameof(StringTable.Fail_CreateCuraProject))
+            );
         }
     }
 
     private void ExecuteOpenProjectFolder(PrintElement project)
     {
-        Process.Start(new ProcessStartInfo(project.DirectoryLocation)
-        {
-            UseShellExecute = true,
-        });
+        Process.Start(new ProcessStartInfo(project.DirectoryLocation) { UseShellExecute = true, });
     }
 
     private void ExecuteOpenProjectWebsite(PrintElement project)
     {
         if (!string.IsNullOrEmpty(project.Metadata.Website))
         {
-            Process.Start(new ProcessStartInfo(project.Metadata.Website)
-            {
-                UseShellExecute = true,
-            });
+            Process.Start(
+                new ProcessStartInfo(project.Metadata.Website) { UseShellExecute = true, }
+            );
         }
     }
 
     private async Task ExecuteDeleteProject(PrintElement project)
     {
-        if (MessageBox.Show(string.Format(_translationManager.GetTranslation(nameof(StringTable.Msg_ConfirmProjectDeletion)), project.Name), "CuraManager", AlertButton.YesNo, AlertImage.Question) == AlertResult.No)
+        if (
+            MessageBox.Show(
+                string.Format(
+                    _translationManager.GetTranslation(
+                        nameof(StringTable.Msg_ConfirmProjectDeletion)
+                    ),
+                    project.Name
+                ),
+                "CuraManager",
+                AlertButton.YesNo,
+                AlertImage.Question
+            ) == AlertResult.No
+        )
             return;
 
         await ExecuteLoadingAction(
-            string.Format(_translationManager.GetTranslation(nameof(StringTable.Prog_DeleteProject)), project.Name),
+            string.Format(
+                _translationManager.GetTranslation(nameof(StringTable.Prog_DeleteProject)),
+                project.Name
+            ),
             async () =>
             {
                 project.Dispose();
@@ -334,8 +430,15 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
                 if (SelectedElement == project)
                     SelectedElement = null;
             },
-            string.Format(_translationManager.GetTranslation(nameof(StringTable.Suc_DeleteProject)), project.Name),
-            string.Format(_translationManager.GetTranslation(nameof(StringTable.Fail_DeleteProject)), project.Name));
+            string.Format(
+                _translationManager.GetTranslation(nameof(StringTable.Suc_DeleteProject)),
+                project.Name
+            ),
+            string.Format(
+                _translationManager.GetTranslation(nameof(StringTable.Fail_DeleteProject)),
+                project.Name
+            )
+        );
     }
 
     private void ExecuteRenameProject(PrintElement project)
@@ -347,23 +450,35 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
 
             var path = Path.Combine(Path.GetDirectoryName(project.DirectoryLocation), newName);
             if (Directory.Exists(path))
-                return string.Format(_translationManager.GetTranslation(nameof(StringTable.Msg_ProjectAlreadyExists)), newName);
+                return string.Format(
+                    _translationManager.GetTranslation(
+                        nameof(StringTable.Msg_ProjectAlreadyExists)
+                    ),
+                    newName
+                );
 
             return null;
         }
 
         var dialog = new RenameDialog(
             _translationManager.GetTranslation(nameof(StringTable.Title_RenameProject)),
-            string.Format(_translationManager.GetTranslation(nameof(StringTable.Desc_RenameProject)), project.Name),
+            string.Format(
+                _translationManager.GetTranslation(nameof(StringTable.Desc_RenameProject)),
+                project.Name
+            ),
             project.Name,
-            Validation)
+            Validation
+        )
         {
             Owner = Application.Current.MainWindow,
         };
 
         if (dialog.ShowDialog() == true)
         {
-            var newPath = Path.Combine(Path.GetDirectoryName(project.DirectoryLocation), dialog.NewName);
+            var newPath = Path.Combine(
+                Path.GetDirectoryName(project.DirectoryLocation),
+                dialog.NewName
+            );
 
             SelectedElement = null;
             PrintElements.Remove(project);
@@ -379,9 +494,17 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
 
     private void ExecuteCreateTag(PrintElement project)
     {
-        var dialog = new RenameDialog(_translationManager.GetTranslation(nameof(StringTable.Title_CreateTag)), _translationManager.GetTranslation(nameof(StringTable.Desc_CreateTag)), string.Empty, s => null)
+        var dialog = new RenameDialog(
+            _translationManager.GetTranslation(nameof(StringTable.Title_CreateTag)),
+            _translationManager.GetTranslation(nameof(StringTable.Desc_CreateTag)),
+            string.Empty,
+            s => null
+        )
         {
-            CustomIcon = new IconPresenter { Icon = new MaterialDesignIcon(MaterialDesignIconCode.Plus) },
+            CustomIcon = new IconPresenter
+            {
+                Icon = new MaterialDesignIcon(MaterialDesignIconCode.Plus)
+            },
             SubmitButtonContent = _translationManager.GetTranslation(nameof(StringTable.Create)),
         };
         if (dialog.ShowDialog() == true)
@@ -399,20 +522,23 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
         }
         else
         {
-            Process.Start(new ProcessStartInfo(file.FilePath)
-            {
-                UseShellExecute = true,
-            });
+            Process.Start(new ProcessStartInfo(file.FilePath) { UseShellExecute = true, });
         }
     }
 
     private void ExecuteDeleteProjectFile(PrintElementFile file)
     {
-        if (MessageBox.Show(
-            string.Format(_translationManager.GetTranslation(nameof(StringTable.Msg_ConfirmFileDeletion)), $"{file.FileName}{file.FileExtension}"),
-            "CuraManager",
-            AlertButton.YesNo,
-            AlertImage.Question) == AlertResult.No)
+        if (
+            MessageBox.Show(
+                string.Format(
+                    _translationManager.GetTranslation(nameof(StringTable.Msg_ConfirmFileDeletion)),
+                    $"{file.FileName}{file.FileExtension}"
+                ),
+                "CuraManager",
+                AlertButton.YesNo,
+                AlertImage.Question
+            ) == AlertResult.No
+        )
         {
             return;
         }
@@ -427,37 +553,54 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
             if (string.Equals(file.FileName, newName, StringComparison.OrdinalIgnoreCase))
                 return null;
 
-            var path = Path.Combine(Path.GetDirectoryName(file.FilePath), newName + file.FileExtension);
+            var path = Path.Combine(
+                Path.GetDirectoryName(file.FilePath),
+                newName + file.FileExtension
+            );
             if (File.Exists(path))
-                return string.Format(_translationManager.GetTranslation(nameof(StringTable.Msg_FileAlreadyExists)), $"{newName}{file.FileExtension}");
+                return string.Format(
+                    _translationManager.GetTranslation(nameof(StringTable.Msg_FileAlreadyExists)),
+                    $"{newName}{file.FileExtension}"
+                );
 
             return null;
         }
 
         var dialog = new RenameDialog(
             _translationManager.GetTranslation(nameof(StringTable.Title_RenameFile)),
-            string.Format(_translationManager.GetTranslation(nameof(StringTable.Desc_RenameFile)), $"{file.FileName}{file.FileExtension}"),
+            string.Format(
+                _translationManager.GetTranslation(nameof(StringTable.Desc_RenameFile)),
+                $"{file.FileName}{file.FileExtension}"
+            ),
             file.FileName,
-            Validation)
+            Validation
+        )
         {
             Owner = Application.Current.MainWindow,
         };
 
         if (dialog.ShowDialog() == true)
         {
-            var newPath = Path.Combine(Path.GetDirectoryName(file.FilePath), dialog.NewName + file.FileExtension);
+            var newPath = Path.Combine(
+                Path.GetDirectoryName(file.FilePath),
+                dialog.NewName + file.FileExtension
+            );
             File.Move(file.FilePath, newPath);
         }
     }
 
     private async Task ExecuteCopyProjectFileTo(Tuple<PrintElementFile, string> data)
     {
-        var targetFile = Path.Combine(data.Item2, Path.GetFileName(data.Item1.FilePath) ?? Guid.NewGuid().ToString());
+        var targetFile = Path.Combine(
+            data.Item2,
+            Path.GetFileName(data.Item1.FilePath) ?? Guid.NewGuid().ToString()
+        );
         await ExecuteLoadingAction(
             _translationManager.GetTranslation(nameof(StringTable.Prog_CopyFile)),
             () => Task.Run(() => File.Copy(data.Item1.FilePath, targetFile, true)),
             _translationManager.GetTranslation(nameof(StringTable.Suc_CopyFile)),
-            _translationManager.GetTranslation(nameof(StringTable.Fail_CopyFile)));
+            _translationManager.GetTranslation(nameof(StringTable.Fail_CopyFile))
+        );
     }
 
     private async Task ExecuteReloadModels()
@@ -474,7 +617,8 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
                 PrintElementsViewSource.View.Refresh();
             }),
             _translationManager.GetTranslation(nameof(StringTable.Suc_ReloadModels)),
-            _translationManager.GetTranslation(nameof(StringTable.Fail_ReloadModels)));
+            _translationManager.GetTranslation(nameof(StringTable.Fail_ReloadModels))
+        );
     }
 
     private void ExecuteRefreshFilter()
@@ -487,11 +631,17 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
     private async Task CreateProjectFromModels(IEnumerable<string> files)
     {
         var settings = _settingsService.LoadSettings();
-        var dialog = new CreateProjectFromFilesDialog(settings.PrintsPath, files) { Owner = Application.Current.MainWindow };
+        var dialog = new CreateProjectFromFilesDialog(settings.PrintsPath, files)
+        {
+            Owner = Application.Current.MainWindow
+        };
         if (dialog.ShowDialog() == true)
         {
             await ExecuteLoadingAction(
-                string.Format(_translationManager.GetTranslation(nameof(StringTable.Prog_CreateProject)), dialog.ProjectName),
+                string.Format(
+                    _translationManager.GetTranslation(nameof(StringTable.Prog_CreateProject)),
+                    dialog.ProjectName
+                ),
                 async () =>
                 {
                     var project = await dialog.CreateProject();
@@ -499,7 +649,8 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
                     SelectedElement = project;
                 },
                 _translationManager.GetTranslation(nameof(StringTable.Suc_CreateProject)),
-                _translationManager.GetTranslation(nameof(StringTable.Fail_CreateProject)));
+                _translationManager.GetTranslation(nameof(StringTable.Fail_CreateProject))
+            );
         }
     }
 
@@ -512,7 +663,10 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
 
         if (settings.ShowWebDialogWhenAddingLink)
         {
-            var dialog = new CreateProjectFromWebDialog(settings.PrintsPath, url) { Owner = Application.Current.MainWindow };
+            var dialog = new CreateProjectFromWebDialog(settings.PrintsPath, url)
+            {
+                Owner = Application.Current.MainWindow
+            };
             if (dialog.ShowDialog() == true)
             {
                 projectName = dialog.ProjectName;
@@ -530,12 +684,17 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
                 _translationManager.GetTranslation(nameof(StringTable.Prog_LoadProjectData)),
                 async () => projectName = await _downloadService.GetProjectName(new Uri(url)),
                 null,
-                null);
-            getProjectFunc = () => CreateProjectFromWebDialog.CreateProject(settings.PrintsPath, url, projectName);
+                null
+            );
+            getProjectFunc = () =>
+                CreateProjectFromWebDialog.CreateProject(settings.PrintsPath, url, projectName);
         }
 
         await ExecuteLoadingAction(
-            string.Format(_translationManager.GetTranslation(nameof(StringTable.Prog_CreateProject)), projectName),
+            string.Format(
+                _translationManager.GetTranslation(nameof(StringTable.Prog_CreateProject)),
+                projectName
+            ),
             async () =>
             {
                 var project = await getProjectFunc();
@@ -548,17 +707,24 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
                 return project != null;
             },
             _translationManager.GetTranslation(nameof(StringTable.Suc_CreateProject)),
-            _translationManager.GetTranslation(nameof(StringTable.Fail_CreateProject)));
+            _translationManager.GetTranslation(nameof(StringTable.Fail_CreateProject))
+        );
     }
 
     private async Task CreateProjectFromArchive(string archivePath)
     {
         var settings = _settingsService.LoadSettings();
-        var dialog = new CreateProjectFromArchiveDialog(settings.PrintsPath, archivePath) { Owner = Application.Current.MainWindow };
+        var dialog = new CreateProjectFromArchiveDialog(settings.PrintsPath, archivePath)
+        {
+            Owner = Application.Current.MainWindow
+        };
         if (dialog.ShowDialog() == true)
         {
             await ExecuteLoadingAction(
-                string.Format(_translationManager.GetTranslation(nameof(StringTable.Prog_CreateProject)), dialog.ProjectName),
+                string.Format(
+                    _translationManager.GetTranslation(nameof(StringTable.Prog_CreateProject)),
+                    dialog.ProjectName
+                ),
                 async () =>
                 {
                     var project = await dialog.CreateProject();
@@ -566,7 +732,8 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
                     SelectedElement = project;
                 },
                 _translationManager.GetTranslation(nameof(StringTable.Suc_CreateProject)),
-                _translationManager.GetTranslation(nameof(StringTable.Fail_CreateProject)));
+                _translationManager.GetTranslation(nameof(StringTable.Fail_CreateProject))
+            );
         }
     }
 
@@ -575,11 +742,14 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
         _cache = new MetadataCache
         {
             PrintsPath = _currentPrintsPath,
-            PrintElements = await PrintElements.ToDictionaryAsync(x => x.Name, x => new PrintElementMetadataCache
-            {
-                IsArchived = x.IsArchived,
-                Tags = x.Tags.ToList(),
-            }),
+            PrintElements = await PrintElements.ToDictionaryAsync(
+                x => x.Name,
+                x => new PrintElementMetadataCache
+                {
+                    IsArchived = x.IsArchived,
+                    Tags = x.Tags.ToList(),
+                }
+            ),
         };
         await Task.Run(() => _cachingService.UpdateCache(_cache));
     }
@@ -589,9 +759,19 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
         if (e.Item is PrintElement element)
         {
             e.Accepted =
-                (element.Name.ToLower().Contains(FilterText ?? string.Empty, StringComparison.OrdinalIgnoreCase) || element.Tags.Any(x => x.Contains(FilterText ?? string.Empty, StringComparison.OrdinalIgnoreCase))) &&
-                ((ShowArchivedElements && element.Metadata.IsArchived) || (ShowNonArchivedElements && !element.Metadata.IsArchived)) &&
-                (VisibleTags.Count == 0 || element.Tags.Any(x => VisibleTags.Contains(x)));
+                (
+                    element
+                        .Name.ToLower()
+                        .Contains(FilterText ?? string.Empty, StringComparison.OrdinalIgnoreCase)
+                    || element.Tags.Any(x =>
+                        x.Contains(FilterText ?? string.Empty, StringComparison.OrdinalIgnoreCase)
+                    )
+                )
+                && (
+                    (ShowArchivedElements && element.Metadata.IsArchived)
+                    || (ShowNonArchivedElements && !element.Metadata.IsArchived)
+                )
+                && (VisibleTags.Count == 0 || element.Tags.Any(x => VisibleTags.Contains(x)));
         }
         else
         {
@@ -599,11 +779,19 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
         }
     }
 
-    private void PrintElements_CollectionItemPropertyChanged(object sender, CollectionItemPropertyChangedEventArgs e)
+    private void PrintElements_CollectionItemPropertyChanged(
+        object sender,
+        CollectionItemPropertyChangedEventArgs e
+    )
     {
         if (e.PropertyName == nameof(PrintElement.IsArchived))
         {
-            if (ShowArchivedElements && ShowNonArchivedElements && Application.Current.Dispatcher.Thread.ManagedThreadId == Environment.CurrentManagedThreadId)
+            if (
+                ShowArchivedElements
+                && ShowNonArchivedElements
+                && Application.Current.Dispatcher.Thread.ManagedThreadId
+                    == Environment.CurrentManagedThreadId
+            )
                 PrintElementsViewSource.View.Refresh();
         }
     }

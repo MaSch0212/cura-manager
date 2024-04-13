@@ -1,15 +1,15 @@
-﻿using CuraManager.Models;
+using System.ComponentModel;
+using System.IO;
+using System.Windows.Forms;
+using System.Windows.Input;
+using System.Windows.Interop;
+using CuraManager.Models;
 using CuraManager.Resources;
 using CuraManager.Services;
 using MaSch.Presentation;
 using MaSch.Presentation.Translation;
 using MaSch.Presentation.Wpf.Commands;
 using MaSch.Presentation.Wpf.Views.SplitView;
-using System.ComponentModel;
-using System.IO;
-using System.Windows.Forms;
-using System.Windows.Input;
-using System.Windows.Interop;
 using Application = System.Windows.Application;
 
 namespace CuraManager.ViewModels.Main;
@@ -49,7 +49,10 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
     public Version LatestSupportedCuraVersion => _curaService?.LatestSupportedCuraVersion;
 
     [DependsOn(nameof(SelectedCuraVersion))]
-    public bool? IsSupportedCuraVersionSelected => LatestSupportedCuraVersion == null ? null : SelectedCuraVersion <= LatestSupportedCuraVersion;
+    public bool? IsSupportedCuraVersionSelected =>
+        LatestSupportedCuraVersion == null
+            ? null
+            : SelectedCuraVersion <= LatestSupportedCuraVersion;
 
     public ICommand UndoCommand { get; }
     public ICommand SaveCommand { get; }
@@ -69,7 +72,9 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
         UndoCommand = new DelegateCommand(ExecuteUndo);
         SaveCommand = new DelegateCommand(ExecuteSave);
         BrowseDirectoryCommand = new DelegateCommand<string>(ExecuteBrowseDirectory);
-        ReloadAvailableVersionsCommand = new AsyncDelegateCommand(async () => await RebuildAvailableVersionsAsync(true));
+        ReloadAvailableVersionsCommand = new AsyncDelegateCommand(
+            async () => await RebuildAvailableVersionsAsync(true)
+        );
     }
 
     public override async Task OnOpen(CancelEventArgs e)
@@ -86,7 +91,12 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
 
         var result = AlertResult.No;
         if (Settings.HasChanges)
-            result = MessageBox.Show(_translationManager.GetTranslation(nameof(StringTable.Msg_UnsavedChanges)), "CuraManager", AlertButton.YesNoCancel, AlertImage.Warning);
+            result = MessageBox.Show(
+                _translationManager.GetTranslation(nameof(StringTable.Msg_UnsavedChanges)),
+                "CuraManager",
+                AlertButton.YesNoCancel,
+                AlertImage.Warning
+            );
 
         if (result == AlertResult.Yes)
         {
@@ -117,7 +127,10 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
 
     private void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(CuraManagerSettings.CuraProgramFilesPath) && sender is CuraManagerSettings settings)
+        if (
+            e.PropertyName is nameof(CuraManagerSettings.CuraProgramFilesPath)
+            && sender is CuraManagerSettings settings
+        )
         {
             SelectedCuraVersion = _curaService.GetCuraVersion(settings.CuraProgramFilesPath);
         }
@@ -127,7 +140,10 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
     private void ExecuteUndo()
     {
         Settings = _settingsService.LoadSettings();
-        RaiseOnMessage(_translationManager.GetTranslation(nameof(StringTable.Suc_UndoChanges)), MessageType.Success);
+        RaiseOnMessage(
+            _translationManager.GetTranslation(nameof(StringTable.Suc_UndoChanges)),
+            MessageType.Success
+        );
     }
 
     private void ExecuteSave()
@@ -139,18 +155,29 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
     {
         var property = Settings.GetType().GetProperty(settingName);
         if (property == null)
-            throw new ArgumentException($"A setting with the name \"{settingName}\" does not exist.", nameof(settingName));
+            throw new ArgumentException(
+                $"A setting with the name \"{settingName}\" does not exist.",
+                nameof(settingName)
+            );
 
         var selectedPath = (string)property.GetValue(Settings);
 
         var fbd = new FolderBrowserDialog
         {
-            SelectedPath = !string.IsNullOrWhiteSpace(selectedPath) ? selectedPath : settingName switch
-            {
-                nameof(Settings.CuraAppDataPath) => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "cura") + Path.DirectorySeparatorChar,
-                nameof(Settings.CuraProgramFilesPath) => Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles) + Path.DirectorySeparatorChar,
-                _ => null,
-            },
+            SelectedPath = !string.IsNullOrWhiteSpace(selectedPath)
+                ? selectedPath
+                : settingName switch
+                {
+                    nameof(Settings.CuraAppDataPath)
+                        => Path.Combine(
+                            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                            "cura"
+                        ) + Path.DirectorySeparatorChar,
+                    nameof(Settings.CuraProgramFilesPath)
+                        => Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)
+                            + Path.DirectorySeparatorChar,
+                    _ => null,
+                },
         };
 
         NativeWindow owner = null;
@@ -175,11 +202,20 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
             var languages = _translationManager.GetAvailableLanguages().ToList();
             if (languages.TryRemove(CultureInfo.InvariantCulture))
                 languages.AddIfNotExists(CultureInfo.GetCultureInfo("en"));
-            var nonNeutral = languages.Where(x => x.Parent.LCID != CultureInfo.InvariantCulture.LCID).GroupBy(x => x.Parent).ToList();
+            var nonNeutral = languages
+                .Where(x => x.Parent.LCID != CultureInfo.InvariantCulture.LCID)
+                .GroupBy(x => x.Parent)
+                .ToList();
             languages.Remove(nonNeutral.Where(x => x.Count() <= 1).SelectMany(x => x));
             languages.Remove(nonNeutral.Where(x => x.Count() > 1).Select(x => x.Key));
             AvailableLanguages = new[] { ObservableTuple.Create((int?)null, osLangEntry) }
-                .Concat(languages.Where(x => x.LCID != CultureInfo.InvariantCulture.LCID).Select(x => ObservableTuple.Create((int?)x.LCID, x.NativeName)).OrderBy(x => x.Item2)).ToArray();
+                .Concat(
+                    languages
+                        .Where(x => x.LCID != CultureInfo.InvariantCulture.LCID)
+                        .Select(x => ObservableTuple.Create((int?)x.LCID, x.NativeName))
+                        .OrderBy(x => x.Item2)
+                )
+                .ToArray();
             NotifyPropertyChanged(nameof(AvailableLanguages));
             NotifyPropertyChanged(nameof(CurrentLanguage));
         }
@@ -197,11 +233,23 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
         IsLoadingVersions = true;
         try
         {
-            AvailableVersions = await _curaService.FindAvailableCuraVersions().Prepend(new CuraVersion(null, null, null, null, true)).ToArrayAsync();
-            SelectedAvailableVersion = AvailableVersions.FirstOrDefault(x =>
-                string.Equals(x.AppDataPath, Settings.CuraAppDataPath, StringComparison.OrdinalIgnoreCase) &&
-                string.Equals(x.ProgramFilesPath, Settings.CuraProgramFilesPath, StringComparison.OrdinalIgnoreCase))
-                ?? AvailableVersions[0];
+            AvailableVersions = await _curaService
+                .FindAvailableCuraVersions()
+                .Prepend(new CuraVersion(null, null, null, null, true))
+                .ToArrayAsync();
+            SelectedAvailableVersion =
+                AvailableVersions.FirstOrDefault(x =>
+                    string.Equals(
+                        x.AppDataPath,
+                        Settings.CuraAppDataPath,
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                    && string.Equals(
+                        x.ProgramFilesPath,
+                        Settings.CuraProgramFilesPath,
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                ) ?? AvailableVersions[0];
         }
         finally
         {
@@ -214,6 +262,7 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
         ExecuteLoadingAction(
             () => _settingsService.SaveSettings(Settings),
             _translationManager.GetTranslation(nameof(StringTable.Suc_SaveChanges)),
-            _translationManager.GetTranslation(nameof(StringTable.Fail_SaveChanges)));
+            _translationManager.GetTranslation(nameof(StringTable.Fail_SaveChanges))
+        );
     }
 }

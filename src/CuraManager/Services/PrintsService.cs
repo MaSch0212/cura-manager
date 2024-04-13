@@ -1,27 +1,36 @@
-﻿using CuraManager.Models;
 using System.IO;
+using CuraManager.Models;
 
 namespace CuraManager.Services;
 
 public class PrintsService : IPrintsService
 {
-    public PrintsService()
-    {
-    }
+    public PrintsService() { }
 
     public IEnumerable<PrintElement> GetPrintElements(MetadataCache cache)
     {
         return GetNewPrintElements(cache, new List<PrintElement>());
     }
 
-    public IEnumerable<PrintElement> GetNewPrintElements(MetadataCache cache, ICollection<PrintElement> elements)
+    public IEnumerable<PrintElement> GetNewPrintElements(
+        MetadataCache cache,
+        ICollection<PrintElement> elements
+    )
     {
         var printsPath = cache.PrintsPath;
-        var directories = Directory.EnumerateDirectories(printsPath, "*", SearchOption.TopDirectoryOnly);
+        var directories = Directory.EnumerateDirectories(
+            printsPath,
+            "*",
+            SearchOption.TopDirectoryOnly
+        );
 
         foreach (var dir in directories)
         {
-            if (!elements.Any(y => string.Equals(y.DirectoryLocation, dir, StringComparison.OrdinalIgnoreCase)))
+            if (
+                !elements.Any(y =>
+                    string.Equals(y.DirectoryLocation, dir, StringComparison.OrdinalIgnoreCase)
+                )
+            )
             {
                 var element = new PrintElement(dir);
                 if (cache.PrintElements.TryGetValue(element.Name, out var elementCache))

@@ -1,9 +1,9 @@
-﻿using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
 using System.IO.Compression;
 using System.Windows;
+using Newtonsoft.Json;
 
 namespace CuraManager.Models;
 
@@ -35,7 +35,8 @@ public sealed partial class PrintElement : ObservableObject, IDisposable, IPrint
         _tagsRaiseEvent = true;
     }
 
-    public IEnumerable<PrintElementFile> AllFiles => CuraProjectFiles.Concat(ModelFiles).Concat(OtherFiles);
+    public IEnumerable<PrintElementFile> AllFiles =>
+        CuraProjectFiles.Concat(ModelFiles).Concat(OtherFiles);
     public ObservableCollection<string> Tags { get; }
     public string TagsDisplay => string.Join(", ", Tags.OrderBy(x => x));
 
@@ -120,7 +121,9 @@ public sealed partial class PrintElement : ObservableObject, IDisposable, IPrint
         CuraProjectFiles.Clear();
         ModelFiles.Clear();
         OtherFiles.Clear();
-        foreach (var file in Directory.GetFiles(DirectoryLocation, "*", SearchOption.TopDirectoryOnly))
+        foreach (
+            var file in Directory.GetFiles(DirectoryLocation, "*", SearchOption.TopDirectoryOnly)
+        )
         {
             GetCorrectListForFile(file)?.Add(new PrintElementFile(file));
         }
@@ -153,7 +156,9 @@ public sealed partial class PrintElement : ObservableObject, IDisposable, IPrint
         }
         else
         {
-            Application.Current.Dispatcher.Invoke(() => newList.Add(new PrintElementFile(e.FullPath)));
+            Application.Current.Dispatcher.Invoke(
+                () => newList.Add(new PrintElementFile(e.FullPath))
+            );
         }
     }
 
@@ -166,7 +171,9 @@ public sealed partial class PrintElement : ObservableObject, IDisposable, IPrint
 
     private void OnFileCreated(object sender, FileSystemEventArgs e)
     {
-        Application.Current.Dispatcher.Invoke(() => GetCorrectListForFile(e.FullPath)?.Add(new PrintElementFile(e.FullPath)));
+        Application.Current.Dispatcher.Invoke(
+            () => GetCorrectListForFile(e.FullPath)?.Add(new PrintElementFile(e.FullPath))
+        );
     }
 
     #endregion
@@ -185,7 +192,8 @@ public sealed partial class PrintElement : ObservableObject, IDisposable, IPrint
         var fileName = Path.GetFileNameWithoutExtension(filePath);
         var extension = Path.GetExtension(filePath);
 
-        bool Predicate(PrintElementFile x) => x.FileName == fileName && x.FileExtension == extension;
+        bool Predicate(PrintElementFile x) =>
+            x.FileName == fileName && x.FileExtension == extension;
         if (CuraProjectFiles.TryFirst(Predicate, out var result))
         {
             list = CuraProjectFiles;
@@ -214,9 +222,16 @@ public sealed partial class PrintElement : ObservableObject, IDisposable, IPrint
             return ModelFiles;
         if (IsExt(".3mf"))
             return IsCuraProjectFile(filePath) ? CuraProjectFiles : ModelFiles;
-        return string.Equals(Path.GetFileName(filePath), "metadata.json", StringComparison.OrdinalIgnoreCase) ? null : OtherFiles;
+        return string.Equals(
+            Path.GetFileName(filePath),
+            "metadata.json",
+            StringComparison.OrdinalIgnoreCase
+        )
+            ? null
+            : OtherFiles;
 
-        bool IsExt(params string[] e) => e.Any(x => string.Equals(ext, x, StringComparison.OrdinalIgnoreCase));
+        bool IsExt(params string[] e) =>
+            e.Any(x => string.Equals(ext, x, StringComparison.OrdinalIgnoreCase));
     }
 
     internal static bool IsCuraProjectFile(string filePath)
@@ -228,11 +243,16 @@ public sealed partial class PrintElement : ObservableObject, IDisposable, IPrint
         try
         {
             zip = ZipFile.OpenRead(filePath);
-            return zip.Entries.Any(x => x.FullName.StartsWith("Cura/", StringComparison.OrdinalIgnoreCase));
+            return zip.Entries.Any(x =>
+                x.FullName.StartsWith("Cura/", StringComparison.OrdinalIgnoreCase)
+            );
         }
         catch
         {
-            var lockingProcesses = Waiter.Retry(() => MaSch.Native.Windows.Explorer.FileInfo.WhoIsLocking(filePath), new RetryOptions { ThrowException = false });
+            var lockingProcesses = Waiter.Retry(
+                () => MaSch.Native.Windows.Explorer.FileInfo.WhoIsLocking(filePath),
+                new RetryOptions { ThrowException = false }
+            );
             return lockingProcesses?.Any(x => x.ProcessName == "Cura") == true;
         }
         finally

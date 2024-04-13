@@ -1,4 +1,4 @@
-﻿using CuraManager.Services.WebProviders;
+using CuraManager.Services.WebProviders;
 
 namespace CuraManager.Services;
 

@@ -1,7 +1,7 @@
-﻿using CuraManager.Resources;
-using MaSch.Presentation.Translation;
 using System.Windows;
 using System.Windows.Input;
+using CuraManager.Resources;
+using MaSch.Presentation.Translation;
 using MessageBox = MaSch.Presentation.Wpf.MessageBox;
 
 namespace CuraManager.Views;
@@ -19,7 +19,12 @@ public partial class RenameDialog : IRenameDialog_Props
     private readonly ITranslationManager _translationManager;
     private readonly Func<string, string> _validationFunction;
 
-    public RenameDialog(string title, string description, string currentName, Func<string, string> validationFunction)
+    public RenameDialog(
+        string title,
+        string description,
+        string currentName,
+        Func<string, string> validationFunction
+    )
     {
         ServiceContext.GetService(out _translationManager);
 
@@ -40,14 +45,26 @@ public partial class RenameDialog : IRenameDialog_Props
     {
         if (string.IsNullOrEmpty(NewName))
         {
-            MessageBox.Show(this, _translationManager.GetTranslation(nameof(StringTable.Msg_EnterNewName)), "CuraManager", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(
+                this,
+                _translationManager.GetTranslation(nameof(StringTable.Msg_EnterNewName)),
+                "CuraManager",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information
+            );
             return;
         }
 
         var error = _validationFunction(NewName);
         if (!string.IsNullOrEmpty(error))
         {
-            MessageBox.Show(this, error, "CuraManager", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(
+                this,
+                error,
+                "CuraManager",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information
+            );
             return;
         }
 

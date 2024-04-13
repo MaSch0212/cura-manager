@@ -1,12 +1,12 @@
-﻿using CuraManager.Models;
-using CuraManager.Resources;
-using HtmlAgilityPack;
-using MaSch.Presentation.Translation;
-using Microsoft.Win32;
 using System.IO;
 using System.IO.Compression;
 using System.Windows;
 using System.Windows.Input;
+using CuraManager.Models;
+using CuraManager.Resources;
+using HtmlAgilityPack;
+using MaSch.Presentation.Translation;
+using Microsoft.Win32;
 using MessageBox = MaSch.Presentation.Wpf.MessageBox;
 
 namespace CuraManager.Views;
@@ -54,25 +54,58 @@ public partial class CreateProjectFromArchiveDialog : ICreateProjectFromArchiveD
     {
         if (string.IsNullOrEmpty(ProjectName))
         {
-            MessageBox.Show(this, _translationManager.GetTranslation(nameof(StringTable.Msg_SpecifyProjectName)), "CuraManager", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(
+                this,
+                _translationManager.GetTranslation(nameof(StringTable.Msg_SpecifyProjectName)),
+                "CuraManager",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information
+            );
             return;
         }
 
         if (string.IsNullOrEmpty(ArchivePath))
         {
-            MessageBox.Show(this, _translationManager.GetTranslation(nameof(StringTable.Msg_SelectArchiveToImport)), "CuraManager", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(
+                this,
+                _translationManager.GetTranslation(nameof(StringTable.Msg_SelectArchiveToImport)),
+                "CuraManager",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information
+            );
             return;
         }
 
         if (!File.Exists(ArchivePath))
         {
-            MessageBox.Show(this, _translationManager.GetTranslation(nameof(StringTable.Msg_ArchiveDoesNotExist)), "CuraManager", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(
+                this,
+                _translationManager.GetTranslation(nameof(StringTable.Msg_ArchiveDoesNotExist)),
+                "CuraManager",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information
+            );
             return;
         }
 
-        if (Directory.EnumerateDirectories(_targetPath, "*", SearchOption.TopDirectoryOnly).Any(x => string.Equals(Path.GetFileName(x), ProjectName)))
+        if (
+            Directory
+                .EnumerateDirectories(_targetPath, "*", SearchOption.TopDirectoryOnly)
+                .Any(x => string.Equals(Path.GetFileName(x), ProjectName))
+        )
         {
-            MessageBox.Show(this, string.Format(_translationManager.GetTranslation(nameof(StringTable.Msg_ProjectAlreadyExists)), ProjectName), "CuraManager", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(
+                this,
+                string.Format(
+                    _translationManager.GetTranslation(
+                        nameof(StringTable.Msg_ProjectAlreadyExists)
+                    ),
+                    ProjectName
+                ),
+                "CuraManager",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information
+            );
             return;
         }
 
@@ -93,7 +126,12 @@ public partial class CreateProjectFromArchiveDialog : ICreateProjectFromArchiveD
 
         using (var zipFile = ZipFile.OpenRead(ArchivePath))
         {
-            if (zipFile.Entries.TryFirst(x => x.FullName == "attribution_card.html", out var htmlEntry))
+            if (
+                zipFile.Entries.TryFirst(
+                    x => x.FullName == "attribution_card.html",
+                    out var htmlEntry
+                )
+            )
             {
                 var tempFile = Path.GetTempFileName();
                 htmlEntry.ExtractToFile(tempFile, true);
@@ -111,15 +149,25 @@ public partial class CreateProjectFromArchiveDialog : ICreateProjectFromArchiveD
         return result;
     }
 
-    public static IEnumerable<(ZipArchiveEntry Entry, string TargetPath)> GetFilesToExtract(ZipArchive zipFile, string targetDir)
+    public static IEnumerable<(ZipArchiveEntry Entry, string TargetPath)> GetFilesToExtract(
+        ZipArchive zipFile,
+        string targetDir
+    )
     {
         string startsWith = string.Empty;
         if (zipFile.Entries.Any(x => x.FullName == "files/"))
             startsWith = "files/";
 
-        foreach (var entry in zipFile.Entries.Where(x => x.FullName.StartsWith(startsWith) && x.Length > 0))
+        foreach (
+            var entry in zipFile.Entries.Where(x =>
+                x.FullName.StartsWith(startsWith) && x.Length > 0
+            )
+        )
         {
-            var newFileName = string.Join(" - ", entry.FullName.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries));
+            var newFileName = string.Join(
+                " - ",
+                entry.FullName.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries)
+            );
             var targetPath = Path.Combine(targetDir, newFileName);
             yield return (entry, targetPath);
         }

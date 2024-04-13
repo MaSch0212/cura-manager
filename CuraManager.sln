@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28922.388
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CuraManager", "src\CuraManager\CuraManager.csproj", "{C54F273B-F3F4-4CB8-A51B-4CFFE9D8F098}"
 EndProject
@@ -14,13 +14,17 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{3B8571FA-A1C3-4E6A-8229-5DC9C1EDE538}"
 	ProjectSection(SolutionItems) = preProject
 		build\build.yml = build\build.yml
-		build\CuraManager.ruleset = build\CuraManager.ruleset
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{4E4CE25F-E04A-40E0-82B8-B0E35F6D59AB}"
 	ProjectSection(SolutionItems) = preProject
 		docs\release-notes\next.md = docs\release-notes\next.md
 		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{1461D877-B9A5-4ADB-AAA3-A9F1E9C55DF6}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
 Global

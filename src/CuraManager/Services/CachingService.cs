@@ -1,14 +1,12 @@
-﻿using CuraManager.Models;
-using Newtonsoft.Json;
 using System.IO;
+using CuraManager.Models;
+using Newtonsoft.Json;
 
 namespace CuraManager.Services;
 
 public class CachingService : ICachingService
 {
-    public CachingService()
-    {
-    }
+    public CachingService() { }
 
     public MetadataCache LoadCache(string printsPath)
     {
