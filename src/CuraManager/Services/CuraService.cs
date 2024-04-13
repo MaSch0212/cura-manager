@@ -22,7 +22,7 @@ public class CuraService : ICuraService
 
     private readonly ISettingsService _settingsService;
 
-    public Version LatestSupportedCuraVersion { get; } = new Version(5, 5, 0, 0);
+    public Version LatestSupportedCuraVersion { get; } = new Version(5, 7, 0, 0);
 
     internal CuraService()
         : this(ServiceContext.GetService<ISettingsService>()) { }
@@ -158,7 +158,10 @@ public class CuraService : ICuraService
             bool CheckEditNameButton(TreeWalker treeWalker, AutomationElement e)
             {
                 return ReferenceEquals(e.Current.ControlType, ControlType.Edit)
-                    && !e.Current.IsOffscreen;
+                    && !e.Current.IsOffscreen
+                    && e.TryGetCurrentPattern(ValuePattern.Pattern, out var objValuePattern)
+                    && objValuePattern is ValuePattern valuePattern
+                    && !valuePattern.Current.IsReadOnly;
             }
         }
     }
