@@ -11,7 +11,7 @@ using Application = System.Windows.Application;
 
 namespace CuraManager.Services;
 
-public class CuraService : ICuraService
+public class CuraService(ISettingsService settingsService) : ICuraService
 {
     private static readonly string ProgramFilesDir = Environment.GetFolderPath(
         Environment.SpecialFolder.ProgramFiles
@@ -20,17 +20,10 @@ public class CuraService : ICuraService
         Environment.SpecialFolder.ApplicationData
     );
 
-    private readonly ISettingsService _settingsService;
-
-    public Version LatestSupportedCuraVersion { get; } = new Version(5, 7, 0, 0);
+    public Version LatestSupportedCuraVersion { get; } = new Version(5, 7, 1, 0);
 
     internal CuraService()
         : this(ServiceContext.GetService<ISettingsService>()) { }
-
-    public CuraService(ISettingsService settingsService)
-    {
-        _settingsService = settingsService;
-    }
 
     public async Task<bool> CreateCuraProject(PrintElement element)
     {
@@ -54,7 +47,7 @@ public class CuraService : ICuraService
 
     public void OpenCura(PrintElement element, string printName, IEnumerable<string> modelsToAdd)
     {
-        var settings = _settingsService.LoadSettings();
+        var settings = settingsService.LoadSettings();
 
         SetCuraSaveDialogPath(element.DirectoryLocation, settings);
 
@@ -168,7 +161,7 @@ public class CuraService : ICuraService
 
     public void OpenCuraProject(string fileName)
     {
-        var settings = _settingsService.LoadSettings();
+        var settings = settingsService.LoadSettings();
 
         SetCuraSaveDialogPath(Path.GetDirectoryName(fileName), settings);
 
