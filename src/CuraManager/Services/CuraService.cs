@@ -20,7 +20,7 @@ public class CuraService(ISettingsService settingsService) : ICuraService
         Environment.SpecialFolder.ApplicationData
     );
 
-    public Version LatestSupportedCuraVersion { get; } = new Version(5, 8, 0, 0);
+    public Version LatestSupportedCuraVersion { get; } = new Version(5, 10, 0, 0);
 
     internal CuraService()
         : this(ServiceContext.GetService<ISettingsService>()) { }
