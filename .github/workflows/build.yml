@@ -30,7 +30,7 @@ concurrency:
 
 jobs:
   build:
-    name: "\U0001F6E0 Build"
+    name: Build
     runs-on: windows-2025
     outputs:
       version: ${{ steps.version.outputs.version }}
@@ -55,6 +55,18 @@ jobs:
           Write-Host "Version: $version"
           "version=$version" >> $env:GITHUB_OUTPUT
 
+      - name: Check release notes
+        shell: pwsh
+        env:
+          APP_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          $notes = "docs/release-notes/v$env:APP_VERSION.md"
+          if (-not (Test-Path $notes -PathType Leaf)) {
+            Write-Output "::error::There is no release-notes file for version $env:APP_VERSION. Please make sure that the file '$notes' exists."
+            exit 1
+          }
+          Write-Host "Found release notes: $notes"
+
       - name: Build projects
         run: >
           dotnet publish CuraManager.slnx
@@ -73,7 +85,7 @@ jobs:
           if-no-files-found: error
 
   release:
-    name: "\U0001F680 Publish to GitHub"
+    name: Publish to GitHub
     needs: build
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
@@ -103,10 +115,6 @@ jobs:
           fi
 
           notes="docs/release-notes/v${APP_VERSION}.md"
-          if [ ! -f "${notes}" ]; then
-            echo "::error::There is no release-notes file for version ${APP_VERSION}. Please make sure that the file \"${notes}\" exists."
-            exit 1
-          fi
 
           echo "Tag \"${tag}\" does not exist. Creating GitHub release..."
           gh release create "${tag}" \
