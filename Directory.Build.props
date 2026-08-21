@@ -1,12 +1,16 @@
 <Project>
-  <PropertyGroup Condition=" '$(Configuration)' != 'Debug_MaSchLocal' ">
-    <!--
-            Lockfiles are disabled for Debug_MaSchLocal on purpose. That configuration
-            swaps the MaSch PackageReferences for ProjectReferences into a local
-            checkout, so restoring under it produces a genuinely different package
-            graph and would rewrite the lockfile with the MaSch packages missing.
-            CI only ever builds Release.
-        -->
+  <PropertyGroup>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug_MaSchLocal' ">
+    <!--
+            Debug_MaSchLocal swaps the MaSch PackageReferences for ProjectReferences into
+            a local checkout, so its package graph genuinely differs. Point it at its own
+            lockfile (gitignored) so it can never rewrite the committed one. Disabling
+            lockfiles outright is not possible here: NuGet also activates lock mode from
+            the presence of packages.lock.json, and an explicit false then yields NU1005.
+        -->
+    <NuGetLockFilePath>$(MSBuildProjectDirectory)\packages.Debug_MaSchLocal.lock.json</NuGetLockFilePath>
   </PropertyGroup>
 </Project>
