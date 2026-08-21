@@ -159,26 +159,31 @@ public sealed partial class PrintElement : ObservableObject, IDisposable, IPrint
     private void OnFileRenamed(object sender, RenamedEventArgs e)
     {
         var file = GetFile(e.OldFullPath, out var list);
-        var newList = GetCorrectListForFile(e.FullPath);
-        if (file != null && newList != null)
+
+        Application.Current.Dispatcher.Invoke(() =>
         {
-            file.RefreshFilePath(e.FullPath);
-            if (!ReferenceEquals(list, newList))
+            // GetCorrectListForFile can create a group, which mutates the bound
+            // SlicerProjectFiles collection, so it has to run on the dispatcher
+            // thread -- same reason OnFileCreated calls it inside the Invoke.
+            var newList = GetCorrectListForFile(e.FullPath);
+            if (newList == null)
+                return;
+
+            if (file != null)
             {
-                Application.Current.Dispatcher.Invoke(() =>
+                file.RefreshFilePath(e.FullPath);
+                if (!ReferenceEquals(list, newList))
                 {
                     list.Remove(file);
                     newList.Add(file);
                     RemoveEmptyGroup();
-                });
+                }
             }
-        }
-        else
-        {
-            Application.Current.Dispatcher.Invoke(() =>
-                newList.Add(new PrintElementFile(e.FullPath))
-            );
-        }
+            else
+            {
+                newList.Add(new PrintElementFile(e.FullPath));
+            }
+        });
     }
 
     private void OnFileDeleted(object sender, FileSystemEventArgs e)
