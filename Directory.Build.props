@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup Condition=" '$(Configuration)' != 'Debug_MaSchLocal' ">
+    <!--
+            Lockfiles are disabled for Debug_MaSchLocal on purpose. That configuration
+            swaps the MaSch PackageReferences for ProjectReferences into a local
+            checkout, so restoring under it produces a genuinely different package
+            graph and would rewrite the lockfile with the MaSch packages missing.
+            CI only ever builds Release.
+        -->
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+  </PropertyGroup>
+</Project>

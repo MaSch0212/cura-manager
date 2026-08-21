@@ -8,6 +8,8 @@ on:
       - .github/workflows/build.yml
       - .editorconfig
       - CuraManager.slnx
+      - Directory.Build.props
+      - Directory.Packages.props
       - docs/release-notes/**
       - src/**
       - tests/**
@@ -18,6 +20,8 @@ on:
       - .github/workflows/build.yml
       - .editorconfig
       - CuraManager.slnx
+      - Directory.Build.props
+      - Directory.Packages.props
       - docs/release-notes/**
       - src/**
       - tests/**
@@ -44,6 +48,9 @@ jobs:
         uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '10.x'
+
+      - name: Restore (locked mode)
+        run: dotnet restore CuraManager.slnx --locked-mode
 
       - name: Determine version
         id: version
