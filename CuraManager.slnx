@@ -25,4 +25,8 @@
     <BuildType Solution="Debug_MaSchLocal|x64" Project="Debug" />
     <BuildType Solution="Debug_MaSchLocal|x86" Project="Debug" />
   </Project>
+  <Project Path="tests/CuraManager.Tests/CuraManager.Tests.csproj">
+    <BuildType Solution="Debug_MaSchLocal|x64" Project="Debug" />
+    <BuildType Solution="Debug_MaSchLocal|x86" Project="Debug" />
+  </Project>
 </Solution>
