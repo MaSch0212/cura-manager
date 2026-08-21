@@ -9,7 +9,7 @@ trigger:
     - src
 
 pool:
-  vmImage: 'windows-2022'
+  vmImage: 'windows-2025'
 
 steps:
 - checkout: self
@@ -23,6 +23,12 @@ steps:
 #     projects: '**/*Test.csproj'
 #     arguments: '--collect "Code coverage" -p:TreatWarningsAsErrors=true'
 
+- task: UseDotNet@2
+  displayName: "\U0001F4E6 Install .NET SDK"
+  inputs:
+    packageType: 'sdk'
+    version: '10.x'
+
 - task: DotNetCoreCLI@2
   displayName: "\U0001F6E0 Build projects"
   inputs:
@@ -31,12 +37,12 @@ steps:
     arguments: '-c Release -r win-x64 --no-self-contained -p:PublishReadyToRun=true -p:OutputZipDir=$(Build.ArtifactStagingDirectory) -p:TreatWarningsAsErrors=true'
     zipAfterPublish: false
 
-- task: PublishBuildArtifacts@1
+- task: PublishPipelineArtifact@1
   displayName: "\U0001F6EB Publish to Azure Pipeline"
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'drop'
-    publishLocation: 'Container'
+    targetPath: '$(Build.ArtifactStagingDirectory)'
+    artifact: 'drop'
+    publishLocation: 'pipeline'
 
 - powershell: |
     Write-Host "Current Version: $(AppVersion)"
