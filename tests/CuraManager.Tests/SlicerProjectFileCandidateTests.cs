@@ -99,10 +99,19 @@ public class SlicerProjectFileCandidateTests
             .ToArray();
         File.WriteAllBytes(path, truncated);
 
-        using var candidate = SlicerProjectFileCandidate.Create(path, new StubLocks("Cura"));
+        var candidate = SlicerProjectFileCandidate.Create(path, new StubLocks("Cura"));
 
         Assert.Empty(candidate.ZipEntryNames);
         Assert.Equal(new[] { "Cura" }, candidate.LockingProcessNames);
+
+        candidate.Dispose();
+
+        // ZipFile.OpenRead holds the file with FileShare.Read, which excludes delete
+        // sharing. If Create leaked the archive on the lazy-Entries throw, this delete
+        // fails with IOException. It is the only externally observable difference
+        // between the fixed and unfixed code, since both return the same fallback.
+        System.IO.File.Delete(path);
+        Assert.False(System.IO.File.Exists(path));
     }
 
     private sealed class StubLocks(params string[] names) : IFileLockInspector
