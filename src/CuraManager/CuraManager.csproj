@@ -112,13 +112,12 @@
         </EmbeddedResource>
     </ItemGroup>
 
-    <Target Name="PowerShellAfterPublish" AfterTargets="Publish">
+    <Target Name="ZipAfterPublish" AfterTargets="Publish">
         <MakeDir Directories="$(OutputZipDir)" />
         <ZipDirectory
             SourceDirectory="$(PublishDir)"
             DestinationFile="$(OutputZipPath)"
             Overwrite="true"
         />
-        <Message Text="##vso[task.setvariable variable=AppVersion;]$(Version)" Importance="high" />
     </Target>
 </Project>
