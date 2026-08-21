@@ -469,6 +469,31 @@ git commit -m "feat: add per-slicer settings schema with migration from the flat
 
 ---
 
+### Task 2b: Central package management and NuGet lockfiles
+
+**Inserted mid-run at the user's request**, after Task 2 and before Task 3, so that
+the third project (`CuraManager.Legacy.CuraAutomation`, Task 5) is authored under
+CPM rather than retrofitted.
+
+Full step-by-step brief:
+`.superpowers/sdd/2026-08-21-multi-slicer-support/task-2b-brief.md`
+
+**Files:** creates `Directory.Packages.props` and `Directory.Build.props`; strips
+every `Version` attribute from the two csproj files; commits
+`src/CuraManager/packages.lock.json` and
+`tests/CuraManager.Tests/packages.lock.json`; adds a `dotnet restore --locked-mode`
+step to CI and both props files to its `paths:` filters.
+
+**Consequence for every later task:** a new `PackageReference` carries **no**
+`Version` attribute. Add a `PackageVersion` entry to `Directory.Packages.props`
+instead, and re-run `dotnet restore` so the lockfiles update.
+
+`Debug_MaSchLocal` gets its own gitignored lockfile via `NuGetLockFilePath`, because
+that configuration replaces the MaSch package references with project references and
+would otherwise rewrite the committed lockfile. Omitting
+`RestorePackagesWithLockFile` is not sufficient — NuGet also activates lock mode from
+the presence of `packages.lock.json`.
+
 ### Task 3: Provider abstraction types
 
 Types only, no registry and no provider implementations. Everything here is pure and testable without a slicer installed.
