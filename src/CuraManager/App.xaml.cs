@@ -41,7 +41,7 @@ public partial class App
     {
         try
         {
-            var wdw = new ExceptionView { ExceptionToDisplay = e.Exception, };
+            var wdw = new ExceptionView { ExceptionToDisplay = e.Exception };
             wdw.ShowDialog();
         }
         catch
@@ -113,7 +113,7 @@ public partial class App
             {
                 Source = new Uri(
                     $"pack://application:,,,/MaSch.Presentation.Wpf.Themes;component/Languages/{langName}.xaml"
-                )
+                ),
             };
             if (_languageResDictIndex < 0)
             {

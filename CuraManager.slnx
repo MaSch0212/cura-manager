@@ -1,0 +1,28 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="Debug_MaSchLocal" />
+    <BuildType Name="Release" />
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/.github/">
+    <File Path=".github/workflows/build.yml" />
+  </Folder>
+  <Folder Name="/common/">
+    <File Path=".editorconfig" />
+  </Folder>
+  <Folder Name="/docs/">
+    <File Path="docs/release-notes/next.md" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/resources/">
+    <File Path="resources/CuraManager.afdesign" />
+    <File Path="resources/CuraManager.ico" />
+  </Folder>
+  <Project Path="src/CuraManager/CuraManager.csproj">
+    <BuildType Solution="Debug_MaSchLocal|x64" Project="Debug" />
+    <BuildType Solution="Debug_MaSchLocal|x86" Project="Debug" />
+  </Project>
+</Solution>

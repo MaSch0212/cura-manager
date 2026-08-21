@@ -1,0 +1,124 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/build.yml
+      - .editorconfig
+      - CuraManager.slnx
+      - docs/release-notes/**
+      - src/**
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/build.yml
+      - .editorconfig
+      - CuraManager.slnx
+      - docs/release-notes/**
+      - src/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    name: Build
+    runs-on: windows-2025
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.x'
+
+      - name: Determine version
+        id: version
+        shell: pwsh
+        run: |
+          $version = (dotnet msbuild src/CuraManager/CuraManager.csproj -getProperty:Version -nologo).Trim()
+          if (-not $version) {
+            Write-Error "Could not determine the version from CuraManager.csproj."
+            exit 1
+          }
+          Write-Host "Version: $version"
+          "version=$version" >> $env:GITHUB_OUTPUT
+
+      - name: Check release notes
+        shell: pwsh
+        env:
+          APP_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          $notes = "docs/release-notes/v$env:APP_VERSION.md"
+          if (-not (Test-Path $notes -PathType Leaf)) {
+            Write-Output "::error::There is no release-notes file for version $env:APP_VERSION. Please make sure that the file '$notes' exists."
+            exit 1
+          }
+          Write-Host "Found release notes: $notes"
+
+      - name: Build projects
+        run: >
+          dotnet publish CuraManager.slnx
+          -c Release
+          -r win-x64
+          --no-self-contained
+          -p:PublishReadyToRun=true
+          -p:TreatWarningsAsErrors=true
+          -p:OutputZipDir=${{ runner.temp }}/artifacts
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: CuraManager-${{ steps.version.outputs.version }}-win-x64
+          path: ${{ runner.temp }}/artifacts/*.zip
+          if-no-files-found: error
+
+  release:
+    name: Publish to GitHub
+    needs: build
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Download artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: CuraManager-${{ needs.build.outputs.version }}-win-x64
+          path: artifacts
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          APP_VERSION: ${{ needs.build.outputs.version }}
+        run: |
+          set -euo pipefail
+          tag="release-${APP_VERSION}"
+
+          if git ls-remote --exit-code --tags origin "refs/tags/${tag}" >/dev/null 2>&1; then
+            echo "The tag \"${tag}\" already exists. No GitHub release will be created."
+            exit 0
+          fi
+
+          notes="docs/release-notes/v${APP_VERSION}.md"
+
+          echo "Tag \"${tag}\" does not exist. Creating GitHub release..."
+          gh release create "${tag}" \
+            --target "${GITHUB_SHA}" \
+            --title "${tag}" \
+            --notes-file "${notes}" \
+            artifacts/*.zip
