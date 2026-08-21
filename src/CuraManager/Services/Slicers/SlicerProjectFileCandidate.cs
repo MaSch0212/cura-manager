@@ -55,19 +55,20 @@ public sealed class SlicerProjectFileCandidate : IDisposable
             return new SlicerProjectFileCandidate(filePath, null, NoEntries, NoEntries);
         }
 
+        ZipArchive archive = null;
         try
         {
-            var archive = ZipFile.OpenRead(filePath);
-            return new SlicerProjectFileCandidate(
-                filePath,
-                archive,
-                archive.Entries.Select(x => x.FullName).ToArray(),
-                NoEntries
-            );
+            archive = ZipFile.OpenRead(filePath);
+            var entryNames = archive.Entries.Select(x => x.FullName).ToArray();
+            return new SlicerProjectFileCandidate(filePath, archive, entryNames, NoEntries);
         }
-        catch (Exception ex) when (ex is IOException or InvalidDataException)
+        catch (Exception ex)
+            when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
         {
-            // Typically the slicer itself is holding the file open.
+            // Typically the slicer itself is holding the file open, or the archive is
+            // truncated. Entries is read lazily, so this can throw after OpenRead
+            // succeeded — the archive must be disposed on the way out.
+            archive?.Dispose();
             return new SlicerProjectFileCandidate(
                 filePath,
                 null,
