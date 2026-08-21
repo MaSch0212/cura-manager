@@ -6,6 +6,7 @@ using System.Windows.Interop;
 using CuraManager.Models;
 using CuraManager.Resources;
 using CuraManager.Services;
+using CuraManager.Services.Slicers;
 using MaSch.Presentation;
 using MaSch.Presentation.Translation;
 using MaSch.Presentation.Wpf.Commands;
@@ -20,8 +21,8 @@ internal interface ISettingsViewModel_Props
     AppSettings Settings { get; set; }
     Version SelectedCuraVersion { get; set; }
 
-    CuraVersion[] AvailableVersions { get; set; }
-    CuraVersion SelectedAvailableVersion { get; set; }
+    SlicerInstallation[] AvailableVersions { get; set; }
+    SlicerInstallation SelectedAvailableVersion { get; set; }
     bool IsLoadingVersions { get; set; }
 }
 
@@ -29,7 +30,12 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
 {
     private readonly ISettingsService _settingsService;
     private readonly ITranslationManager _translationManager;
-    private readonly ICuraService _curaService;
+    private readonly ISlicerRegistry _slicerRegistry;
+
+    // TODO(Task 8): SettingsViewModel is rewritten wholesale to enumerate every provider;
+    // this single hard-coded lookup is an interim stand-in for that.
+    private ISlicerProvider CuraProvider =>
+        _slicerRegistry?.GetProvider(CuraSlicerProvider.ProviderId);
 
     public ObservableTuple<int?, string>[] AvailableLanguages { get; set; }
 
@@ -46,7 +52,7 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
         }
     }
 
-    public Version LatestSupportedCuraVersion => _curaService?.LatestSupportedCuraVersion;
+    public Version LatestSupportedCuraVersion => CuraProvider?.LatestSupportedVersion;
 
     [DependsOn(nameof(SelectedCuraVersion))]
     public bool? IsSupportedCuraVersionSelected =>
@@ -66,7 +72,7 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
         {
             ServiceContext.GetService(out _settingsService);
             ServiceContext.GetService(out _translationManager);
-            ServiceContext.GetService(out _curaService);
+            ServiceContext.GetService(out _slicerRegistry);
         }
 
         UndoCommand = new DelegateCommand(ExecuteUndo);
@@ -113,10 +119,13 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
         if (previous != null)
             previous.PropertyChanged -= Settings_PropertyChanged;
         value.PropertyChanged += Settings_PropertyChanged;
-        SelectedCuraVersion = _curaService.GetCuraVersion(value.CuraProgramFilesPath);
+        SelectedCuraVersion = CuraProvider.GetVersion(value.CuraProgramFilesPath);
     }
 
-    partial void OnSelectedAvailableVersionChanged(CuraVersion previous, CuraVersion value)
+    partial void OnSelectedAvailableVersionChanged(
+        SlicerInstallation previous,
+        SlicerInstallation value
+    )
     {
         if (value?.Version != null)
         {
@@ -132,7 +141,7 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
             && sender is AppSettings settings
         )
         {
-            SelectedCuraVersion = _curaService.GetCuraVersion(settings.CuraProgramFilesPath);
+            SelectedCuraVersion = CuraProvider.GetVersion(settings.CuraProgramFilesPath);
         }
     }
 
@@ -232,9 +241,9 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
         IsLoadingVersions = true;
         try
         {
-            AvailableVersions = await _curaService
-                .FindAvailableCuraVersions()
-                .Prepend(new CuraVersion(null, null, null, null, true))
+            AvailableVersions = await CuraProvider
+                .FindInstallations()
+                .Prepend(new SlicerInstallation(null, null, null, null, true))
                 .ToArrayAsync();
             SelectedAvailableVersion =
                 AvailableVersions.FirstOrDefault(x =>

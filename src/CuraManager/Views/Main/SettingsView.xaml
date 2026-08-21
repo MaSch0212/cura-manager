@@ -116,7 +116,7 @@
                 SelectedItem="{Binding SelectedAvailableVersion}"
               >
                 <ComboBox.ItemTemplate>
-                  <DataTemplate DataType="{x:Type models:CuraVersion}">
+                  <DataTemplate DataType="{x:Type models:SlicerInstallation}">
                     <Grid>
                       <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />

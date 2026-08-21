@@ -3,15 +3,20 @@ using System.IO.Compression;
 using CuraManager.Extensions;
 using CuraManager.Legacy.CuraAutomation;
 using CuraManager.Models;
-using CuraManager.Views;
 using IniParser;
 using IniParser.Model;
-using Application = System.Windows.Application;
 
-namespace CuraManager.Services;
+namespace CuraManager.Services.Slicers;
 
-public class CuraService(ISettingsService settingsService) : ICuraService
+/// <summary>
+/// <see cref="ISlicerProvider"/> implementation for UltiMaker Cura.
+/// </summary>
+public class CuraSlicerProvider : ISlicerProvider
 {
+    public const string ProviderId = "cura";
+
+    private static readonly string[] CuraProcessNames = ["Cura", "UltiMaker-Cura"];
+
     private static readonly string ProgramFilesDir = Environment.GetFolderPath(
         Environment.SpecialFolder.ProgramFiles
     );
@@ -19,82 +24,63 @@ public class CuraService(ISettingsService settingsService) : ICuraService
         Environment.SpecialFolder.ApplicationData
     );
 
-    public Version LatestSupportedCuraVersion { get; } = new Version(5, 10, 0, 0);
+    private readonly ICuraProjectNameAutomation _automation;
+    private readonly Func<bool> _isLegacyNamingEnabled;
 
-    internal CuraService()
-        : this(ServiceContext.GetService<ISettingsService>()) { }
-
-    public async Task<bool> CreateCuraProject(PrintElement element)
+    public CuraSlicerProvider(
+        ICuraProjectNameAutomation automation,
+        Func<bool> isLegacyNamingEnabled
+    )
     {
-        var dialog = new CreateCuraProjectDialog(element)
+        _automation = automation;
+        _isLegacyNamingEnabled = isLegacyNamingEnabled;
+    }
+
+    public string Id => ProviderId;
+    public string DisplayName => "UltiMaker Cura";
+    public string IconResourceKey => "CuraIcon";
+    public bool SupportsProfileUpdateOnOpen => true;
+    public Version LatestSupportedVersion { get; } = new Version(5, 10, 0, 0);
+
+    public IEnumerable<SlicerInstallation> FindInstallations()
+    {
+        return from programDir in Directory.EnumerateDirectories(ProgramFilesDir)
+            let programName = Path.GetFileName(programDir)
+            where
+                programName.Contains("ultimaker", StringComparison.OrdinalIgnoreCase)
+                && programName.Contains("cura", StringComparison.OrdinalIgnoreCase)
+                && CheckCuraProgramFilesPath(programDir)
+            let curaVersion = GetVersion(programDir)
+            where curaVersion != null
+            let curaAppDataPath = FindAppDataDir(curaVersion)
+            where curaAppDataPath != null
+            select new SlicerInstallation(
+                curaVersion,
+                programName,
+                programDir,
+                curaAppDataPath,
+                curaVersion <= LatestSupportedVersion
+            );
+
+        static string FindAppDataDir(Version curaVersion)
         {
-            Owner = Application.Current.MainWindow,
-        };
-        if (dialog.ShowDialog() == true)
-        {
-            var modelFiles =
-                from x in dialog.Models
-                where x.IsEnabled && x.Amount > 0
-                from m in Enumerable.Range(0, x.Amount)
-                select x.Element.FilePath;
-            await Task.Run(() => OpenCura(element, dialog.ProjectName, modelFiles));
-            return true;
+            for (int i = 4; i > 0; i--)
+            {
+                var path = Path.Combine(AppDataDir, "cura", curaVersion.ToString(i));
+                if (CheckCuraAppDataPath(path))
+                    return path;
+            }
+
+            return null;
         }
-
-        return false;
     }
 
-    public void OpenCura(PrintElement element, string printName, IEnumerable<string> modelsToAdd)
+    public Version GetVersion(string programFilesPath)
     {
-        var settings = settingsService.LoadSettings();
-
-        SetCuraSaveDialogPath(element.DirectoryLocation, settings);
-
-        var curaPath =
-            GetCuraExecutableFilePath(settings.CuraProgramFilesPath)
-            ?? throw new FileNotFoundException("Could not find cura executable.");
-        var curaFileName = Path.GetFileNameWithoutExtension(curaPath);
-
-        var p = Process.Start(
-            new ProcessStartInfo
-            {
-                FileName = curaPath,
-                Arguments = $"\"{string.Join("\" \"", modelsToAdd)}\"",
-            }
-        );
-        p.WaitForInputIdle();
-
-        ServiceContext
-            .GetService<ICuraProjectNameAutomation>()
-            .SetProjectName(p, curaFileName, printName);
-    }
-
-    public void OpenCuraProject(string fileName)
-    {
-        var settings = settingsService.LoadSettings();
-
-        SetCuraSaveDialogPath(Path.GetDirectoryName(fileName), settings);
-
-        if (settings.UpdateCuraProjectsOnOpen)
-            UpdateCuraProjectConfigs(fileName, settings);
-
-        Process.Start(
-            new ProcessStartInfo
-            {
-                FileName =
-                    GetCuraExecutableFilePath(settings.CuraProgramFilesPath)
-                    ?? throw new FileNotFoundException("Could not find cura executable."),
-                Arguments = $"\"{fileName}\"",
-            }
-        );
-    }
-
-    public Version GetCuraVersion(string curaPath)
-    {
-        if (curaPath is null or "")
+        if (programFilesPath is null or "")
             return null;
 
-        var exePath = GetCuraExecutableFilePath(curaPath);
+        var exePath = GetCuraExecutableFilePath(programFilesPath);
         if (exePath is null)
             return null;
 
@@ -122,43 +108,73 @@ public class CuraService(ISettingsService settingsService) : ICuraService
         return null;
     }
 
-    public bool AreCuraPathsCorrect(AppSettings settings)
+    public bool ArePathsValid(SlicerSettings settings)
     {
-        return CheckCuraAppDataPath(settings.CuraAppDataPath)
-            && CheckCuraProgramFilesPath(settings.CuraProgramFilesPath);
+        return CheckCuraAppDataPath(settings.AppDataPath)
+            && CheckCuraProgramFilesPath(settings.ProgramFilesPath);
     }
 
-    public IEnumerable<CuraVersion> FindAvailableCuraVersions()
+    public SlicerMatch IsProjectFile(SlicerProjectFileCandidate candidate)
     {
-        return from programDir in Directory.EnumerateDirectories(ProgramFilesDir)
-            let programName = Path.GetFileName(programDir)
-            where
-                programName.Contains("ultimaker", StringComparison.OrdinalIgnoreCase)
-                && programName.Contains("cura", StringComparison.OrdinalIgnoreCase)
-                && CheckCuraProgramFilesPath(programDir)
-            let curaVersion = GetCuraVersion(programDir)
-            where curaVersion != null
-            let curaAppDataPath = FindAppDataDir(curaVersion)
-            where curaAppDataPath != null
-            select new CuraVersion(
-                curaVersion,
-                programName,
-                programDir,
-                curaAppDataPath,
-                curaVersion <= LatestSupportedCuraVersion
-            );
+        if (!string.Equals(candidate.Extension, ".3mf", StringComparison.OrdinalIgnoreCase))
+            return SlicerMatch.None;
 
-        static string FindAppDataDir(Version curaVersion)
-        {
-            for (int i = 4; i > 0; i--)
+        if (candidate.HasEntryStartingWith("Cura/"))
+            return SlicerMatch.Exact;
+
+        // Unreadable because Cura itself has it open: weaker than a marker, so Probable.
+        if (candidate.LockingProcessNames.Any(x => CuraProcessNames.Contains(x)))
+            return SlicerMatch.Probable;
+
+        return SlicerMatch.None;
+    }
+
+    public void LaunchWithModels(SlicerSettings settings, SlicerLaunchRequest request)
+    {
+        SetSaveDialogPath(Path.Combine(settings.AppDataPath, "cura.cfg"), request.ProjectDirectory);
+
+        var curaPath =
+            GetCuraExecutableFilePath(settings.ProgramFilesPath)
+            ?? throw new FileNotFoundException("Could not find cura executable.");
+
+        var process = Process.Start(
+            new ProcessStartInfo
             {
-                var path = Path.Combine(AppDataDir, "cura", curaVersion.ToString(i));
-                if (CheckCuraAppDataPath(path))
-                    return path;
+                FileName = curaPath,
+                Arguments = $"\"{string.Join("\" \"", request.ModelFiles)}\"",
             }
+        );
 
-            return null;
-        }
+        if (string.IsNullOrEmpty(request.ProjectName) || !_isLegacyNamingEnabled())
+            return;
+
+        process.WaitForInputIdle();
+        _automation.SetProjectName(
+            process,
+            Path.GetFileNameWithoutExtension(curaPath),
+            request.ProjectName
+        );
+    }
+
+    public void OpenProject(SlicerSettings settings, string projectFilePath)
+    {
+        SetSaveDialogPath(
+            Path.Combine(settings.AppDataPath, "cura.cfg"),
+            Path.GetDirectoryName(projectFilePath)
+        );
+
+        if (settings.UpdateProjectsOnOpen)
+            UpdateCuraProjectConfigs(projectFilePath, settings);
+
+        Process.Start(
+            new ProcessStartInfo
+            {
+                FileName =
+                    GetCuraExecutableFilePath(settings.ProgramFilesPath)
+                    ?? throw new FileNotFoundException("Could not find cura executable."),
+                Arguments = $"\"{projectFilePath}\"",
+            }
+        );
     }
 
     private static bool CheckCuraAppDataPath(string appDataPath)
@@ -185,9 +201,13 @@ public class CuraService(ISettingsService settingsService) : ICuraService
         return curaExecutableFile;
     }
 
-    private static void SetCuraSaveDialogPath(string targetPath, AppSettings settings)
+    /// <summary>
+    /// Rewrites the <c>dialog_save_path</c> key in <c>cura.cfg</c>, preserving every other
+    /// key. Internal and taking the config path directly so the round-trip behaviour can be
+    /// pinned by a test without touching the filesystem layout of a real Cura installation.
+    /// </summary>
+    internal static void SetSaveDialogPath(string curaConfigPath, string targetPath)
     {
-        var curaConfigPath = Path.Combine(settings.CuraAppDataPath, "cura.cfg");
         var targetPathForConfig = Uri.UnescapeDataString(new Uri(targetPath).PathAndQuery);
 
         var parser = new StreamIniDataParser();
@@ -202,11 +222,11 @@ public class CuraService(ISettingsService settingsService) : ICuraService
             parser.WriteData(sw, iniData);
     }
 
-    private static void UpdateCuraProjectConfigs(string fileName, AppSettings settings)
+    private static void UpdateCuraProjectConfigs(string fileName, SlicerSettings settings)
     {
-        string curaResourcesPath4x = Path.Combine(settings.CuraProgramFilesPath, "resources");
+        string curaResourcesPath4x = Path.Combine(settings.ProgramFilesPath, "resources");
         string curaResourcesPath5x = Path.Combine(
-            settings.CuraProgramFilesPath,
+            settings.ProgramFilesPath,
             "share",
             "cura",
             "resources"
@@ -244,9 +264,7 @@ public class CuraService(ISettingsService settingsService) : ICuraService
 
                     IniData curaCfgData;
                     using (
-                        var sr = new StreamReader(
-                            Path.Combine(settings.CuraAppDataPath, "cura.cfg")
-                        )
+                        var sr = new StreamReader(Path.Combine(settings.AppDataPath, "cura.cfg"))
                     )
                         curaCfgData = parser.ReadData(sr);
 
@@ -277,7 +295,7 @@ public class CuraService(ISettingsService settingsService) : ICuraService
                 var escapedCfName = Uri.EscapeDataString(cf.Name).Replace("%20", "+");
                 var of = Directory
                     .EnumerateFiles(
-                        settings.CuraAppDataPath,
+                        settings.AppDataPath,
                         escapedCfName,
                         SearchOption.AllDirectories
                     )

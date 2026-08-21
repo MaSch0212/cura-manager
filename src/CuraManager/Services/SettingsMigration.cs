@@ -9,7 +9,7 @@ namespace CuraManager.Services;
 public static class SettingsMigration
 {
     public const int CurrentVersion = 1;
-    public const string CuraProviderId = "cura";
+    public const string CuraProviderId = Slicers.CuraSlicerProvider.ProviderId;
 
     /// <summary>
     /// Loads settings from raw JSON, migrating if needed.

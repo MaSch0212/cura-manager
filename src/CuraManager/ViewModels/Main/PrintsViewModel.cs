@@ -7,6 +7,7 @@ using System.Windows.Input;
 using CuraManager.Models;
 using CuraManager.Resources;
 using CuraManager.Services;
+using CuraManager.Services.Slicers;
 using CuraManager.Views;
 using MaSch.Core.Observable.Collections;
 using MaSch.Presentation;
@@ -33,7 +34,7 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
 {
     private readonly ITranslationManager _translationManager;
     private readonly IPrintsService _printsService;
-    private readonly ICuraService _curaService;
+    private readonly ISlicerRegistry _slicerRegistry;
     private readonly ISettingsService _settingsService;
     private readonly IDownloadService _downloadService;
     private readonly ICachingService _cachingService;
@@ -76,7 +77,7 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
         {
             ServiceContext.GetService(out _translationManager);
             ServiceContext.GetService(out _printsService);
-            ServiceContext.GetService(out _curaService);
+            ServiceContext.GetService(out _slicerRegistry);
             ServiceContext.GetService(out _settingsService);
             ServiceContext.GetService(out _downloadService);
             ServiceContext.GetService(out _cachingService);
@@ -362,10 +363,17 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
         }
     }
 
+    // TODO(Task 9): This is an interim stand-in for the old CuraService.CreateCuraProject.
+    // It only ever targets the active provider and hard-codes the Cura-specific dialog;
+    // Task 9 rehomes project creation behind the registry properly.
     private async Task ExecuteNewCuraProject(PrintElement project)
     {
-        var settings = _settingsService.LoadSettings();
-        if (!_curaService.AreCuraPathsCorrect(settings))
+        var activeProvider = _slicerRegistry.ActiveProvider;
+        if (activeProvider == null)
+            return;
+
+        var settings = _slicerRegistry.GetSettings(activeProvider);
+        if (!activeProvider.ArePathsValid(settings))
         {
             MessageBox.Show(
                 _translationManager.GetTranslation(nameof(StringTable.Msg_CuraPathsNotConfigured)),
@@ -373,16 +381,35 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
                 AlertButton.Ok,
                 AlertImage.Warning
             );
+            return;
         }
-        else
+
+        var dialog = new CreateCuraProjectDialog(project)
         {
-            await ExecuteLoadingAction(
-                _translationManager.GetTranslation(nameof(StringTable.Prog_CreateCuraProject)),
-                async () => await _curaService.CreateCuraProject(project),
-                _translationManager.GetTranslation(nameof(StringTable.Suc_CreateCuraProject)),
-                _translationManager.GetTranslation(nameof(StringTable.Fail_CreateCuraProject))
-            );
-        }
+            Owner = Application.Current.MainWindow,
+        };
+        if (dialog.ShowDialog() != true)
+            return;
+
+        var modelFiles = (
+            from x in dialog.Models
+            where x.IsEnabled && x.Amount > 0
+            from m in Enumerable.Range(0, x.Amount)
+            select x.Element.FilePath
+        ).ToList();
+
+        await ExecuteLoadingAction(
+            _translationManager.GetTranslation(nameof(StringTable.Prog_CreateCuraProject)),
+            () =>
+                Task.Run(() =>
+                    activeProvider.LaunchWithModels(
+                        settings,
+                        new SlicerLaunchRequest(project.DirectoryLocation, modelFiles, project.Name)
+                    )
+                ),
+            _translationManager.GetTranslation(nameof(StringTable.Suc_CreateCuraProject)),
+            _translationManager.GetTranslation(nameof(StringTable.Fail_CreateCuraProject))
+        );
     }
 
     private void ExecuteOpenProjectFolder(PrintElement project)
@@ -516,9 +543,10 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
 
     private void ExecuteOpenProjectFile(PrintElementFile file)
     {
-        if (PrintElement.IsCuraProjectFile(file.FilePath))
+        var provider = _slicerRegistry.FindProviderForFile(file.FilePath);
+        if (provider != null)
         {
-            _curaService.OpenCuraProject(file.FilePath);
+            provider.OpenProject(_slicerRegistry.GetSettings(provider), file.FilePath);
         }
         else
         {
