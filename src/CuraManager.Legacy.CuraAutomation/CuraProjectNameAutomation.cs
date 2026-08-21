@@ -131,9 +131,22 @@ public class CuraProjectNameAutomation : ICuraProjectNameAutomation
         var stopwatch = Stopwatch.StartNew();
         do
         {
-            var element = factory();
-            if (element != null)
-                return element;
+            try
+            {
+                var element = factory();
+                if (element != null)
+                    return element;
+            }
+            catch (Exception)
+            {
+                // MaSch's Waiter.WaitUntil defaults to IgnoreAllExceptions = true, so the
+                // original absorbed anything thrown while walking the tree and kept trying.
+                // UI Automation throws transiently (ElementNotAvailableException and friends)
+                // against a window that is still stabilizing, which is exactly when this runs.
+                // Keep polling; a timeout returns null and the caller treats that as
+                // "name not set", which is the original's degraded behaviour.
+            }
+
             Thread.Sleep(250);
         } while (stopwatch.Elapsed < timeout);
 
