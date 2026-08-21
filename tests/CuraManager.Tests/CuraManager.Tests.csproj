@@ -9,7 +9,15 @@
         <IsPublishable>false</IsPublishable>
         <OutputPath>../../bin/$(Configuration)/tests</OutputPath>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-        <GenerateDocumentationFile>false</GenerateDocumentationFile>
+        <!--
+          IDE0005 (unused usings) only runs during build when GenerateDocumentationFile is
+          true, regardless of EnforceCodeStyleInBuild (https://github.com/dotnet/roslyn/issues/41640).
+          Test types are never meant to be publicly documented, so CS1591 is suppressed same as
+          in the main project.
+        -->
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>1591</NoWarn>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <CSharpier_UnformattedAsWarnings>true</CSharpier_UnformattedAsWarnings>
         <Configurations>Debug;Release;Debug_MaSchLocal</Configurations>
     </PropertyGroup>

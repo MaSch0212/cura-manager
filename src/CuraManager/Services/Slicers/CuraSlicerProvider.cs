@@ -131,7 +131,7 @@ public class CuraSlicerProvider : ISlicerProvider
 
     public void LaunchWithModels(SlicerSettings settings, SlicerLaunchRequest request)
     {
-        SetSaveDialogPath(Path.Combine(settings.AppDataPath, "cura.cfg"), request.ProjectDirectory);
+        SetSaveDialogPath(GetCuraConfigPath(settings), request.ProjectDirectory);
 
         var curaPath =
             GetCuraExecutableFilePath(settings.ProgramFilesPath)
@@ -158,10 +158,7 @@ public class CuraSlicerProvider : ISlicerProvider
 
     public void OpenProject(SlicerSettings settings, string projectFilePath)
     {
-        SetSaveDialogPath(
-            Path.Combine(settings.AppDataPath, "cura.cfg"),
-            Path.GetDirectoryName(projectFilePath)
-        );
+        SetSaveDialogPath(GetCuraConfigPath(settings), Path.GetDirectoryName(projectFilePath));
 
         if (settings.UpdateProjectsOnOpen)
             UpdateCuraProjectConfigs(projectFilePath, settings);
@@ -193,6 +190,9 @@ public class CuraSlicerProvider : ISlicerProvider
 
     private static string GetCuraExecutableFilePath(string curaPath)
     {
+        if (string.IsNullOrEmpty(curaPath))
+            return null;
+
         string curaExecutableFile = Path.Combine(curaPath, "Ultimaker-Cura.exe");
         if (!File.Exists(curaExecutableFile))
             curaExecutableFile = Path.Combine(curaPath, "Cura.exe");
@@ -202,12 +202,26 @@ public class CuraSlicerProvider : ISlicerProvider
     }
 
     /// <summary>
+    /// Resolves the path to <c>cura.cfg</c> for the given settings, or <see langword="null"/>
+    /// when the AppData path is not configured yet.
+    /// </summary>
+    private static string GetCuraConfigPath(SlicerSettings settings) =>
+        string.IsNullOrEmpty(settings.AppDataPath)
+            ? null
+            : Path.Combine(settings.AppDataPath, "cura.cfg");
+
+    /// <summary>
     /// Rewrites the <c>dialog_save_path</c> key in <c>cura.cfg</c>, preserving every other
     /// key. Internal and taking the config path directly so the round-trip behaviour can be
     /// pinned by a test without touching the filesystem layout of a real Cura installation.
+    /// Does nothing when <paramref name="curaConfigPath"/> is null/empty or does not point to
+    /// an existing file — e.g. a fresh install where Cura's AppData path is not configured yet.
     /// </summary>
     internal static void SetSaveDialogPath(string curaConfigPath, string targetPath)
     {
+        if (string.IsNullOrEmpty(curaConfigPath) || !File.Exists(curaConfigPath))
+            return;
+
         var targetPathForConfig = Uri.UnescapeDataString(new Uri(targetPath).PathAndQuery);
 
         var parser = new StreamIniDataParser();
@@ -224,6 +238,15 @@ public class CuraSlicerProvider : ISlicerProvider
 
     private static void UpdateCuraProjectConfigs(string fileName, SlicerSettings settings)
     {
+        // A fresh/partial install may have neither path configured; skip rather than let
+        // Path.Combine throw ArgumentNullException before the caller's clearer
+        // FileNotFoundException from GetCuraExecutableFilePath ever runs.
+        if (
+            string.IsNullOrEmpty(settings.AppDataPath)
+            || string.IsNullOrEmpty(settings.ProgramFilesPath)
+        )
+            return;
+
         string curaResourcesPath4x = Path.Combine(settings.ProgramFilesPath, "resources");
         string curaResourcesPath5x = Path.Combine(
             settings.ProgramFilesPath,

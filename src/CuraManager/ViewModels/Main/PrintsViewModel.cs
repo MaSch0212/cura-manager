@@ -404,7 +404,11 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
                 Task.Run(() =>
                     activeProvider.LaunchWithModels(
                         settings,
-                        new SlicerLaunchRequest(project.DirectoryLocation, modelFiles, project.Name)
+                        new SlicerLaunchRequest(
+                            project.DirectoryLocation,
+                            modelFiles,
+                            dialog.ProjectName
+                        )
                     )
                 ),
             _translationManager.GetTranslation(nameof(StringTable.Suc_CreateCuraProject)),

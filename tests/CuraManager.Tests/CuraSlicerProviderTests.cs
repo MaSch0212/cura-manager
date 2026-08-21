@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using CuraManager.Models;
 using CuraManager.Services;
 using CuraManager.Services.Slicers;
@@ -116,7 +115,30 @@ public class CuraSlicerProviderTests
         Assert.Contains("visible_settings = layer_height;infill_sparse_density", result);
         Assert.Contains("window_maximized = True", result);
         Assert.Contains("categories_expanded = material", result);
-        Assert.Contains("D:/Prints/Widget", result);
+        Assert.Contains("dialog_save_path = D:/Prints/Widget", result);
         Assert.DoesNotContain("C:\\old", result);
+    }
+
+    [Fact]
+    public void SetSaveDialogPath_MissingConfigFile_DoesNotThrow()
+    {
+        using var scope = new TestZip.Scope();
+        var configPath = scope.File("cura.cfg"); // never written: simulates an unconfigured install
+
+        var exception = Record.Exception(() =>
+            CuraSlicerProvider.SetSaveDialogPath(configPath, "D:\\Prints\\Widget")
+        );
+
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void SetSaveDialogPath_NullConfigPath_DoesNotThrow()
+    {
+        var exception = Record.Exception(() =>
+            CuraSlicerProvider.SetSaveDialogPath(null, "D:\\Prints\\Widget")
+        );
+
+        Assert.Null(exception);
     }
 }
