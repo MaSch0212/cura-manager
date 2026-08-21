@@ -4,9 +4,9 @@ namespace CuraManager.Services;
 
 public interface ISettingsService
 {
-    CuraManagerSettings LoadSettings();
-    void SaveSettings(CuraManagerSettings settings);
+    AppSettings LoadSettings();
+    void SaveSettings(AppSettings settings);
 
-    CuraManagerGuiSettings LoadGuiSettings();
-    void SaveGuiSettings(CuraManagerGuiSettings settings);
+    AppGuiSettings LoadGuiSettings();
+    void SaveGuiSettings(AppGuiSettings settings);
 }

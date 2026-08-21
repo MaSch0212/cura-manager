@@ -212,7 +212,7 @@ public class CuraService(ISettingsService settingsService) : ICuraService
         return null;
     }
 
-    public bool AreCuraPathsCorrect(CuraManagerSettings settings)
+    public bool AreCuraPathsCorrect(AppSettings settings)
     {
         return CheckCuraAppDataPath(settings.CuraAppDataPath)
             && CheckCuraProgramFilesPath(settings.CuraProgramFilesPath);
@@ -275,7 +275,7 @@ public class CuraService(ISettingsService settingsService) : ICuraService
         return curaExecutableFile;
     }
 
-    private static void SetCuraSaveDialogPath(string targetPath, CuraManagerSettings settings)
+    private static void SetCuraSaveDialogPath(string targetPath, AppSettings settings)
     {
         var curaConfigPath = Path.Combine(settings.CuraAppDataPath, "cura.cfg");
         var targetPathForConfig = Uri.UnescapeDataString(new Uri(targetPath).PathAndQuery);
@@ -313,7 +313,7 @@ public class CuraService(ISettingsService settingsService) : ICuraService
         return element != null;
     }
 
-    private static void UpdateCuraProjectConfigs(string fileName, CuraManagerSettings settings)
+    private static void UpdateCuraProjectConfigs(string fileName, AppSettings settings)
     {
         string curaResourcesPath4x = Path.Combine(settings.CuraProgramFilesPath, "resources");
         string curaResourcesPath5x = Path.Combine(

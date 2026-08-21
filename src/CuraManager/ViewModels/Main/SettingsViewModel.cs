@@ -17,7 +17,7 @@ namespace CuraManager.ViewModels.Main;
 [ObservablePropertyDefinition]
 internal interface ISettingsViewModel_Props
 {
-    CuraManagerSettings Settings { get; set; }
+    AppSettings Settings { get; set; }
     Version SelectedCuraVersion { get; set; }
 
     CuraVersion[] AvailableVersions { get; set; }
@@ -108,7 +108,7 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
         }
     }
 
-    partial void OnSettingsChanged(CuraManagerSettings previous, CuraManagerSettings value)
+    partial void OnSettingsChanged(AppSettings previous, AppSettings value)
     {
         if (previous != null)
             previous.PropertyChanged -= Settings_PropertyChanged;
@@ -128,8 +128,8 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
     private void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         if (
-            e.PropertyName is nameof(CuraManagerSettings.CuraProgramFilesPath)
-            && sender is CuraManagerSettings settings
+            e.PropertyName is nameof(AppSettings.CuraProgramFilesPath)
+            && sender is AppSettings settings
         )
         {
             SelectedCuraVersion = _curaService.GetCuraVersion(settings.CuraProgramFilesPath);
