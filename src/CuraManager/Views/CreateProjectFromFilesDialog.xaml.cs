@@ -104,7 +104,7 @@ public partial class CreateProjectFromFilesDialog : ICreateProjectFromFilesDialo
 
     private void AddFilesButton_OnClick(object sender, RoutedEventArgs e)
     {
-        var ofd = new OpenFileDialog { Multiselect = true, };
+        var ofd = new OpenFileDialog { Multiselect = true };
         if (ofd.ShowDialog(Application.Current.MainWindow) == true)
         {
             Files.Add(ofd.FileNames.Select(x => new PrintElementFile(x)));

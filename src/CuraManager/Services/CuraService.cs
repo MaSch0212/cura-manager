@@ -29,7 +29,7 @@ public class CuraService(ISettingsService settingsService) : ICuraService
     {
         var dialog = new CreateCuraProjectDialog(element)
         {
-            Owner = Application.Current.MainWindow
+            Owner = Application.Current.MainWindow,
         };
         if (dialog.ShowDialog() == true)
         {

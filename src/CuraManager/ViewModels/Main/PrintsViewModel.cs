@@ -355,7 +355,7 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
 
     private async Task ExecuteAddFilesToProject(PrintElement project)
     {
-        var ofd = new OpenFileDialog { Multiselect = true, };
+        var ofd = new OpenFileDialog { Multiselect = true };
         if (ofd.ShowDialog(Application.Current.MainWindow) == true)
         {
             await AddFilesToProject(project, ofd.FileNames);
@@ -387,7 +387,7 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
 
     private void ExecuteOpenProjectFolder(PrintElement project)
     {
-        Process.Start(new ProcessStartInfo(project.DirectoryLocation) { UseShellExecute = true, });
+        Process.Start(new ProcessStartInfo(project.DirectoryLocation) { UseShellExecute = true });
     }
 
     private void ExecuteOpenProjectWebsite(PrintElement project)
@@ -395,7 +395,7 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
         if (!string.IsNullOrEmpty(project.Metadata.Website))
         {
             Process.Start(
-                new ProcessStartInfo(project.Metadata.Website) { UseShellExecute = true, }
+                new ProcessStartInfo(project.Metadata.Website) { UseShellExecute = true }
             );
         }
     }
@@ -503,7 +503,7 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
         {
             CustomIcon = new IconPresenter
             {
-                Icon = new MaterialDesignIcon(MaterialDesignIconCode.Plus)
+                Icon = new MaterialDesignIcon(MaterialDesignIconCode.Plus),
             },
             SubmitButtonContent = _translationManager.GetTranslation(nameof(StringTable.Create)),
         };
@@ -522,7 +522,7 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
         }
         else
         {
-            Process.Start(new ProcessStartInfo(file.FilePath) { UseShellExecute = true, });
+            Process.Start(new ProcessStartInfo(file.FilePath) { UseShellExecute = true });
         }
     }
 
@@ -633,7 +633,7 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
         var settings = _settingsService.LoadSettings();
         var dialog = new CreateProjectFromFilesDialog(settings.PrintsPath, files)
         {
-            Owner = Application.Current.MainWindow
+            Owner = Application.Current.MainWindow,
         };
         if (dialog.ShowDialog() == true)
         {
@@ -665,7 +665,7 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
         {
             var dialog = new CreateProjectFromWebDialog(settings.PrintsPath, url)
             {
-                Owner = Application.Current.MainWindow
+                Owner = Application.Current.MainWindow,
             };
             if (dialog.ShowDialog() == true)
             {
@@ -716,7 +716,7 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
         var settings = _settingsService.LoadSettings();
         var dialog = new CreateProjectFromArchiveDialog(settings.PrintsPath, archivePath)
         {
-            Owner = Application.Current.MainWindow
+            Owner = Application.Current.MainWindow,
         };
         if (dialog.ShowDialog() == true)
         {

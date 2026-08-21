@@ -1,111 +1,124 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <!-- General Project info -->
-    <TargetFramework>net10.0-windows</TargetFramework>
-    <LangVersion>latest</LangVersion>
-    <UseWPF>true</UseWPF>
-    <UseWindowsForms>true</UseWindowsForms>
-    <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
-    <OutputPath>../../bin/$(Configuration)</OutputPath>
-    <Nullable>disable</Nullable>
-    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>1591</NoWarn>
+    <PropertyGroup>
+        <!-- General Project info -->
+        <TargetFramework>net10.0-windows</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <UseWPF>true</UseWPF>
+        <UseWindowsForms>true</UseWindowsForms>
+        <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
+        <OutputPath>../../bin/$(Configuration)</OutputPath>
+        <Nullable>disable</Nullable>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+        <CSharpier_UnformattedAsWarnings>true</CSharpier_UnformattedAsWarnings>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>1591</NoWarn>
 
-    <!-- Output info -->
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <OutputType>WinExe</OutputType>
-    <ApplicationIcon>../../resources/CuraManager.ico</ApplicationIcon>
+        <!-- Output info -->
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <OutputType>WinExe</OutputType>
+        <ApplicationIcon>../../resources/CuraManager.ico</ApplicationIcon>
 
-    <!-- Package Info -->
-    <Version>1.7.3</Version>
-    <Authors>Marc Schmidt</Authors>
-    <Copyright>Copyright © 2019 - $([System.DateTime]::Now.ToString('yyyy')) $(Authors)</Copyright>
-    <SupportedOSPlatform>windows</SupportedOSPlatform>
-    <Configurations>Debug;Release;Debug_MaSchLocal</Configurations>
-  </PropertyGroup>
+        <!-- Package Info -->
+        <Version>1.7.3</Version>
+        <Authors>Marc Schmidt</Authors>
+        <Copyright>Copyright © 2019 - $([System.DateTime]::Now.ToString('yyyy')) $(Authors)</Copyright>
+        <SupportedOSPlatform>windows</SupportedOSPlatform>
+        <Configurations>Debug;Release;Debug_MaSchLocal</Configurations>
+    </PropertyGroup>
 
-  <PropertyGroup>
-    <OutputZipDir Condition=" '$(OutputZipDir)' == '' ">$(OutputPath)</OutputZipDir>
-    <OutputZipPath Condition=" '$(OutputZipPath)' == '' ">$(OutputZipDir)\$(AssemblyName)-$(Version)-$(RuntimeIdentifier).zip</OutputZipPath>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputZipDir Condition=" '$(OutputZipDir)' == '' ">$(OutputPath)</OutputZipDir>
+        <OutputZipPath Condition=" '$(OutputZipPath)' == '' "
+            >$(OutputZipDir)\$(AssemblyName)-$(Version)-$(RuntimeIdentifier).zip</OutputZipPath>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <Using Include="System" />
-    <Using Include="System.Collections" />
-    <Using Include="System.Collections.Generic" />
-    <Using Include="System.Diagnostics" />
-    <Using Include="System.Diagnostics.CodeAnalysis" />
-    <Using Include="System.Globalization" />
-    <Using Include="System.Linq" />
-    <Using Include="System.Linq.Expressions" />
-    <Using Include="System.Text" />
-    <Using Include="System.Text.RegularExpressions" />
-    <Using Include="System.Threading" />
-    <Using Include="System.Threading.Tasks" />
-    <Using Include="MaSch.Core" />
-    <Using Include="MaSch.Core.Attributes" />
-    <Using Include="MaSch.Core.Extensions" />
-    <Using Include="MaSch.Core.Observable" />
-  </ItemGroup>
+    <ItemGroup>
+        <Using Include="System" />
+        <Using Include="System.Collections" />
+        <Using Include="System.Collections.Generic" />
+        <Using Include="System.Diagnostics" />
+        <Using Include="System.Diagnostics.CodeAnalysis" />
+        <Using Include="System.Globalization" />
+        <Using Include="System.Linq" />
+        <Using Include="System.Linq.Expressions" />
+        <Using Include="System.Text" />
+        <Using Include="System.Text.RegularExpressions" />
+        <Using Include="System.Threading" />
+        <Using Include="System.Threading.Tasks" />
+        <Using Include="MaSch.Core" />
+        <Using Include="MaSch.Core.Attributes" />
+        <Using Include="MaSch.Core.Extensions" />
+        <Using Include="MaSch.Core.Observable" />
+    </ItemGroup>
 
-  <ItemGroup Condition=" '$(MASCH_SOURCES)' == '' or '$(Configuration)' != 'Debug_MaSchLocal' ">
-    <PackageReference Include="MaSch.Generators" Version="0.3.4" />
-    <PackageReference Include="MaSch.Native.Windows" Version="0.1.4" />
-    <PackageReference Include="MaSch.Presentation" Version="0.2.5" />
-    <PackageReference Include="MaSch.Presentation.Wpf.Controls" Version="0.2.9" />
-    <PackageReference Include="MaSch.Presentation.Wpf.MaterialDesign" Version="0.3.0" />
-    <PackageReference Include="MaSch.Presentation.Wpf.Themes" Version="0.2.1" />
-  </ItemGroup>
+    <ItemGroup Condition=" '$(MASCH_SOURCES)' == '' or '$(Configuration)' != 'Debug_MaSchLocal' ">
+        <PackageReference Include="MaSch.Generators" Version="0.3.4" />
+        <PackageReference Include="MaSch.Native.Windows" Version="0.1.4" />
+        <PackageReference Include="MaSch.Presentation" Version="0.2.5" />
+        <PackageReference Include="MaSch.Presentation.Wpf.Controls" Version="0.2.9" />
+        <PackageReference Include="MaSch.Presentation.Wpf.MaterialDesign" Version="0.3.0" />
+        <PackageReference Include="MaSch.Presentation.Wpf.Themes" Version="0.2.1" />
+    </ItemGroup>
 
-  <ItemGroup Condition=" '$(MASCH_SOURCES)' != '' and '$(Configuration)' == 'Debug_MaSchLocal' ">
-    <ProjectReference Include="$(MASCH_SOURCES)\src\Generators\MaSch.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="$(MASCH_SOURCES)\src\Native.Windows\MaSch.Native.Windows.csproj" />
-    <ProjectReference Include="$(MASCH_SOURCES)\src\Core\MaSch.Core.csproj" />
-    <ProjectReference Include="$(MASCH_SOURCES)\src\Presentation\MaSch.Presentation.csproj" />
-    <ProjectReference Include="$(MASCH_SOURCES)\src\Presentation.Wpf.Controls\MaSch.Presentation.Wpf.Controls.csproj" />
-    <ProjectReference Include="$(MASCH_SOURCES)\src\Presentation.Wpf.MaterialDesign\MaSch.Presentation.Wpf.MaterialDesign.csproj" />
-    <ProjectReference Include="$(MASCH_SOURCES)\src\Presentation.Wpf.Themes\MaSch.Presentation.Wpf.Themes.csproj" />
-  </ItemGroup>
+    <ItemGroup Condition=" '$(MASCH_SOURCES)' != '' and '$(Configuration)' == 'Debug_MaSchLocal' ">
+        <ProjectReference
+            Include="$(MASCH_SOURCES)\src\Generators\MaSch.Generators.csproj"
+            OutputItemType="Analyzer"
+            ReferenceOutputAssembly="false"
+        />
+        <ProjectReference Include="$(MASCH_SOURCES)\src\Native.Windows\MaSch.Native.Windows.csproj" />
+        <ProjectReference Include="$(MASCH_SOURCES)\src\Core\MaSch.Core.csproj" />
+        <ProjectReference Include="$(MASCH_SOURCES)\src\Presentation\MaSch.Presentation.csproj" />
+        <ProjectReference Include="$(MASCH_SOURCES)\src\Presentation.Wpf.Controls\MaSch.Presentation.Wpf.Controls.csproj" />
+        <ProjectReference Include="$(MASCH_SOURCES)\src\Presentation.Wpf.MaterialDesign\MaSch.Presentation.Wpf.MaterialDesign.csproj" />
+        <ProjectReference Include="$(MASCH_SOURCES)\src\Presentation.Wpf.Themes\MaSch.Presentation.Wpf.Themes.csproj" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="CSharpier.MsBuild" Version="0.28.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.400">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="HtmlAgilityPack" Version="1.12.4" />
-    <PackageReference Include="ini-parser-netstandard" Version="2.5.3" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="10.0.11" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="CSharpier.MsBuild" Version="1.3.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.400">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="HtmlAgilityPack" Version="1.12.4" />
+        <PackageReference Include="ini-parser-netstandard" Version="2.5.3" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+        <PackageReference Include="Microsoft.Windows.Compatibility" Version="10.0.11" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <Resource Include="..\..\resources\CuraManager.ico" Link="Resources\CuraManager.ico" />
-    <Resource Include="..\..\resources\CuraManager512.png" Link="Resources\CuraManager512.png" />
-  </ItemGroup>
+    <ItemGroup>
+        <Resource Include="..\..\resources\CuraManager.ico" Link="Resources\CuraManager.ico" />
+        <Resource
+            Include="..\..\resources\CuraManager512.png"
+            Link="Resources\CuraManager512.png"
+        />
+    </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Resources\StringTable.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>StringTable.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
+    <ItemGroup>
+        <Compile Update="Resources\StringTable.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>StringTable.resx</DependentUpon>
+        </Compile>
+    </ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Update="Resources\StringTable.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>StringTable.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Update="Resources\StringTable.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>StringTable.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+    </ItemGroup>
 
-  <Target Name="PowerShellAfterPublish" AfterTargets="Publish">
-    <MakeDir Directories="$(OutputZipDir)" />
-    <ZipDirectory SourceDirectory="$(PublishDir)" DestinationFile="$(OutputZipPath)" Overwrite="true" />
-    <Message Text="##vso[task.setvariable variable=AppVersion;]$(Version)" Importance="high" />
-  </Target>
+    <Target Name="PowerShellAfterPublish" AfterTargets="Publish">
+        <MakeDir Directories="$(OutputZipDir)" />
+        <ZipDirectory
+            SourceDirectory="$(PublishDir)"
+            DestinationFile="$(OutputZipPath)"
+            Overwrite="true"
+        />
+        <Message Text="##vso[task.setvariable variable=AppVersion;]$(Version)" Importance="high" />
+    </Target>
 </Project>

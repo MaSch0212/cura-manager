@@ -72,8 +72,8 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
         UndoCommand = new DelegateCommand(ExecuteUndo);
         SaveCommand = new DelegateCommand(ExecuteSave);
         BrowseDirectoryCommand = new DelegateCommand<string>(ExecuteBrowseDirectory);
-        ReloadAvailableVersionsCommand = new AsyncDelegateCommand(
-            async () => await RebuildAvailableVersionsAsync(true)
+        ReloadAvailableVersionsCommand = new AsyncDelegateCommand(async () =>
+            await RebuildAvailableVersionsAsync(true)
         );
     }
 
@@ -168,14 +168,13 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
                 ? selectedPath
                 : settingName switch
                 {
-                    nameof(Settings.CuraAppDataPath)
-                        => Path.Combine(
-                            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                            "cura"
-                        ) + Path.DirectorySeparatorChar,
-                    nameof(Settings.CuraProgramFilesPath)
-                        => Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)
-                            + Path.DirectorySeparatorChar,
+                    nameof(Settings.CuraAppDataPath) => Path.Combine(
+                        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                        "cura"
+                    ) + Path.DirectorySeparatorChar,
+                    nameof(Settings.CuraProgramFilesPath) => Environment.GetFolderPath(
+                        Environment.SpecialFolder.ProgramFiles
+                    ) + Path.DirectorySeparatorChar,
                     _ => null,
                 },
         };

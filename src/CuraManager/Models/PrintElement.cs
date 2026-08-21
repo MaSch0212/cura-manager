@@ -156,8 +156,8 @@ public sealed partial class PrintElement : ObservableObject, IDisposable, IPrint
         }
         else
         {
-            Application.Current.Dispatcher.Invoke(
-                () => newList.Add(new PrintElementFile(e.FullPath))
+            Application.Current.Dispatcher.Invoke(() =>
+                newList.Add(new PrintElementFile(e.FullPath))
             );
         }
     }
@@ -171,8 +171,8 @@ public sealed partial class PrintElement : ObservableObject, IDisposable, IPrint
 
     private void OnFileCreated(object sender, FileSystemEventArgs e)
     {
-        Application.Current.Dispatcher.Invoke(
-            () => GetCorrectListForFile(e.FullPath)?.Add(new PrintElementFile(e.FullPath))
+        Application.Current.Dispatcher.Invoke(() =>
+            GetCorrectListForFile(e.FullPath)?.Add(new PrintElementFile(e.FullPath))
         );
     }
 
