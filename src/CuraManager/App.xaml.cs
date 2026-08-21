@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Markup;
+using CuraManager.Legacy.CuraAutomation;
 using CuraManager.Resources;
 using CuraManager.Services;
 using CuraManager.Services.WebProviders;
@@ -75,6 +76,7 @@ public partial class App
         ServiceContext.AddService<ICuraService>(new CuraService());
         ServiceContext.AddService<IPrintsService>(new PrintsService());
         ServiceContext.AddService<IFileIconCache>(new FileIconCache());
+        ServiceContext.AddService<ICuraProjectNameAutomation>(new CuraProjectNameAutomation());
 
         ServiceContext.AddService<IDownloadService>(
             new DownloadService(

@@ -90,6 +90,10 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="../CuraManager.Legacy.CuraAutomation/CuraManager.Legacy.CuraAutomation.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
         <Resource Include="..\..\resources\CuraManager.ico" Link="Resources\CuraManager.ico" />
         <Resource
             Include="..\..\resources\CuraManager512.png"

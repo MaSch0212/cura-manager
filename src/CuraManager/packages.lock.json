@@ -379,6 +379,9 @@
         "type": "Transitive",
         "resolved": "8.1.2",
         "contentHash": "FziIBleSpygZOBudSeMkawLgfarnSam7paGkTtV9ITyTmw/TdEqB+moS0TeApmNfAMWGbcWXDXr3djckuLgGDg=="
+      },
+      "curamanager.legacy.curaautomation": {
+        "type": "Project"
       }
     }
   }

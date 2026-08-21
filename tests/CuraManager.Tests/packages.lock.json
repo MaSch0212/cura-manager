@@ -365,6 +365,7 @@
       "curamanager": {
         "type": "Project",
         "dependencies": {
+          "CuraManager.Legacy.CuraAutomation": "[1.0.0, )",
           "HtmlAgilityPack": "[1.12.4, )",
           "MaSch.Generators": "[0.3.4, )",
           "MaSch.Native.Windows": "[0.1.4, )",
@@ -376,6 +377,9 @@
           "Newtonsoft.Json": "[13.0.4, )",
           "ini-parser-netstandard": "[2.5.3, )"
         }
+      },
+      "curamanager.legacy.curaautomation": {
+        "type": "Project"
       },
       "HtmlAgilityPack": {
         "type": "CentralTransitive",

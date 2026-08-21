@@ -1,8 +1,7 @@
 using System.IO;
 using System.IO.Compression;
-using System.Windows.Automation;
-using System.Windows.Forms;
 using CuraManager.Extensions;
+using CuraManager.Legacy.CuraAutomation;
 using CuraManager.Models;
 using CuraManager.Views;
 using IniParser;
@@ -65,98 +64,9 @@ public class CuraService(ISettingsService settingsService) : ICuraService
         );
         p.WaitForInputIdle();
 
-        if (curaFileName == "Cura")
-            SetName4x();
-        else
-            SetName5x();
-
-        void SetName4x()
-        {
-            if (
-                TryFindChild(
-                    AutomationElement.RootElement,
-                    CheckWindow,
-                    TimeSpan.FromMinutes(5),
-                    out var curaWindow
-                )
-                && TryFindChild(
-                    curaWindow,
-                    CheckEditNameButton,
-                    TimeSpan.FromSeconds(30),
-                    out var editNameButton
-                )
-                && editNameButton.TryGetCurrentPattern(
-                    InvokePattern.Pattern,
-                    out var objInvokePattern
-                )
-                && objInvokePattern is InvokePattern invokePattern
-            )
-            {
-                invokePattern.Invoke();
-                SendKeys.SendWait($"{printName}{{ENTER}}");
-            }
-
-            bool CheckWindow(TreeWalker treeWalker, AutomationElement e)
-            {
-                return e.Current.ProcessId == p.Id
-                    && e.Current.Name?.Contains("Ultimaker Cura") == true;
-            }
-
-            bool CheckEditNameButton(TreeWalker treeWalker, AutomationElement e)
-            {
-                return ReferenceEquals(e.Current.ControlType, ControlType.Button)
-                    && string.IsNullOrEmpty(e.Current.Name)
-                    && !e.Current.IsOffscreen
-                    && ReferenceEquals(
-                        treeWalker.GetNextSibling(e)?.Current.ControlType,
-                        ControlType.Edit
-                    );
-            }
-        }
-
-        void SetName5x()
-        {
-            if (
-                TryFindChild(
-                    AutomationElement.RootElement,
-                    CheckWindow,
-                    TimeSpan.FromMinutes(5),
-                    out var curaWindow
-                )
-                && TryFindChild(
-                    curaWindow,
-                    CheckEditNameButton,
-                    TimeSpan.FromSeconds(30),
-                    out var editNameButton
-                )
-                && editNameButton.TryGetCurrentPattern(
-                    ValuePattern.Pattern,
-                    out var objValuePattern
-                )
-                && objValuePattern is ValuePattern valuePattern
-            )
-            {
-                valuePattern.SetValue(printName);
-            }
-
-            bool CheckWindow(TreeWalker treeWalker, AutomationElement e)
-            {
-                return e.Current.ProcessId == p.Id
-                    && e.Current.Name?.Contains(
-                        "Ultimaker Cura",
-                        StringComparison.OrdinalIgnoreCase
-                    ) == true;
-            }
-
-            bool CheckEditNameButton(TreeWalker treeWalker, AutomationElement e)
-            {
-                return ReferenceEquals(e.Current.ControlType, ControlType.Edit)
-                    && !e.Current.IsOffscreen
-                    && e.TryGetCurrentPattern(ValuePattern.Pattern, out var objValuePattern)
-                    && objValuePattern is ValuePattern valuePattern
-                    && !valuePattern.Current.IsReadOnly;
-            }
-        }
+        ServiceContext
+            .GetService<ICuraProjectNameAutomation>()
+            .SetProjectName(p, curaFileName, printName);
     }
 
     public void OpenCuraProject(string fileName)
@@ -290,27 +200,6 @@ public class CuraService(ISettingsService settingsService) : ICuraService
 
         using (var sw = new StreamWriter(curaConfigPath, false, new UTF8Encoding(false)))
             parser.WriteData(sw, iniData);
-    }
-
-    private static bool TryFindChild(
-        AutomationElement parent,
-        Func<TreeWalker, AutomationElement, bool> checkFunc,
-        TimeSpan timeout,
-        out AutomationElement element
-    )
-    {
-        var treeWalker = TreeWalker.RawViewWalker;
-        element = Waiter.WaitUntil(
-            () =>
-            {
-                var e = treeWalker.GetFirstChild(parent);
-                while (e != null && !checkFunc(treeWalker, e))
-                    e = treeWalker.GetNextSibling(e);
-                return e;
-            },
-            new WaiterOptions { ThrowException = false, Timeout = timeout }
-        );
-        return element != null;
     }
 
     private static void UpdateCuraProjectConfigs(string fileName, AppSettings settings)
