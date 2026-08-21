@@ -1,18 +1,36 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
-using System.IO.Compression;
 using System.Windows;
+using CuraManager.Services.Slicers;
 using Newtonsoft.Json;
 
 namespace CuraManager.Models;
+
+/// <summary>
+/// The high-level category a file in a print element's directory falls into.
+/// </summary>
+public enum PrintElementFileCategory
+{
+    /// <summary>A 3D model file, e.g. <c>.stl</c>, <c>.obj</c>, or <c>.x3d</c>.</summary>
+    Model,
+
+    /// <summary>
+    /// A file whose extension is used by slicer project files (e.g. <c>.3mf</c>) but which needs
+    /// further inspection to determine which slicer, if any, produced it.
+    /// </summary>
+    MaybeSlicerProject,
+
+    /// <summary>Any other file.</summary>
+    Other,
+}
 
 [ObservablePropertyDefinition]
 internal interface IPrintElement_Props
 {
     bool IsInitializing { get; set; }
     PrintElementMetadata Metadata { get; set; }
-    IList<PrintElementFile> CuraProjectFiles { get; set; }
+    IList<SlicerFileGroup> SlicerProjectFiles { get; set; }
     IList<PrintElementFile> ModelFiles { get; set; }
     IList<PrintElementFile> OtherFiles { get; set; }
 }
@@ -36,7 +54,7 @@ public sealed partial class PrintElement : ObservableObject, IDisposable, IPrint
     }
 
     public IEnumerable<PrintElementFile> AllFiles =>
-        CuraProjectFiles.Concat(ModelFiles).Concat(OtherFiles);
+        SlicerProjectFiles.SelectMany(x => x.Files).Concat(ModelFiles).Concat(OtherFiles);
     public ObservableCollection<string> Tags { get; }
     public string TagsDisplay => string.Join(", ", Tags.OrderBy(x => x));
 
@@ -55,7 +73,7 @@ public sealed partial class PrintElement : ObservableObject, IDisposable, IPrint
     public PrintElement(string location)
     {
         DirectoryLocation = location;
-        CuraProjectFiles = new ObservableCollection<PrintElementFile>();
+        SlicerProjectFiles = new ObservableCollection<SlicerFileGroup>();
         ModelFiles = new ObservableCollection<PrintElementFile>();
         OtherFiles = new ObservableCollection<PrintElementFile>();
         Tags = new ObservableCollection<string>();
@@ -118,7 +136,7 @@ public sealed partial class PrintElement : ObservableObject, IDisposable, IPrint
 
     private void FillInformation()
     {
-        CuraProjectFiles.Clear();
+        SlicerProjectFiles.Clear();
         ModelFiles.Clear();
         OtherFiles.Clear();
         foreach (
@@ -151,6 +169,7 @@ public sealed partial class PrintElement : ObservableObject, IDisposable, IPrint
                 {
                     list.Remove(file);
                     newList.Add(file);
+                    RemoveEmptyGroup();
                 });
             }
         }
@@ -166,7 +185,11 @@ public sealed partial class PrintElement : ObservableObject, IDisposable, IPrint
     {
         var file = GetFile(e.FullPath, out var list);
         if (file != null)
-            Application.Current.Dispatcher.Invoke(() => list.Remove(file));
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                list.Remove(file);
+                RemoveEmptyGroup();
+            });
     }
 
     private void OnFileCreated(object sender, FileSystemEventArgs e)
@@ -177,6 +200,19 @@ public sealed partial class PrintElement : ObservableObject, IDisposable, IPrint
     }
 
     #endregion
+
+    /// <summary>
+    /// Removes the first slicer group that has become empty, if any. A group is created lazily
+    /// the first time a file for its provider is seen (see <see cref="GetOrCreateGroup"/>) and
+    /// must be dropped again once its last file is removed or moved out, so the UI's
+    /// <c>ItemsControl</c> over <see cref="SlicerProjectFiles"/> never renders an empty group.
+    /// </summary>
+    private void RemoveEmptyGroup()
+    {
+        var emptyGroup = SlicerProjectFiles.FirstOrDefault(x => x.Files.Count == 0);
+        if (emptyGroup != null)
+            SlicerProjectFiles.Remove(emptyGroup);
+    }
 
     public void Dispose()
     {
@@ -194,11 +230,18 @@ public sealed partial class PrintElement : ObservableObject, IDisposable, IPrint
 
         bool Predicate(PrintElementFile x) =>
             x.FileName == fileName && x.FileExtension == extension;
-        if (CuraProjectFiles.TryFirst(Predicate, out var result))
+
+        PrintElementFile result;
+        foreach (var group in SlicerProjectFiles)
         {
-            list = CuraProjectFiles;
+            if (group.Files.TryFirst(Predicate, out result))
+            {
+                list = group.Files;
+                return result;
+            }
         }
-        else if (ModelFiles.TryFirst(Predicate, out result))
+
+        if (ModelFiles.TryFirst(Predicate, out result))
         {
             list = ModelFiles;
         }
@@ -217,48 +260,59 @@ public sealed partial class PrintElement : ObservableObject, IDisposable, IPrint
 
     private IList<PrintElementFile> GetCorrectListForFile(string filePath)
     {
-        var ext = Path.GetExtension(filePath);
-        if (IsExt(".stl", ".obj", ".x3d"))
-            return ModelFiles;
-        if (IsExt(".3mf"))
-            return IsCuraProjectFile(filePath) ? CuraProjectFiles : ModelFiles;
-        return string.Equals(
-            Path.GetFileName(filePath),
-            "metadata.json",
-            StringComparison.OrdinalIgnoreCase
+        if (
+            string.Equals(
+                Path.GetFileName(filePath),
+                "metadata.json",
+                StringComparison.OrdinalIgnoreCase
+            )
         )
-            ? null
-            : OtherFiles;
+            return null;
 
-        bool IsExt(params string[] e) =>
-            e.Any(x => string.Equals(ext, x, StringComparison.OrdinalIgnoreCase));
+        switch (CategorizeByExtension(Path.GetExtension(filePath)))
+        {
+            case PrintElementFileCategory.Model:
+                return ModelFiles;
+            case PrintElementFileCategory.MaybeSlicerProject:
+                var provider = ServiceContext
+                    .GetService<ISlicerRegistry>()
+                    .FindProviderForFile(filePath);
+                return provider == null ? ModelFiles : GetOrCreateGroup(provider);
+            default:
+                return OtherFiles;
+        }
     }
 
-    internal static bool IsCuraProjectFile(string filePath)
+    private IList<PrintElementFile> GetOrCreateGroup(ISlicerProvider provider)
     {
-        if (Path.GetExtension(filePath) != ".3mf" || !File.Exists(filePath))
-            return false;
+        var group = SlicerProjectFiles.FirstOrDefault(x => x.Provider.Id == provider.Id);
+        if (group == null)
+        {
+            group = new SlicerFileGroup(provider);
+            SlicerProjectFiles.Add(group);
+        }
 
-        ZipArchive zip = null;
-        try
-        {
-            zip = ZipFile.OpenRead(filePath);
-            return zip.Entries.Any(x =>
-                x.FullName.StartsWith("Cura/", StringComparison.OrdinalIgnoreCase)
-            );
-        }
-        catch
-        {
-            var lockingProcesses = Waiter.Retry(
-                () => MaSch.Native.Windows.Explorer.FileInfo.WhoIsLocking(filePath),
-                new RetryOptions { ThrowException = false }
-            );
-            return lockingProcesses?.Any(x => x.ProcessName == "Cura") == true;
-        }
-        finally
-        {
-            zip?.Dispose();
-        }
+        return group.Files;
+    }
+
+    /// <summary>
+    /// Classifies a file extension into the broad category used to decide which list a print
+    /// element file belongs to. Extracted as a pure, static method so it can be unit tested
+    /// without constructing a <see cref="PrintElement"/> (which requires a real directory and a
+    /// live <see cref="FileSystemWatcher"/>).
+    /// </summary>
+    /// <param name="extension">The file extension, including the leading dot (e.g. <c>".stl"</c>).</param>
+    /// <returns>The category the extension falls into.</returns>
+    internal static PrintElementFileCategory CategorizeByExtension(string extension)
+    {
+        if (IsExt(".stl", ".obj", ".x3d"))
+            return PrintElementFileCategory.Model;
+        if (IsExt(".3mf"))
+            return PrintElementFileCategory.MaybeSlicerProject;
+        return PrintElementFileCategory.Other;
+
+        bool IsExt(params string[] e) =>
+            e.Any(x => string.Equals(extension, x, StringComparison.OrdinalIgnoreCase));
     }
 
     private PrintElementMetadata LoadMetadata()

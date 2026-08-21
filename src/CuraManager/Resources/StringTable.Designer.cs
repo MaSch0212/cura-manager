@@ -941,7 +941,16 @@ namespace CuraManager.Resources {
                 return ResourceManager.GetString("ShowWebDialogWhenAddingLink", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to {0} Project Files.
+        /// </summary>
+        internal static string SlicerProjectFiles {
+            get {
+                return ResourceManager.GetString("SlicerProjectFiles", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Files have been added.
         /// </summary>

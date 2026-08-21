@@ -603,14 +603,6 @@
                 </Border>
               </DataTemplate>
               <CollectionViewSource
-                x:Key="CuraProjectFiles"
-                Source="{Binding SelectedElement.CuraProjectFiles}"
-              >
-                <CollectionViewSource.SortDescriptions>
-                  <scm:SortDescription Direction="Ascending" PropertyName="FileName" />
-                </CollectionViewSource.SortDescriptions>
-              </CollectionViewSource>
-              <CollectionViewSource
                 x:Key="ModelFiles"
                 Source="{Binding SelectedElement.ModelFiles}"
               >
@@ -627,15 +619,18 @@
                 </CollectionViewSource.SortDescriptions>
               </CollectionViewSource>
             </StackPanel.Resources>
-            <GroupBox
-              Header="{m:Translation CuraProjectFiles}"
-              Visibility="{Binding SelectedElement.CuraProjectFiles.Count, Converter={StaticResource ZeroToCollapsed}}"
-            >
-              <ItemsControl
-                ItemTemplate="{StaticResource PrintElementFileTemplate}"
-                ItemsSource="{Binding Source={StaticResource CuraProjectFiles}}"
-              />
-            </GroupBox>
+            <ItemsControl ItemsSource="{Binding SelectedElement.SlicerProjectFiles}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type models:SlicerFileGroup}">
+                  <GroupBox Header="{Binding Header}">
+                    <ItemsControl
+                      ItemTemplate="{StaticResource PrintElementFileTemplate}"
+                      ItemsSource="{Binding Files}"
+                    />
+                  </GroupBox>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
             <GroupBox
               Header="{m:Translation ModelFiles}"
               Visibility="{Binding SelectedElement.ModelFiles.Count, Converter={StaticResource ZeroToCollapsed}}"

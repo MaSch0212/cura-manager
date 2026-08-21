@@ -316,6 +316,9 @@ After pressing the button, the application is restarted.</value>
   <data name="CuraProjectFiles" xml:space="preserve">
     <value>Cura Project Files</value>
   </data>
+  <data name="SlicerProjectFiles" xml:space="preserve">
+    <value>{0} Project Files</value>
+  </data>
   <data name="ModelFiles" xml:space="preserve">
     <value>3D Model Files</value>
   </data>

@@ -316,6 +316,9 @@ Nach dem Drücken der Schaltfläche wird die Anwendung neu gestartet.</value>
   <data name="CuraProjectFiles" xml:space="preserve">
     <value>Cura Projektdateien</value>
   </data>
+  <data name="SlicerProjectFiles" xml:space="preserve">
+    <value>{0}-Projektdateien</value>
+  </data>
   <data name="ModelFiles" xml:space="preserve">
     <value>3D-Modell-Dateien</value>
   </data>
