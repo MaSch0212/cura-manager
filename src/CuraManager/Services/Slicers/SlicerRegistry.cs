@@ -39,6 +39,17 @@ public class SlicerRegistry : ISlicerRegistry
     public SlicerSettings GetSettings(ISlicerProvider provider) =>
         GetSettings(_settingsAccessor(), provider);
 
+    public SlicerSettings GetSettings(AppSettings settings, ISlicerProvider provider)
+    {
+        if (!settings.Slicers.TryGetValue(provider.Id, out var slicerSettings))
+        {
+            slicerSettings = new SlicerSettings();
+            settings.Slicers[provider.Id] = slicerSettings;
+        }
+
+        return slicerSettings;
+    }
+
     public ISlicerProvider FindProviderForFile(string filePath)
     {
         using var candidate = SlicerProjectFileCandidate.Create(filePath, _lockInspector);
@@ -91,17 +102,6 @@ public class SlicerRegistry : ISlicerRegistry
         }
 
         return changed;
-    }
-
-    private static SlicerSettings GetSettings(AppSettings settings, ISlicerProvider provider)
-    {
-        if (!settings.Slicers.TryGetValue(provider.Id, out var slicerSettings))
-        {
-            slicerSettings = new SlicerSettings();
-            settings.Slicers[provider.Id] = slicerSettings;
-        }
-
-        return slicerSettings;
     }
 
     private IReadOnlyList<ISlicerProvider> GetEnabled(AppSettings settings) =>

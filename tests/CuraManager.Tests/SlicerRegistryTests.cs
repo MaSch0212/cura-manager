@@ -69,6 +69,45 @@ public class SlicerRegistryTests
     }
 
     [Fact]
+    public void GetProvider_ReturnsMatchingProviderCaseInsensitively()
+    {
+        var registry = Build(
+            new AppSettings(),
+            new FakeSlicerProvider("a"),
+            new FakeSlicerProvider("b")
+        );
+
+        Assert.Equal("a", registry.GetProvider("a").Id);
+        Assert.Equal("a", registry.GetProvider("A").Id);
+        Assert.Null(registry.GetProvider("nonexistent"));
+    }
+
+    [Fact]
+    public void GetSettings_CreatesEntryInTheSuppliedInstance()
+    {
+        var settings = new AppSettings();
+        var registry = Build(settings, new FakeSlicerProvider("a"));
+
+        var result = registry.GetSettings(settings, registry.GetProvider("a"));
+
+        Assert.True(settings.Slicers.ContainsKey("a"));
+        Assert.Same(settings.Slicers["a"], result);
+    }
+
+    [Fact]
+    public void GetSettings_ReturnsExistingEntryWithoutReplacingIt()
+    {
+        var settings = new AppSettings();
+        var existing = new SlicerSettings { ProgramFilesPath = "distinctive-path" };
+        settings.Slicers["a"] = existing;
+        var registry = Build(settings, new FakeSlicerProvider("a"));
+
+        var result = registry.GetSettings(settings, registry.GetProvider("a"));
+
+        Assert.Same(existing, result);
+    }
+
+    [Fact]
     public void FindProviderForFile_PrefersExactOverProbable()
     {
         using var scope = new TestZip.Scope();
@@ -109,6 +148,22 @@ public class SlicerRegistryTests
     }
 
     [Fact]
+    public void FindProviderForFile_ActiveProviderIsNotDisplacedByALaterTie()
+    {
+        using var scope = new TestZip.Scope();
+        var path = TestZip.Create(scope.File("a.3mf"), ("Metadata/x.config", "{}"));
+        var settings = SettingsWith("a", "b");
+        settings.ActiveSlicerId = "a";
+        var registry = Build(
+            settings,
+            new FakeSlicerProvider("a", SlicerMatch.Probable),
+            new FakeSlicerProvider("b", SlicerMatch.Probable)
+        );
+
+        Assert.Equal("a", registry.FindProviderForFile(path).Id);
+    }
+
+    [Fact]
     public void FindProviderForFile_ReturnsNullWhenNothingMatches()
     {
         using var scope = new TestZip.Scope();
@@ -132,6 +187,19 @@ public class SlicerRegistryTests
         Assert.True(settings.Slicers["a"].IsEnabled);
         Assert.Equal("a", settings.ActiveSlicerId);
         Assert.False(settings.Slicers.ContainsKey("b"));
+    }
+
+    [Fact]
+    public void ApplyFirstRunDefaults_PreservesAnAlreadySetActiveSlicerId()
+    {
+        var settings = new AppSettings { ActiveSlicerId = "preexisting" };
+        var installed = new FakeSlicerProvider("a");
+        installed.Installations.Add(new SlicerInstallation(new Version(1, 0), "A", "p", "d", true));
+        var registry = Build(settings, installed);
+
+        registry.ApplyFirstRunDefaults(settings);
+
+        Assert.Equal("preexisting", settings.ActiveSlicerId);
     }
 
     [Fact]

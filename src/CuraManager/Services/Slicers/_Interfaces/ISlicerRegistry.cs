@@ -16,8 +16,21 @@ public interface ISlicerRegistry
 
     ISlicerProvider GetProvider(string id);
 
-    /// <summary>Settings for a provider, created on demand so callers never see null.</summary>
+    /// <summary>
+    /// Settings for a provider, created on demand so callers never see null. Reads a fresh
+    /// <see cref="AppSettings"/> from the settings service, so an entry this creates belongs to
+    /// an object the caller does not own and will not be saved; use the two-argument overload
+    /// whenever the returned object will be mutated and saved.
+    /// </summary>
     SlicerSettings GetSettings(ISlicerProvider provider);
+
+    /// <summary>
+    /// Settings for a provider within a caller-supplied <see cref="AppSettings"/>, created on
+    /// demand so callers never see null. Use this overload whenever the returned object will be
+    /// mutated and saved — the parameterless overload reads a fresh instance from the settings
+    /// service, so entries it creates belong to an object the caller does not own and will not save.
+    /// </summary>
+    SlicerSettings GetSettings(AppSettings settings, ISlicerProvider provider);
 
     /// <summary>
     /// Identifies the provider that produced a file, or <see langword="null"/>.
