@@ -92,6 +92,7 @@ public partial class App
                     new CuraProjectNameAutomation(),
                     () => settingsService.LoadSettings().EnableLegacyCuraProjectNaming
                 ),
+                new AnycubicSlicerProvider(),
             },
             fileLockInspector,
             settingsService

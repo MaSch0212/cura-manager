@@ -270,7 +270,7 @@
                     Command="{Binding NewSlicerProjectCommand}"
                     CommandParameter="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                     Header="{m:Translation MenuItem_NewSlicerProject}"
-                    Icon="{StaticResource CuraIcon}"
+                    Icon="{Binding ActiveSlicerIcon}"
                     ToolTip="{Binding NewSlicerProjectToolTip}"
                     ToolTipService.ShowOnDisabled="True"
                   />
@@ -427,7 +427,7 @@
           <mct:IconButton
             Command="{Binding NewSlicerProjectCommand}"
             CommandParameter="{Binding SelectedElement}"
-            Icon="{StaticResource CuraIcon}"
+            Icon="{Binding ActiveSlicerIcon}"
             ToolTip="{Binding NewSlicerProjectToolTip}"
             ToolTipService.ShowOnDisabled="True"
           />

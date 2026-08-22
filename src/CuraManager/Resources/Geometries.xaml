@@ -15,4 +15,10 @@
     Stretch="Uniform"
     Type="Geometry"
   />
+
+  <!--
+    No usable Anycubic-specific path data was produced, so this falls back to a neutral
+    MaterialDesign printer glyph rather than shipping an unresolvable StaticResource.
+  -->
+  <m:MaterialDesignIcon x:Key="AnycubicIcon" Icon="Printer3d" Stretch="Uniform" />
 </ResourceDictionary>

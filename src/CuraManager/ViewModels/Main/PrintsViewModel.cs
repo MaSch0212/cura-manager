@@ -76,6 +76,12 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
     public bool IsSlicerSelectionVisible => EnabledSlicers.Count > 1;
 
     [DependsOn(nameof(ActiveSlicer))]
+    public object ActiveSlicerIcon =>
+        ActiveSlicer == null
+            ? null
+            : Application.Current.TryFindResource(ActiveSlicer.IconResourceKey);
+
+    [DependsOn(nameof(ActiveSlicer))]
     public string NewSlicerProjectToolTip =>
         ActiveSlicer == null
             ? _translationManager.GetTranslation(nameof(StringTable.Msg_NoSlicerEnabled))
