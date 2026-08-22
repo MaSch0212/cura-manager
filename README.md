@@ -1,5 +1,5 @@
 # Cura Manager
-Application to manage 3D Prints using the Ultimaker Cura Slicer.
+Application to manage 3D Prints using UltiMaker Cura, Anycubic Slicer Next, or OrcaSlicer.
 
 ## 🚀 Build Status
 [![Build Status](https://github.com/MaSch0212/cura-manager/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/MaSch0212/cura-manager/actions/workflows/build.yml)
@@ -10,12 +10,10 @@ Just download and extract the ZIP file from the [latest release](https://github.
 The first time you start the application, you need to provide the following settings:
 - **Print projects folder location**<br>
   Select a folder in which the print projects and all 3D models should be created. This can be some local folder, a Windows share or a folder that is used for some cloud storage provider like Microsoft OneDrive.
-- **Cura version**<br>
-  Select the version of UltiMaker Cura that should be used by CuraManager. If the version you want to use is not listed, you can also select "Custom Version" and then provide the following paths manually:
-  - **Cura AppData location**<br>
-    Select the AppData folder to the Cura version you want to use with CuraManager. This is normally in a folder like this: `C:\Users\<username>\AppData\Roaming\cura\<version>`.
-  - **Cura ProgramFiles location**<br>
-    Select the installation directory of the Cura version you want to use with CuraManager. This is normally in a folder like this: `C:\Program Files\Ultimaker Cura <version>`.
+- **Slicers**<br>
+  On the settings page, enable each slicer you want to use with CuraManager (UltiMaker Cura, Anycubic Slicer Next and OrcaSlicer are currently supported). For every slicer you enable, pick one of the detected installations, or select "Custom" to provide the required paths manually. If you enable more than one slicer, you can choose which one is active on the "Print Projects" page. Note that the "Create new project" button stays disabled until at least one slicer is enabled.
+
+> **Note:** The screenshots in this README are from an older, Cura-only version of CuraManager and do not yet reflect the current multi-slicer UI.
 
 ![Settings](resources/images/settings.png)
 
@@ -75,3 +73,14 @@ When you have created some projects in Cura Manager you can easily create a Cura
 You can now set your print settings and start printing.
 
 Also you probably want to save the Cura project. You can simply click "File" -> "Save Project..." in Cura and you will see, that the file explorer that opens is directly in the correct directory for your print project. So you just need to press "Save" in that dialog without doing anything else.
+
+## ⚠️ Legacy features
+
+### 🏷️ Automatic project naming in Cura
+
+Earlier versions of CuraManager always asked for a project name when creating a Cura project and set that name inside the Cura project itself. This is now an optional legacy feature that only applies to UltiMaker Cura (no Orca-family slicer has a project name field or command-line argument):
+- If you are upgrading from an earlier version, it stays **enabled** so your existing workflow does not change.
+- New installations start with it **disabled**. In that case, the create-project dialog no longer asks for a project name.
+- You can toggle it at the bottom of the settings page.
+
+This option is deprecated and will be removed in version 2.0.
