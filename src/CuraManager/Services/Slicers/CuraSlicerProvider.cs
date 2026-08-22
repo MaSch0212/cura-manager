@@ -44,6 +44,12 @@ public class CuraSlicerProvider : ISlicerProvider
 
     public IEnumerable<SlicerInstallation> FindInstallations()
     {
+        // Matches the guard in OrcaFamilySlicerProvider.FindInstallations: a machine
+        // without a Program Files directory (or one that is temporarily inaccessible)
+        // should yield no installations rather than let EnumerateDirectories throw.
+        if (!Directory.Exists(ProgramFilesDir))
+            return [];
+
         return from programDir in Directory.EnumerateDirectories(ProgramFilesDir)
             let programName = Path.GetFileName(programDir)
             where

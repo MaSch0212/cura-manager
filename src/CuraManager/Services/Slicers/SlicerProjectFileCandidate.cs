@@ -15,6 +15,9 @@ public sealed class SlicerProjectFileCandidate : IDisposable
     private readonly Dictionary<string, string> _entryTextCache = new(
         StringComparer.OrdinalIgnoreCase
     );
+    private readonly Dictionary<string, string> _entryTextPrefixCache = new(
+        StringComparer.OrdinalIgnoreCase
+    );
 
     private SlicerProjectFileCandidate(
         string filePath,
@@ -84,7 +87,14 @@ public sealed class SlicerProjectFileCandidate : IDisposable
     public bool HasEntryStartingWith(string prefix) =>
         ZipEntryNames.Any(x => x.StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
 
-    /// <summary>Reads an entry as text, or returns <see langword="null"/> if absent. Memoized.</summary>
+    /// <summary>
+    /// Reads an entry as text in full, or returns <see langword="null"/> if absent or
+    /// unreadable. Memoized. A valid central directory does not guarantee a readable
+    /// entry stream -- a corrupt/truncated entry throws <see cref="InvalidDataException"/>
+    /// or <see cref="IOException"/> from <see cref="ZipArchiveEntry.Open"/> or the
+    /// subsequent read, which is treated the same as the entry being absent so a single
+    /// damaged entry cannot take down every provider probing the file.
+    /// </summary>
     public string ReadEntryText(string entryName)
     {
         if (_archive == null)
@@ -92,16 +102,76 @@ public sealed class SlicerProjectFileCandidate : IDisposable
         if (_entryTextCache.TryGetValue(entryName, out var cached))
             return cached;
 
-        var entry = _archive.GetEntry(entryName);
         string text = null;
-        if (entry != null)
+        try
         {
-            using var stream = entry.Open();
-            using var reader = new StreamReader(stream);
-            text = reader.ReadToEnd();
+            var entry = _archive.GetEntry(entryName);
+            if (entry != null)
+            {
+                using var stream = entry.Open();
+                using var reader = new StreamReader(stream);
+                text = reader.ReadToEnd();
+            }
+        }
+        catch (Exception ex)
+            when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
+        {
+            text = null;
         }
 
         _entryTextCache[entryName] = text;
+        return text;
+    }
+
+    /// <summary>
+    /// Reads at most <paramref name="maxBytes"/> bytes of an entry as text, or returns
+    /// <see langword="null"/> if absent or unreadable. Memoized separately per
+    /// (entry, bound) pair from <see cref="ReadEntryText"/>, because the two serve
+    /// different callers: this exists so a discriminator that only needs to see a
+    /// marker near the start of an entry never has to decompress the rest of it -- for a
+    /// multi-hundred-megabyte mesh entry, <see cref="ReadEntryText"/> would otherwise
+    /// allocate a UTF-16 string roughly twice that size, on the UI thread, for every
+    /// provider that gets asked to identify the file. Decoded with a replacement-fallback
+    /// UTF-8 decoder, so a bound that lands mid-codepoint degrades gracefully instead of
+    /// throwing.
+    /// </summary>
+    public string ReadEntryTextPrefix(string entryName, int maxBytes)
+    {
+        if (_archive == null)
+            return null;
+
+        var cacheKey = $"{entryName}\0{maxBytes}";
+        if (_entryTextPrefixCache.TryGetValue(cacheKey, out var cached))
+            return cached;
+
+        string text = null;
+        try
+        {
+            var entry = _archive.GetEntry(entryName);
+            if (entry != null)
+            {
+                using var stream = entry.Open();
+                var buffer = new byte[maxBytes];
+                var totalRead = 0;
+                int read;
+                while (
+                    totalRead < buffer.Length
+                    && (read = stream.Read(buffer, totalRead, buffer.Length - totalRead)) > 0
+                )
+                {
+                    totalRead += read;
+                }
+
+                text = Encoding.UTF8.GetString(buffer, 0, totalRead);
+            }
+        }
+        catch (Exception ex)
+            when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
+        {
+            text = null;
+        }
+
+        _entryTextPrefixCache[cacheKey] = text;
         return text;
     }
 

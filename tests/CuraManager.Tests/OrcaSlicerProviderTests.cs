@@ -124,4 +124,26 @@ public class OrcaSlicerProviderTests
 
         Assert.Equal(SlicerMatch.None, Match(path));
     }
+
+    [Fact]
+    public void OrcaMarkerBeyondHeaderBound_IsNotDetectedAsExact()
+    {
+        // The discriminator only reads a bounded prefix of 3D/3dmodel.model (see
+        // OrcaFamilySlicerProvider.ModelMetadataHeaderBoundBytes) so that identifying a
+        // file never has to decompress its (potentially huge) mesh in full. Padding the
+        // marker past that bound must fall back to Probable via the X-BBL- slice info,
+        // not silently read further and claim Exact anyway.
+        using var scope = new TestZip.Scope();
+        var padding = new string('x', 8_300);
+        var modelWithLateMarker =
+            $"""<?xml version="1.0" encoding="UTF-8"?><model unit="millimeter"><!--{padding}--><metadata name="OrcaSlicer">2.4.2</metadata></model>""";
+        var path = TestZip.Create(
+            scope.File("a.3mf"),
+            ("3D/3dmodel.model", modelWithLateMarker),
+            ("Metadata/project_settings.config", "{}"),
+            ("Metadata/slice_info.config", BblSliceInfo)
+        );
+
+        Assert.Equal(SlicerMatch.Probable, Match(path));
+    }
 }

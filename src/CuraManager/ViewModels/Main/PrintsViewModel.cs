@@ -610,7 +610,13 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
     private void ExecuteOpenProjectFile(PrintElementFile file)
     {
         var provider = _slicerRegistry.FindProviderForFile(file.FilePath);
-        if (provider != null)
+
+        // Fall back to the shell not only when nothing matches, but also when the
+        // matched provider is currently disabled: its SlicerSettings would be an empty
+        // placeholder (see SlicerRegistry.GetSettings), and launching with that throws
+        // FileNotFoundException from the provider's Start/OpenProject instead of just
+        // opening the file the way it did before per-slicer providers existed.
+        if (provider != null && _slicerRegistry.EnabledProviders.Contains(provider))
         {
             provider.OpenProject(_slicerRegistry.GetSettings(provider), file.FilePath);
         }

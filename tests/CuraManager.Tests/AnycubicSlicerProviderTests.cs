@@ -185,6 +185,36 @@ public class AnycubicSlicerProviderTests
     }
 
     [Fact]
+    public void SetLastExportPath_ZeroByteConfig_DoesNotThrow()
+    {
+        // An unreadable/empty external config is treated like a missing one: no-op,
+        // rather than letting JToken.Load's JsonReaderException escape.
+        using var scope = new TestZip.Scope();
+        var configPath = scope.File("AnycubicSlicerNext.conf");
+        File.WriteAllBytes(configPath, []);
+
+        OrcaFamilySlicerProvider.SetLastExportPath(configPath, "D:\\Prints\\Widget");
+
+        Assert.Empty(File.ReadAllBytes(configPath));
+    }
+
+    [Fact]
+    public void SetLastExportPath_NonObjectJson_DoesNotThrow()
+    {
+        // A config holding a JSON array instead of an object parses fine via JToken.Load
+        // but fails the provider's `(JObject)` cast; that must degrade the same as a
+        // missing config rather than throw InvalidCastException.
+        using var scope = new TestZip.Scope();
+        var configPath = scope.File("AnycubicSlicerNext.conf");
+        const string original = "[1, 2, 3]";
+        File.WriteAllText(configPath, original);
+
+        OrcaFamilySlicerProvider.SetLastExportPath(configPath, "D:\\Prints\\Widget");
+
+        Assert.Equal(original, File.ReadAllText(configPath));
+    }
+
+    [Fact]
     public void SetLastExportPath_TrailingChecksumComment_DoesNotThrow()
     {
         // The shipped Anycubic Slicer Next / OrcaSlicer config ends with a non-JSON

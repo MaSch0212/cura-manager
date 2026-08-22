@@ -17,6 +17,22 @@ public abstract class OrcaFamilySlicerProvider : ISlicerProvider
     private const string SliceInfoEntry = "Metadata/slice_info.config";
     private const string ModelFileEntry = "3D/3dmodel.model";
 
+    /// <summary>
+    /// Bound, in bytes, for the prefix of <c>3D/3dmodel.model</c> read when looking for a
+    /// flavour marker. That file's &lt;model&gt; element opens with a run of
+    /// &lt;metadata&gt; tags before any &lt;resources&gt;/mesh data, and the markers this
+    /// class cares about all live in that header. Measured against a real OrcaSlicer
+    /// 2.4.2 project (D:\temp\slicer projects\OrcaSlicer.3mf, read-only): the
+    /// <c>name="OrcaSlicer"</c> marker starts at byte offset 382 into the uncompressed
+    /// entry, well inside the metadata block. This bound is ~20x that offset -- generous
+    /// headroom for verbose metadata (long designer/description strings, extra keys) on
+    /// other files -- while still capping the read far below the size of a real mesh,
+    /// which on a file from the user's library measured 73,389,740 bytes uncompressed
+    /// (i.e. reading it in full would allocate a ~147 MB UTF-16 string per probe, on the
+    /// UI thread, for every 3mf regardless of which slicer produced it).
+    /// </summary>
+    private const int ModelMetadataHeaderBoundBytes = 8192;
+
     private static readonly string ProgramFilesDir = Environment.GetFolderPath(
         Environment.SpecialFolder.ProgramFiles
     );
@@ -72,9 +88,14 @@ public abstract class OrcaFamilySlicerProvider : ISlicerProvider
             && sliceInfo.Contains(SliceInfoHeaderPrefix, StringComparison.Ordinal);
     }
 
-    /// <summary>Reads <c>3D/3dmodel.model</c>; exposed for flavour discriminators.</summary>
+    /// <summary>
+    /// Reads the header prefix of <c>3D/3dmodel.model</c> (see
+    /// <see cref="ModelMetadataHeaderBoundBytes"/>); exposed for flavour discriminators.
+    /// Bounded rather than reading the whole entry, because that entry is the full mesh
+    /// and can be tens to hundreds of megabytes.
+    /// </summary>
     protected static string ReadModelMetadata(SlicerProjectFileCandidate candidate) =>
-        candidate.ReadEntryText(ModelFileEntry);
+        candidate.ReadEntryTextPrefix(ModelFileEntry, ModelMetadataHeaderBoundBytes);
 
     public SlicerMatch IsProjectFile(SlicerProjectFileCandidate candidate)
     {
@@ -212,10 +233,25 @@ public abstract class OrcaFamilySlicerProvider : ISlicerProvider
             return;
 
         JObject config;
-        using (var reader = new JsonTextReader(new StringReader(File.ReadAllText(configPath))))
+        try
         {
+            using var reader = new JsonTextReader(new StringReader(File.ReadAllText(configPath)));
             reader.Read();
             config = (JObject)JToken.Load(reader);
+        }
+        catch (Exception ex)
+            when (ex
+                    is JsonException
+                        or InvalidCastException
+                        or IOException
+                        or UnauthorizedAccessException
+            )
+        {
+            // A zero-byte or non-object config (JToken.Load throwing, or the file holding
+            // a JSON array/scalar instead of an object) is treated like a missing config:
+            // there is no sensible place to patch last_export_path into, and the slicer
+            // will recreate the file on next launch regardless.
+            return;
         }
 
         if (config["app"] is JObject app)
@@ -234,13 +270,17 @@ public abstract class OrcaFamilySlicerProvider : ISlicerProvider
     /// Reproduces the PrusaSlicer-family <c>AppConfig</c> checksum: MD5 over the config
     /// text up to and including its last <c>}</c>, uppercase hex. This is a file-format
     /// checksum imposed by a third-party binary, not a security control, so MD5 is
-    /// required rather than a design choice.
+    /// required rather than a design choice. Normalizes CRLF to LF itself before hashing
+    /// -- the same normalization <see cref="SetLastExportPath"/> already applies to the
+    /// text it writes -- so this method's result matches the slicer's own recomputed
+    /// checksum regardless of the line endings <paramref name="json"/> arrives with.
     /// </summary>
 #pragma warning disable CA5351 // MD5 is broken for security purposes, but this checksum must match a fixed third-party file format.
     private static string ComputeChecksum(string json)
     {
-        var lastBrace = json.LastIndexOf('}');
-        var toHash = lastBrace >= 0 ? json[..(lastBrace + 1)] : json;
+        var normalized = json.Replace("\r\n", "\n");
+        var lastBrace = normalized.LastIndexOf('}');
+        var toHash = lastBrace >= 0 ? normalized[..(lastBrace + 1)] : normalized;
         return Convert.ToHexString(MD5.HashData(Encoding.UTF8.GetBytes(toHash)));
     }
 #pragma warning restore CA5351
