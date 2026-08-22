@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 using CuraManager.Models;
 using CuraManager.Services;
 using CuraManager.Services.Slicers;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
@@ -40,6 +43,17 @@ public class AnycubicSlicerProviderTests
     {
         using var candidate = SlicerProjectFileCandidate.Create(path, new NoLocks());
         return new AnycubicSlicerProvider().IsProjectFile(candidate);
+    }
+
+    /// <summary>
+    /// Parses a written config the way the provider itself does: load only the first
+    /// JSON value, ignoring whatever trailing "# MD5 checksum ..." comment follows it.
+    /// </summary>
+    private static JObject ParseWrittenConfig(string path)
+    {
+        using var reader = new JsonTextReader(new StringReader(File.ReadAllText(path)));
+        reader.Read();
+        return (JObject)JToken.Load(reader);
     }
 
     [Fact]
@@ -112,7 +126,7 @@ public class AnycubicSlicerProviderTests
 
         OrcaFamilySlicerProvider.SetLastExportPath(configPath, "D:\\Prints\\Widget");
 
-        var result = JObject.Parse(File.ReadAllText(configPath));
+        var result = ParseWrittenConfig(configPath);
         Assert.Equal("D:\\Prints\\Widget", (string)result["app"]["last_export_path"]);
         Assert.Equal("en", (string)result["app"]["language"]);
         Assert.Equal("PLA Basic", (string)result["presets"]["filament"]);
@@ -132,7 +146,7 @@ public class AnycubicSlicerProviderTests
 
         OrcaFamilySlicerProvider.SetLastExportPath(configPath, "D:\\Prints\\Widget");
 
-        var result = JObject.Parse(File.ReadAllText(configPath));
+        var result = ParseWrittenConfig(configPath);
         Assert.Equal("D:\\Prints\\Widget", (string)result["last_export_path"]);
         Assert.Equal("PLA Basic", (string)result["presets"]["filament"]);
     }
@@ -148,7 +162,7 @@ public class AnycubicSlicerProviderTests
     [Fact]
     public void SetLastExportPath_TrailingChecksumComment_DoesNotThrow()
     {
-        // The shipped Anycubic Slicer Next config ends with a non-JSON
+        // The shipped Anycubic Slicer Next / OrcaSlicer config ends with a non-JSON
         // "# MD5 checksum ..." comment line after the closing brace.
         using var scope = new TestZip.Scope();
         var configPath = scope.File("AnycubicSlicerNext.conf");
@@ -162,7 +176,42 @@ public class AnycubicSlicerProviderTests
 
         OrcaFamilySlicerProvider.SetLastExportPath(configPath, "D:\\Prints\\Widget");
 
-        var result = JObject.Parse(File.ReadAllText(configPath));
+        var result = ParseWrittenConfig(configPath);
         Assert.Equal("D:\\Prints\\Widget", (string)result["app"]["last_export_path"]);
+    }
+
+    [Fact]
+    public void SetLastExportPath_WritesChecksumThatMatchesTheSlicersOwnAlgorithm_AndEndsWithNewline()
+    {
+        // AppConfig.cpp's loader computes MD5 over the config text (CRLF normalized to
+        // LF, as its text-mode read would do) up to and including the last '}'. A file
+        // ending in '}' with nothing after it makes the loader's own
+        // substr(last_pos + 2) throw std::out_of_range on next launch, uncaught by the
+        // surrounding JSON-parse-error handler — so the trailing newline is asserted
+        // explicitly, not just implied by the checksum line being present.
+        using var scope = new TestZip.Scope();
+        var configPath = scope.File("AnycubicSlicerNext.conf");
+        File.WriteAllText(
+            configPath,
+            """
+            { "app": { "last_export_path": "C:\\old" } }
+            """
+        );
+
+        OrcaFamilySlicerProvider.SetLastExportPath(configPath, "D:\\Prints\\Widget");
+
+        var written = File.ReadAllText(configPath);
+        Assert.EndsWith("\n", written);
+
+        var lines = written.TrimEnd('\n').Split('\n');
+        var checksumLine = Assert.Single(lines, l => l.StartsWith("# MD5 checksum "));
+        var actualHash = checksumLine["# MD5 checksum ".Length..];
+
+        var jsonText = written[..written.IndexOf("\n# MD5 checksum ", StringComparison.Ordinal)];
+        var normalized = jsonText.Replace("\r\n", "\n");
+        var toHash = normalized[..(normalized.LastIndexOf('}') + 1)];
+        var expectedHash = Convert.ToHexString(MD5.HashData(Encoding.UTF8.GetBytes(toHash)));
+
+        Assert.Equal(expectedHash, actualHash);
     }
 }

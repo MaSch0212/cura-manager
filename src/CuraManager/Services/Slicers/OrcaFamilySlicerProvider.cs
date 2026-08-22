@@ -1,4 +1,5 @@
 using System.IO;
+using System.Security.Cryptography;
 using CuraManager.Extensions;
 using CuraManager.Models;
 using Newtonsoft.Json;
@@ -157,16 +158,17 @@ public abstract class OrcaFamilySlicerProvider : ISlicerProvider
     /// file — e.g. a fresh install where the slicer's AppData path is not configured yet.
     /// </summary>
     /// <remarks>
-    /// The shipped Anycubic Slicer Next config file, like the PrusaSlicer-family
-    /// <c>AppConfig</c> it inherits from, ends with a trailing <c>"# MD5 checksum ..."</c>
-    /// comment line after the closing JSON brace. <see cref="JObject.Parse(string)"/>
-    /// throws on that trailing content ("Additional text encountered after finished
-    /// reading JSON content"), so the file is read with a raw <see cref="JsonTextReader"/>
-    /// that stops as soon as the first JSON value is loaded instead. The comment line
-    /// itself is not preserved on write-back — recomputing it would require an
-    /// undocumented hash algorithm, and writing back a stale, wrong checksum seemed worse
-    /// than omitting it. This has not been confirmed harmless against a real
-    /// Anycubic Slicer Next launch; see the task-10 report.
+    /// The shipped Anycubic Slicer Next (and OrcaSlicer) config file, like the
+    /// PrusaSlicer-family <c>AppConfig</c> it inherits from, ends with a trailing
+    /// <c>"# MD5 checksum ..."</c> comment line after the closing JSON brace.
+    /// <see cref="JObject.Parse(string)"/> throws on that trailing content ("Additional
+    /// text encountered after finished reading JSON content"), so the file is read with a
+    /// raw <see cref="JsonTextReader"/> that stops as soon as the first JSON value is
+    /// loaded instead. On write-back the checksum line is regenerated (see
+    /// <see cref="ComputeChecksum"/>) and the file is always terminated with a trailing
+    /// newline: per <c>AppConfig.cpp</c>'s loader, a file ending in <c>}</c> with nothing
+    /// after it makes <c>substr(last_pos+2)</c> throw <c>std::out_of_range</c> — uncaught
+    /// by the surrounding JSON-parse-error handler — the very next time the slicer starts.
     /// </remarks>
     internal static void SetLastExportPath(string configPath, string targetPath)
     {
@@ -185,6 +187,25 @@ public abstract class OrcaFamilySlicerProvider : ISlicerProvider
         else
             config["last_export_path"] = targetPath;
 
-        File.WriteAllText(configPath, config.ToString(Formatting.Indented));
+        // Write LF-only so the checksum computed here matches what the slicer's own
+        // text-mode read (which normalizes CRLF -> LF before hashing) recomputes.
+        var json = config.ToString(Formatting.Indented).Replace("\r\n", "\n");
+        var checksum = ComputeChecksum(json);
+        File.WriteAllText(configPath, $"{json}\n# MD5 checksum {checksum}\n");
     }
+
+    /// <summary>
+    /// Reproduces the PrusaSlicer-family <c>AppConfig</c> checksum: MD5 over the config
+    /// text up to and including its last <c>}</c>, uppercase hex. This is a file-format
+    /// checksum imposed by a third-party binary, not a security control, so MD5 is
+    /// required rather than a design choice.
+    /// </summary>
+#pragma warning disable CA5351 // MD5 is broken for security purposes, but this checksum must match a fixed third-party file format.
+    private static string ComputeChecksum(string json)
+    {
+        var lastBrace = json.LastIndexOf('}');
+        var toHash = lastBrace >= 0 ? json[..(lastBrace + 1)] : json;
+        return Convert.ToHexString(MD5.HashData(Encoding.UTF8.GetBytes(toHash)));
+    }
+#pragma warning restore CA5351
 }
