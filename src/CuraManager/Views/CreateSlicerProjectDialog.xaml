@@ -16,7 +16,7 @@
   mc:Ignorable="d"
 >
   <mct:Window.CustomIcon>
-    <mct:IconPresenter Icon="{StaticResource CuraIcon}" />
+    <mct:IconPresenter Icon="{Binding SlicerIcon, RelativeSource={RelativeSource AncestorType=local:CreateSlicerProjectDialog}}" />
   </mct:Window.CustomIcon>
   <StackPanel Margin="10">
     <StackPanel.Resources>

@@ -15,6 +15,7 @@ public abstract class OrcaFamilySlicerProvider : ISlicerProvider
 {
     private const string ProjectSettingsEntry = "Metadata/project_settings.config";
     private const string SliceInfoEntry = "Metadata/slice_info.config";
+    private const string ModelFileEntry = "3D/3dmodel.model";
 
     private static readonly string ProgramFilesDir = Environment.GetFolderPath(
         Environment.SpecialFolder.ProgramFiles
@@ -39,24 +40,59 @@ public abstract class OrcaFamilySlicerProvider : ISlicerProvider
     /// <summary>Matched case-insensitively against Program Files directory names.</summary>
     protected abstract string InstallDirNameFilter { get; }
 
-    /// <summary>Producer key prefix in slice_info.config, for example <c>X-ACNext-</c>.</summary>
+    /// <summary>
+    /// Producer key prefix in <c>Metadata/slice_info.config</c>, for example
+    /// <c>X-ACNext-</c>. Return <see langword="null"/> when the flavour cannot be
+    /// identified that way and <see cref="IsProducedByThisFlavour"/> is overridden instead.
+    /// </summary>
     protected abstract string SliceInfoHeaderPrefix { get; }
+
+    /// <summary>
+    /// Process names the flavour's own slicer runs under, used as a last-resort hint
+    /// when the archive could not be read because that slicer currently has the file
+    /// open. For example OrcaSlicer's executable name yields <c>orca-slicer</c> and
+    /// <c>OrcaSlicer</c> — both are listed because the real process casing could not be
+    /// verified on this machine.
+    /// </summary>
+    protected abstract string[] ProcessNames { get; }
+
+    /// <summary>
+    /// Whether this specific Bambu-lineage flavour produced the file. The default
+    /// matches <see cref="SliceInfoHeaderPrefix"/> against slice_info.config.
+    /// Override when the flavour needs a different marker — OrcaSlicer and Bambu
+    /// Studio both emit <c>X-BBL-</c>, so the prefix alone cannot separate them.
+    /// </summary>
+    protected virtual bool IsProducedByThisFlavour(SlicerProjectFileCandidate candidate)
+    {
+        if (string.IsNullOrEmpty(SliceInfoHeaderPrefix))
+            return false;
+
+        var sliceInfo = candidate.ReadEntryText(SliceInfoEntry);
+        return sliceInfo != null
+            && sliceInfo.Contains(SliceInfoHeaderPrefix, StringComparison.Ordinal);
+    }
+
+    /// <summary>Reads <c>3D/3dmodel.model</c>; exposed for flavour discriminators.</summary>
+    protected static string ReadModelMetadata(SlicerProjectFileCandidate candidate) =>
+        candidate.ReadEntryText(ModelFileEntry);
 
     public SlicerMatch IsProjectFile(SlicerProjectFileCandidate candidate)
     {
         if (!string.Equals(candidate.Extension, ".3mf", StringComparison.OrdinalIgnoreCase))
             return SlicerMatch.None;
 
-        var sliceInfo = candidate.ReadEntryText(SliceInfoEntry);
-        if (
-            sliceInfo != null
-            && sliceInfo.Contains(SliceInfoHeaderPrefix, StringComparison.Ordinal)
-        )
+        if (IsProducedByThisFlavour(candidate))
             return SlicerMatch.Exact;
 
         // Bambu lineage, but produced by an unidentified sibling. Older files from this
         // slicer also land here, because they emitted the inherited X-BBL- keys.
+        var sliceInfo = candidate.ReadEntryText(SliceInfoEntry);
         if (candidate.HasEntry(ProjectSettingsEntry) || sliceInfo != null)
+            return SlicerMatch.Probable;
+
+        // Unreadable because this flavour's own slicer has it open: weaker than a
+        // marker, so Probable.
+        if (candidate.LockingProcessNames.Any(x => ProcessNames.Contains(x)))
             return SlicerMatch.Probable;
 
         return SlicerMatch.None;

@@ -21,4 +21,6 @@ public class AnycubicSlicerProvider : OrcaFamilySlicerProvider
     protected override string InstallDirNameFilter => "anycubic";
 
     protected override string SliceInfoHeaderPrefix => "X-ACNext-";
+
+    protected override string[] ProcessNames => ["AnycubicSlicerNext"];
 }

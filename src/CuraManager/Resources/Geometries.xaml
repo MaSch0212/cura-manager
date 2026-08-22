@@ -21,4 +21,11 @@
     MaterialDesign printer glyph rather than shipping an unresolvable StaticResource.
   -->
   <m:MaterialDesignIcon x:Key="AnycubicIcon" Icon="Printer3d" Stretch="Uniform" />
+
+  <!--
+    No usable OrcaSlicer-specific path data was produced either, so this falls back to
+    the same neutral MaterialDesign printer glyph as Anycubic rather than shipping an
+    unresolvable StaticResource.
+  -->
+  <m:MaterialDesignIcon x:Key="OrcaSlicerIcon" Icon="Printer3d" Stretch="Uniform" />
 </ResourceDictionary>

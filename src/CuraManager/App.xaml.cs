@@ -93,6 +93,7 @@ public partial class App
                     () => settingsService.LoadSettings().EnableLegacyCuraProjectNaming
                 ),
                 new AnycubicSlicerProvider(),
+                new OrcaSlicerProvider(),
             },
             fileLockInspector,
             settingsService

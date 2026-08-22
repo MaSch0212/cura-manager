@@ -23,7 +23,7 @@ public partial class CreateSlicerProjectDialog : ICreateSlicerProjectDialog_Prop
 
     public IList<PrintElementFileSelection> Models { get; }
 
-    public string SlicerIconResourceKey { get; }
+    public object SlicerIcon { get; }
 
     public CreateSlicerProjectDialog(
         PrintElement element,
@@ -40,7 +40,7 @@ public partial class CreateSlicerProjectDialog : ICreateSlicerProjectDialog_Prop
         ProjectName =
             element?.Name ?? _translationManager.GetTranslation(nameof(StringTable.Untitled));
         ShowProjectName = showProjectName;
-        SlicerIconResourceKey = provider.IconResourceKey;
+        SlicerIcon = Application.Current.TryFindResource(provider.IconResourceKey);
         Title = string.Format(
             _translationManager.GetTranslation(nameof(StringTable.Title_CreateSlicerProject)),
             provider.DisplayName

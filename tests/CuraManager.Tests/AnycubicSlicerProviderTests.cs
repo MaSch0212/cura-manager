@@ -39,9 +39,14 @@ public class AnycubicSlicerProviderTests
             Array.Empty<string>();
     }
 
-    private static SlicerMatch Match(string path)
+    private sealed class StubLocks(params string[] names) : IFileLockInspector
     {
-        using var candidate = SlicerProjectFileCandidate.Create(path, new NoLocks());
+        public IReadOnlyList<string> GetLockingProcessNames(string filePath) => names;
+    }
+
+    private static SlicerMatch Match(string path, IFileLockInspector locks = null)
+    {
+        using var candidate = SlicerProjectFileCandidate.Create(path, locks ?? new NoLocks());
         return new AnycubicSlicerProvider().IsProjectFile(candidate);
     }
 
@@ -107,6 +112,26 @@ public class AnycubicSlicerProviderTests
         var path = TestZip.Create(scope.File("a.3mf"), ("3D/3dmodel.model", "<model/>"));
 
         Assert.Equal(SlicerMatch.None, Match(path));
+    }
+
+    [Fact]
+    public void UnreadableFileLockedByAnycubicSlicerNext_IsProbableMatch()
+    {
+        using var scope = new TestZip.Scope();
+        var path = scope.File("locked.3mf");
+        File.WriteAllText(path, "not a zip");
+
+        Assert.Equal(SlicerMatch.Probable, Match(path, new StubLocks("AnycubicSlicerNext")));
+    }
+
+    [Fact]
+    public void UnreadableFileLockedBySomethingElse_IsNoMatch()
+    {
+        using var scope = new TestZip.Scope();
+        var path = scope.File("locked.3mf");
+        File.WriteAllText(path, "not a zip");
+
+        Assert.Equal(SlicerMatch.None, Match(path, new StubLocks("notepad")));
     }
 
     [Fact]
