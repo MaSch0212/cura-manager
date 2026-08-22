@@ -635,25 +635,10 @@
             <ItemsControl ItemsSource="{Binding SelectedElement.SlicerProjectFiles}">
               <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="{x:Type models:SlicerFileGroup}">
-                  <DataTemplate.Resources>
-                    <!--
-                      Sorted per group instance: DataTemplate.Resources are instantiated
-                      once per generated visual tree, so each group's CollectionViewSource
-                      binds to that group's own Files collection instead of one shared
-                      view. Mirrors the FileName sort used by the ModelFiles/OtherFiles
-                      sections below so watcher-added files land in place instead of
-                      appending at the bottom.
-                    -->
-                    <CollectionViewSource x:Key="SlicerGroupFiles" Source="{Binding Files}">
-                      <CollectionViewSource.SortDescriptions>
-                        <scm:SortDescription Direction="Ascending" PropertyName="FileName" />
-                      </CollectionViewSource.SortDescriptions>
-                    </CollectionViewSource>
-                  </DataTemplate.Resources>
                   <GroupBox Header="{Binding Header}">
                     <ItemsControl
                       ItemTemplate="{StaticResource PrintElementFileTemplate}"
-                      ItemsSource="{Binding Source={StaticResource SlicerGroupFiles}}"
+                      ItemsSource="{Binding FilesView}"
                     />
                   </GroupBox>
                 </DataTemplate>
