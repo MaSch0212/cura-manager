@@ -141,8 +141,8 @@
   <data name="UseSystemLanguage" xml:space="preserve">
     <value>Betriebssystemsprache verwenden</value>
   </data>
-  <data name="Title_CreateCuraProject" xml:space="preserve">
-    <value>Cura Projekt erstellen</value>
+  <data name="Title_CreateSlicerProject" xml:space="preserve">
+    <value>{0}-Projekt erstellen</value>
   </data>
   <data name="ProjectName" xml:space="preserve">
     <value>Projektname</value>
@@ -292,8 +292,8 @@ Nach dem Drücken der Schaltfläche wird die Anwendung neu gestartet.</value>
   <data name="ToolTip_AddFilesToProject" xml:space="preserve">
     <value>Dateien zum Projekt hinzufügen</value>
   </data>
-  <data name="ToolTip_NewCuraProject" xml:space="preserve">
-    <value>Neues Cura Projekt erstellen</value>
+  <data name="ToolTip_NewSlicerProject" xml:space="preserve">
+    <value>Neues {0}-Projekt erstellen</value>
   </data>
   <data name="ToolTip_OpenProjectFolder" xml:space="preserve">
     <value>Projektordner öffnen</value>
@@ -312,9 +312,6 @@ Nach dem Drücken der Schaltfläche wird die Anwendung neu gestartet.</value>
   </data>
   <data name="Delete" xml:space="preserve">
     <value>Löschen</value>
-  </data>
-  <data name="CuraProjectFiles" xml:space="preserve">
-    <value>Cura Projektdateien</value>
   </data>
   <data name="SlicerProjectFiles" xml:space="preserve">
     <value>{0}-Projektdateien</value>
@@ -336,15 +333,6 @@ Nach dem Drücken der Schaltfläche wird die Anwendung neu gestartet.</value>
   </data>
   <data name="PrintProjectsFolderLocation" xml:space="preserve">
     <value>Ordner für Druckprojekte</value>
-  </data>
-  <data name="CuraAppDataLocation" xml:space="preserve">
-    <value>Pfad des Cura AppData-Verzeichnisses</value>
-  </data>
-  <data name="CuraProgramFilesLocation" xml:space="preserve">
-    <value>Pfad des Cura Installationverzeichnisses</value>
-  </data>
-  <data name="UpdateProfilesInCuraProjects" xml:space="preserve">
-    <value>Das Profil und die Maschineneinstellungen im Cura-Projekt aktualisieren, bevor es geöffnet wird. Dies verhindert unerwünschte Änderungen an Ihren Profilen beim Öffnen von Cura-Projekten.</value>
   </data>
   <data name="Msg_VersionUpToDate" xml:space="preserve">
     <value>Die installierte Version ist auf dem neuesten Stand.</value>
@@ -379,17 +367,17 @@ Nach dem Drücken der Schaltfläche wird die Anwendung neu gestartet.</value>
   <data name="Suc_CreateProject" xml:space="preserve">
     <value>Projekt wurde angelegt</value>
   </data>
-  <data name="Msg_CuraPathsNotConfigured" xml:space="preserve">
-    <value>Die Cura-Pfade sind nicht korrekt konfiguriert. Bitte stellen Sie sicher, dass unter dem konfigurierten AppData-Pfad eine "cura.cfg"-Datei und unter dem ProgramFiles-Pfad die "Cura.exe"- oder "Ultimaker-Cura.exe"-Datei vorhanden ist.</value>
+  <data name="Msg_SlicerPathsNotConfigured" xml:space="preserve">
+    <value>Die Pfade für {0} sind nicht korrekt konfiguriert. Bitte prüfen Sie die Einstellungsseite.</value>
   </data>
-  <data name="Prog_CreateCuraProject" xml:space="preserve">
-    <value>Cura Projekt wird erstellt...</value>
+  <data name="Prog_CreateSlicerProject" xml:space="preserve">
+    <value>{0}-Projekt wird erstellt...</value>
   </data>
-  <data name="Fail_CreateCuraProject" xml:space="preserve">
-    <value>Erstellen des Cura Projekts ist fehlgeschlagen</value>
+  <data name="Fail_CreateSlicerProject" xml:space="preserve">
+    <value>Erstellen des {0}-Projekts fehlgeschlagen</value>
   </data>
-  <data name="Suc_CreateCuraProject" xml:space="preserve">
-    <value>Cura Projekt wurde erstellt</value>
+  <data name="Suc_CreateSlicerProject" xml:space="preserve">
+    <value>{0}-Projekt wurde erstellt</value>
   </data>
   <data name="Msg_ConfirmProjectDeletion" xml:space="preserve">
     <value>Möchten Sie wirklich das Projekt "{0}" mit all seinen Dateien und Unterverzeichnissen löschen?</value>
@@ -514,18 +502,6 @@ Nach dem Drücken der Schaltfläche wird die Anwendung neu gestartet.</value>
   <data name="ToolTip_Filter" xml:space="preserve">
     <value>Filter</value>
   </data>
-  <data name="LatestSupportedCuraVersion" xml:space="preserve">
-    <value>Neueste unterstützte Cura-Version</value>
-  </data>
-  <data name="SelectedCuraVersion" xml:space="preserve">
-    <value>Version von Cura im angegebenen Pfad</value>
-  </data>
-  <data name="Warn_CuraVersionNotSupported" xml:space="preserve">
-    <value>Die im angegebenen Pfad installierte Version von Cura ist höher als die neueste unterstützte Version. Dies ist möglicherweise kein Problem, aber es kann zu unvorhergesehenen Problemen bei der Erstellung eines neuen Cura-Projekts kommen. Sie können auch prüfen, ob eine neue Version von CuraManager verfügbar ist, die diese Version unterstützt.</value>
-  </data>
-  <data name="Warn_NoCuraVersionFound" xml:space="preserve">
-    <value>Die Cura-Version konnte anhand des angegebenen Pfades nicht ermittelt werden.</value>
-  </data>
   <data name="DownloadLatestVersion" xml:space="preserve">
     <value>Aktualisieren</value>
   </data>
@@ -535,58 +511,52 @@ Nach dem Drücken der Schaltfläche wird die Anwendung neu gestartet.</value>
   <data name="ApplicationSettings" xml:space="preserve">
     <value>Anwendungseinstellungen</value>
   </data>
-  <data name="CuraSettings" xml:space="preserve">
-    <value>Cura-Einstellungen</value>
-  </data>
-  <data name="CustomCuraVersion" xml:space="preserve">
-    <value>Benutzerdefinierte Version</value>
-  </data>
-  <data name="CuraVersion" xml:space="preserve">
-    <value>Cura Version</value>
-  </data>
-  <data name="UnsupportedCuraVersion" xml:space="preserve">
-    <value>Diese Cura Version wird nicht offiziell unterstützt.</value>
-  </data>
-  <data name="SlicerVersion" xml:space="preserve">
-    <value>Slicer-Version</value>
-  </data>
   <data name="CustomSlicerVersion" xml:space="preserve">
     <value>Benutzerdefinierte Version</value>
   </data>
+  <data name="SlicerVersion" xml:space="preserve">
+    <value>Version</value>
+  </data>
   <data name="UnsupportedSlicerVersion" xml:space="preserve">
-    <value>Diese Slicer-Version wird nicht offiziell unterstützt.</value>
+    <value>Diese Version wird nicht offiziell unterstützt.</value>
   </data>
   <data name="SlicerAppDataLocation" xml:space="preserve">
-    <value>Pfad des Slicer AppData-Verzeichnisses</value>
+    <value>AppData-Speicherort</value>
   </data>
   <data name="SlicerInstallLocation" xml:space="preserve">
-    <value>Pfad des Slicer-Installationsverzeichnisses</value>
+    <value>Installationsverzeichnis</value>
   </data>
   <data name="UpdateProfilesInSlicerProjects" xml:space="preserve">
-    <value>Das Profil und die Maschineneinstellungen im Slicer-Projekt aktualisieren, bevor es geöffnet wird. Dies verhindert unerwünschte Änderungen an Ihren Profilen beim Öffnen von Slicer-Projekten.</value>
+    <value>Profil- und Geräteeinstellungen im Projekt vor dem Öffnen aktualisieren. Das verhindert ungewollte Änderungen an Ihren Profilen beim Öffnen von Projekten.</value>
   </data>
   <data name="Warn_NoSlicerVersionFound" xml:space="preserve">
-    <value>Die Slicer-Version konnte anhand des angegebenen Pfades nicht ermittelt werden.</value>
+    <value>Die Version konnte im angegebenen Pfad nicht ermittelt werden.</value>
   </data>
   <data name="Warn_SlicerVersionNotSupported" xml:space="preserve">
-    <value>Die im angegebenen Pfad installierte Slicer-Version ist höher als die neueste unterstützte Version. Dies ist möglicherweise kein Problem, aber es kann zu unvorhergesehenen Problemen bei der Erstellung eines neuen Projekts kommen. Sie können auch prüfen, ob eine neue Version von CuraManager verfügbar ist, die diese Version unterstützt.</value>
+    <value>Die im angegebenen Pfad installierte Version ist neuer als die neueste unterstützte Version. Das muss kein Problem sein, es kann beim Erstellen neuer Projekte aber zu unvorhergesehenen Fehlern kommen. Prüfen Sie gegebenenfalls, ob eine neue Version von CuraManager verfügbar ist, die diese Version unterstützt.</value>
   </data>
   <data name="LatestSupportedSlicerVersion" xml:space="preserve">
-    <value>Neueste unterstützte Slicer-Version</value>
+    <value>Neueste unterstützte Version</value>
   </data>
   <data name="DetectedSlicerVersion" xml:space="preserve">
-    <value>Erkannte Slicer-Version</value>
+    <value>Im angegebenen Pfad gefundene Version</value>
   </data>
   <data name="EnableSlicer" xml:space="preserve">
-    <value>Diesen Slicer aktivieren</value>
+    <value>Aktiviert</value>
+  </data>
+  <data name="ActiveSlicer" xml:space="preserve">
+    <value>Aktiver Slicer</value>
+  </data>
+  <data name="Msg_NoSlicerEnabled" xml:space="preserve">
+    <value>Es ist kein Slicer aktiviert. Aktivieren Sie einen auf der Einstellungsseite, um Projekte zu erstellen.</value>
   </data>
   <data name="LegacyFeatures" xml:space="preserve">
-    <value>Legacy-Funktionen</value>
+    <value>Veraltete Funktionen</value>
   </data>
   <data name="EnableLegacyCuraProjectNaming" xml:space="preserve">
-    <value>Alte Cura-Projektbenennung verwenden</value>
+    <value>Projektnamen in Cura automatisch setzen</value>
   </data>
   <data name="Desc_LegacyCuraProjectNaming" xml:space="preserve">
-    <value>Verwendet das ältere, auf UI-Automatisierung basierende Benennungsschema für Cura-Projekte. Aktivieren Sie dies nur, wenn Sie auf das Verhalten früherer CuraManager-Versionen angewiesen sind.</value>
+    <value>Nach dem Start von Cura wird der Projektname per UI-Automatisierung in das Namensfeld eingetragen. Betrifft nur Cura, funktioniert nur unter Windows und kann bei Oberflächenänderungen in Cura fehlschlagen. Diese Option wird in Version 2.0 entfernt.</value>
   </data>
 </root>

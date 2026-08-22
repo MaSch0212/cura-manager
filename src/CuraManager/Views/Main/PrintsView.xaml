@@ -140,6 +140,16 @@
         Icon="{m:MaterialDesignIcon Icon=Reload}"
         ToolTip="{m:Translation ToolTip_ReloadModels}"
       />
+      <Separator Visibility="{Binding IsSlicerSelectionVisible, Converter={StaticResource BoolToCollapsed}}" />
+      <ComboBox
+        MinWidth="160"
+        VerticalAlignment="Center"
+        DisplayMemberPath="DisplayName"
+        ItemsSource="{Binding EnabledSlicers}"
+        SelectedItem="{Binding ActiveSlicer}"
+        ToolTip="{m:Translation ActiveSlicer}"
+        Visibility="{Binding IsSlicerSelectionVisible, Converter={StaticResource BoolToCollapsed}}"
+      />
     </StackPanel>
   </mv:ExtendedSplitViewContent.ToolbarContent>
   <mv:ExtendedSplitViewContent.ToolbarEndContent>
@@ -257,9 +267,9 @@
                     Icon="{m:MaterialDesignIcon Icon=PlusBoxMultiple}"
                   />
                   <MenuItem
-                    Command="{Binding NewCuraProjectCommand}"
+                    Command="{Binding NewSlicerProjectCommand}"
                     CommandParameter="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                    Header="{m:Translation ToolTip_NewCuraProject}"
+                    Header="{Binding NewSlicerProjectToolTip}"
                     Icon="{StaticResource CuraIcon}"
                   />
                   <Separator />
@@ -413,10 +423,10 @@
             ToolTip="{m:Translation ToolTip_AddFilesToProject}"
           />
           <mct:IconButton
-            Command="{Binding NewCuraProjectCommand}"
+            Command="{Binding NewSlicerProjectCommand}"
             CommandParameter="{Binding SelectedElement}"
             Icon="{StaticResource CuraIcon}"
-            ToolTip="{m:Translation ToolTip_NewCuraProject}"
+            ToolTip="{Binding NewSlicerProjectToolTip}"
           />
           <mct:IconButton
             Margin="10,0,0,0"
