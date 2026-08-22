@@ -1,11 +1,11 @@
 using System.ComponentModel;
-using System.IO;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Interop;
 using CuraManager.Models;
 using CuraManager.Resources;
 using CuraManager.Services;
+using CuraManager.Services.Slicers;
 using MaSch.Presentation;
 using MaSch.Presentation.Translation;
 using MaSch.Presentation.Wpf.Commands;
@@ -17,19 +17,17 @@ namespace CuraManager.ViewModels.Main;
 [ObservablePropertyDefinition]
 internal interface ISettingsViewModel_Props
 {
-    CuraManagerSettings Settings { get; set; }
-    Version SelectedCuraVersion { get; set; }
-
-    CuraVersion[] AvailableVersions { get; set; }
-    CuraVersion SelectedAvailableVersion { get; set; }
-    bool IsLoadingVersions { get; set; }
+    AppSettings Settings { get; set; }
+    SlicerSettingsViewModel[] Slicers { get; set; }
 }
 
 public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsViewModel_Props
 {
     private readonly ISettingsService _settingsService;
     private readonly ITranslationManager _translationManager;
-    private readonly ICuraService _curaService;
+    private readonly ISlicerRegistry _slicerRegistry;
+
+    private Task _slicersReloadTask = Task.CompletedTask;
 
     public ObservableTuple<int?, string>[] AvailableLanguages { get; set; }
 
@@ -46,19 +44,10 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
         }
     }
 
-    public Version LatestSupportedCuraVersion => _curaService?.LatestSupportedCuraVersion;
-
-    [DependsOn(nameof(SelectedCuraVersion))]
-    public bool? IsSupportedCuraVersionSelected =>
-        LatestSupportedCuraVersion == null
-            ? null
-            : SelectedCuraVersion <= LatestSupportedCuraVersion;
-
     public ICommand UndoCommand { get; }
     public ICommand SaveCommand { get; }
 
     public ICommand BrowseDirectoryCommand { get; }
-    public ICommand ReloadAvailableVersionsCommand { get; }
 
     public SettingsViewModel()
     {
@@ -66,22 +55,19 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
         {
             ServiceContext.GetService(out _settingsService);
             ServiceContext.GetService(out _translationManager);
-            ServiceContext.GetService(out _curaService);
+            ServiceContext.GetService(out _slicerRegistry);
         }
 
         UndoCommand = new DelegateCommand(ExecuteUndo);
         SaveCommand = new DelegateCommand(ExecuteSave);
-        BrowseDirectoryCommand = new DelegateCommand<string>(ExecuteBrowseDirectory);
-        ReloadAvailableVersionsCommand = new AsyncDelegateCommand(async () =>
-            await RebuildAvailableVersionsAsync(true)
-        );
+        BrowseDirectoryCommand = new DelegateCommand(ExecuteBrowsePrintsPath);
     }
 
     public override async Task OnOpen(CancelEventArgs e)
     {
         RebuildAvailableLanguages();
         Settings = _settingsService.LoadSettings();
-        await RebuildAvailableVersionsAsync(false);
+        await _slicersReloadTask;
         await base.OnOpen(e);
     }
 
@@ -108,31 +94,41 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
         }
     }
 
-    partial void OnSettingsChanged(CuraManagerSettings previous, CuraManagerSettings value)
+    partial void OnSettingsChanged(AppSettings previous, AppSettings value)
     {
-        if (previous != null)
-            previous.PropertyChanged -= Settings_PropertyChanged;
-        value.PropertyChanged += Settings_PropertyChanged;
-        SelectedCuraVersion = _curaService.GetCuraVersion(value.CuraProgramFilesPath);
+        Slicers = _slicerRegistry
+            .AllProviders.Select(x => new SlicerSettingsViewModel(
+                x,
+                _slicerRegistry.GetSettings(value, x)
+            ))
+            .ToArray();
+
+        // Fresh SlicerSettingsViewModels start with AvailableInstallations == null, so every
+        // reassignment of Settings (OnOpen's initial load, and ExecuteUndo below) needs to
+        // repopulate the version dropdowns. OnSettingsChanged is a synchronous partial void, so
+        // this can't be awaited here; OnOpen awaits this same task afterwards instead of starting
+        // a second, redundant scan, and ExecuteUndo (which cannot await from a DelegateCommand)
+        // relies on this fire-and-forget kickoff alone.
+        _slicersReloadTask = ReloadAllInstallationsSafeAsync();
     }
 
-    partial void OnSelectedAvailableVersionChanged(CuraVersion previous, CuraVersion value)
+    /// <summary>
+    /// Reloads every slicer's installations, guarding against the fire-and-forget call from
+    /// <see cref="OnSettingsChanged"/> faulting an unobserved task. The protection lives here,
+    /// not inside <see cref="SlicerSettingsViewModel.ReloadInstallationsAsync"/>, so the
+    /// user-initiated <c>ReloadCommand</c> (awaited by its own <c>AsyncDelegateCommand</c>) still
+    /// surfaces a genuine scan failure through the normal unhandled-exception path instead of
+    /// silently leaving the dropdown empty.
+    /// </summary>
+    private async Task ReloadAllInstallationsSafeAsync()
     {
-        if (value?.Version != null)
+        try
         {
-            Settings.CuraAppDataPath = value.AppDataPath;
-            Settings.CuraProgramFilesPath = value.ProgramFilesPath;
+            await Task.WhenAll(Slicers.Select(x => x.ReloadInstallationsAsync(false)));
         }
-    }
-
-    private void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-        if (
-            e.PropertyName is nameof(CuraManagerSettings.CuraProgramFilesPath)
-            && sender is CuraManagerSettings settings
-        )
+        catch (Exception)
         {
-            SelectedCuraVersion = _curaService.GetCuraVersion(settings.CuraProgramFilesPath);
+            // A failed scan degrades to an empty/stale dropdown; the reload button retries.
         }
     }
 
@@ -151,33 +147,9 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
         TrySaveSettings();
     }
 
-    private void ExecuteBrowseDirectory(string settingName)
+    private void ExecuteBrowsePrintsPath()
     {
-        var property = Settings.GetType().GetProperty(settingName);
-        if (property == null)
-            throw new ArgumentException(
-                $"A setting with the name \"{settingName}\" does not exist.",
-                nameof(settingName)
-            );
-
-        var selectedPath = (string)property.GetValue(Settings);
-
-        var fbd = new FolderBrowserDialog
-        {
-            SelectedPath = !string.IsNullOrWhiteSpace(selectedPath)
-                ? selectedPath
-                : settingName switch
-                {
-                    nameof(Settings.CuraAppDataPath) => Path.Combine(
-                        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                        "cura"
-                    ) + Path.DirectorySeparatorChar,
-                    nameof(Settings.CuraProgramFilesPath) => Environment.GetFolderPath(
-                        Environment.SpecialFolder.ProgramFiles
-                    ) + Path.DirectorySeparatorChar,
-                    _ => null,
-                },
-        };
+        var fbd = new FolderBrowserDialog { SelectedPath = Settings.PrintsPath };
 
         NativeWindow owner = null;
         if (Application.Current.MainWindow != null)
@@ -188,7 +160,7 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
 
         if (fbd.ShowDialog(owner) == DialogResult.OK)
         {
-            property.SetValue(Settings, fbd.SelectedPath);
+            Settings.PrintsPath = fbd.SelectedPath;
         }
     }
     #endregion
@@ -221,38 +193,6 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
         else
         {
             AvailableLanguages[0].Item2 = osLangEntry;
-        }
-    }
-
-    private async Task RebuildAvailableVersionsAsync(bool force)
-    {
-        if (AvailableVersions != null && !force)
-            return;
-
-        IsLoadingVersions = true;
-        try
-        {
-            AvailableVersions = await _curaService
-                .FindAvailableCuraVersions()
-                .Prepend(new CuraVersion(null, null, null, null, true))
-                .ToArrayAsync();
-            SelectedAvailableVersion =
-                AvailableVersions.FirstOrDefault(x =>
-                    string.Equals(
-                        x.AppDataPath,
-                        Settings.CuraAppDataPath,
-                        StringComparison.OrdinalIgnoreCase
-                    )
-                    && string.Equals(
-                        x.ProgramFilesPath,
-                        Settings.CuraProgramFilesPath,
-                        StringComparison.OrdinalIgnoreCase
-                    )
-                ) ?? AvailableVersions[0];
-        }
-        finally
-        {
-            IsLoadingVersions = false;
         }
     }
 

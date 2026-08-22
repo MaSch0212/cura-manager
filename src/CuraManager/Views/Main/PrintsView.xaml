@@ -140,6 +140,16 @@
         Icon="{m:MaterialDesignIcon Icon=Reload}"
         ToolTip="{m:Translation ToolTip_ReloadModels}"
       />
+      <Separator Visibility="{Binding IsSlicerSelectionVisible, Converter={StaticResource BoolToCollapsed}}" />
+      <ComboBox
+        MinWidth="160"
+        VerticalAlignment="Center"
+        DisplayMemberPath="DisplayName"
+        ItemsSource="{Binding EnabledSlicers}"
+        SelectedItem="{Binding ActiveSlicer}"
+        ToolTip="{m:Translation ActiveSlicer}"
+        Visibility="{Binding IsSlicerSelectionVisible, Converter={StaticResource BoolToCollapsed}}"
+      />
     </StackPanel>
   </mv:ExtendedSplitViewContent.ToolbarContent>
   <mv:ExtendedSplitViewContent.ToolbarEndContent>
@@ -257,10 +267,12 @@
                     Icon="{m:MaterialDesignIcon Icon=PlusBoxMultiple}"
                   />
                   <MenuItem
-                    Command="{Binding NewCuraProjectCommand}"
+                    Command="{Binding NewSlicerProjectCommand}"
                     CommandParameter="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                    Header="{m:Translation ToolTip_NewCuraProject}"
-                    Icon="{StaticResource CuraIcon}"
+                    Header="{m:Translation MenuItem_NewSlicerProject}"
+                    Icon="{Binding ActiveSlicerIcon}"
+                    ToolTip="{Binding NewSlicerProjectToolTip}"
+                    ToolTipService.ShowOnDisabled="True"
                   />
                   <Separator />
                   <MenuItem
@@ -413,10 +425,11 @@
             ToolTip="{m:Translation ToolTip_AddFilesToProject}"
           />
           <mct:IconButton
-            Command="{Binding NewCuraProjectCommand}"
+            Command="{Binding NewSlicerProjectCommand}"
             CommandParameter="{Binding SelectedElement}"
-            Icon="{StaticResource CuraIcon}"
-            ToolTip="{m:Translation ToolTip_NewCuraProject}"
+            Icon="{Binding ActiveSlicerIcon}"
+            ToolTip="{Binding NewSlicerProjectToolTip}"
+            ToolTipService.ShowOnDisabled="True"
           />
           <mct:IconButton
             Margin="10,0,0,0"
@@ -603,14 +616,6 @@
                 </Border>
               </DataTemplate>
               <CollectionViewSource
-                x:Key="CuraProjectFiles"
-                Source="{Binding SelectedElement.CuraProjectFiles}"
-              >
-                <CollectionViewSource.SortDescriptions>
-                  <scm:SortDescription Direction="Ascending" PropertyName="FileName" />
-                </CollectionViewSource.SortDescriptions>
-              </CollectionViewSource>
-              <CollectionViewSource
                 x:Key="ModelFiles"
                 Source="{Binding SelectedElement.ModelFiles}"
               >
@@ -627,15 +632,18 @@
                 </CollectionViewSource.SortDescriptions>
               </CollectionViewSource>
             </StackPanel.Resources>
-            <GroupBox
-              Header="{m:Translation CuraProjectFiles}"
-              Visibility="{Binding SelectedElement.CuraProjectFiles.Count, Converter={StaticResource ZeroToCollapsed}}"
-            >
-              <ItemsControl
-                ItemTemplate="{StaticResource PrintElementFileTemplate}"
-                ItemsSource="{Binding Source={StaticResource CuraProjectFiles}}"
-              />
-            </GroupBox>
+            <ItemsControl ItemsSource="{Binding SelectedElement.SlicerProjectFiles}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type models:SlicerFileGroup}">
+                  <GroupBox Header="{Binding Header}">
+                    <ItemsControl
+                      ItemTemplate="{StaticResource PrintElementFileTemplate}"
+                      ItemsSource="{Binding FilesView}"
+                    />
+                  </GroupBox>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
             <GroupBox
               Header="{m:Translation ModelFiles}"
               Visibility="{Binding SelectedElement.ModelFiles.Count, Converter={StaticResource ZeroToCollapsed}}"

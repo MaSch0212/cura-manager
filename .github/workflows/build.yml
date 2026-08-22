@@ -8,8 +8,11 @@ on:
       - .github/workflows/build.yml
       - .editorconfig
       - CuraManager.slnx
+      - Directory.Build.props
+      - Directory.Packages.props
       - docs/release-notes/**
       - src/**
+      - tests/**
   pull_request:
     branches:
       - main
@@ -17,8 +20,11 @@ on:
       - .github/workflows/build.yml
       - .editorconfig
       - CuraManager.slnx
+      - Directory.Build.props
+      - Directory.Packages.props
       - docs/release-notes/**
       - src/**
+      - tests/**
   workflow_dispatch:
 
 permissions:
@@ -43,6 +49,9 @@ jobs:
         with:
           dotnet-version: '10.x'
 
+      - name: Restore (locked mode)
+        run: dotnet restore CuraManager.slnx --locked-mode
+
       - name: Determine version
         id: version
         shell: pwsh
@@ -66,6 +75,9 @@ jobs:
             exit 1
           }
           Write-Host "Found release notes: $notes"
+
+      - name: Run tests
+        run: dotnet test CuraManager.slnx -c Release -p:TreatWarningsAsErrors=true
 
       - name: Build projects
         run: >

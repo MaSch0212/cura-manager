@@ -1,7 +1,9 @@
 using System.Windows;
 using System.Windows.Markup;
+using CuraManager.Legacy.CuraAutomation;
 using CuraManager.Resources;
 using CuraManager.Services;
+using CuraManager.Services.Slicers;
 using CuraManager.Services.WebProviders;
 using CuraManager.Views;
 using MaSch.Presentation;
@@ -60,6 +62,11 @@ public partial class App
         var themeManager = ServiceContext.GetService<IThemeManager>();
         themeManager.LoadTheme(Theme.FromDefaultTheme(settingsService.LoadSettings().Theme));
 
+        var slicerRegistry = ServiceContext.GetService<ISlicerRegistry>();
+        var settings = settingsService.LoadSettings();
+        if (slicerRegistry.ApplyFirstRunDefaults(settings))
+            settingsService.SaveSettings(settings);
+
         MainWindow = new MainWindow();
         MainWindow.Show();
     }
@@ -72,9 +79,26 @@ public partial class App
         ServiceContext.AddService<IThemeManager>(ThemeManager.DefaultThemeManager);
         ServiceContext.AddService<ICachingService>(new CachingService());
         ServiceContext.AddService<ISettingsService>(settingsService);
-        ServiceContext.AddService<ICuraService>(new CuraService());
         ServiceContext.AddService<IPrintsService>(new PrintsService());
         ServiceContext.AddService<IFileIconCache>(new FileIconCache());
+
+        var fileLockInspector = new WindowsFileLockInspector();
+        ServiceContext.AddService<IFileLockInspector>(fileLockInspector);
+
+        var slicerRegistry = new SlicerRegistry(
+            new ISlicerProvider[]
+            {
+                new CuraSlicerProvider(
+                    new CuraProjectNameAutomation(),
+                    () => settingsService.LoadSettings().EnableLegacyCuraProjectNaming
+                ),
+                new AnycubicSlicerProvider(),
+                new OrcaSlicerProvider(),
+            },
+            fileLockInspector,
+            settingsService
+        );
+        ServiceContext.AddService<ISlicerRegistry>(slicerRegistry);
 
         ServiceContext.AddService<IDownloadService>(
             new DownloadService(

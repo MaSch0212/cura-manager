@@ -1,6 +1,6 @@
 namespace CuraManager.Models;
 
-public record CuraVersion(
+public record SlicerInstallation(
     Version Version,
     string DisplayName,
     string ProgramFilesPath,

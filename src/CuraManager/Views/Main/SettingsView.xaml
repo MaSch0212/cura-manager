@@ -40,214 +40,245 @@
     <Style BasedOn="{StaticResource {x:Type Label}}" TargetType="Label">
       <Setter Property="Margin" Value="0,10,0,0" />
     </Style>
-    <Style x:Key="CuraVersionNotSupportedStyle" TargetType="TextBlock">
-      <Setter Property="Visibility" Value="Collapsed" />
-      <Style.Triggers>
-        <DataTrigger Binding="{Binding IsSupportedCuraVersionSelected}" Value="False">
-          <Setter Property="Visibility" Value="Visible" />
-        </DataTrigger>
-      </Style.Triggers>
-    </Style>
     <mcv:IsEqualConverter x:Key="IsNull" CompareExactObject="True" ForcedParameter="{x:Null}" />
     <mcv:ValueConverterGroup x:Key="NullToVisible">
       <mcv:IsEqualConverter CompareExactObject="True" ForcedParameter="{x:Null}" />
       <mcv:BoolToVisibilityConverter />
     </mcv:ValueConverterGroup>
   </mv:ExtendedSplitViewContent.Resources>
-  <StackPanel>
-    <StackPanel.Resources>
-      <Style
-        BasedOn="{StaticResource {x:Type mct:IconButton}}"
-        TargetType="{x:Type mct:IconButton}"
-      >
-        <Setter Property="Padding" Value="8" />
-      </Style>
-    </StackPanel.Resources>
-    <GroupBox Header="{m:Translation ApplicationSettings}">
-      <Grid>
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="*" MaxWidth="350" />
-        </Grid.ColumnDefinitions>
-        <StackPanel>
-          <Label Margin="0" Content="{m:Translation ApplicationLanguage}" />
-          <ComboBox
-            DisplayMemberPath="Item2"
-            ItemsSource="{Binding AvailableLanguages}"
-            SelectedItem="{Binding CurrentLanguage}"
-          />
-
-          <Label Content="{m:Translation ApplicationTheme}" />
-          <ComboBox
-            DisplayMemberPath="Description"
-            ItemsSource="{Binding Source={m:Enumeration {x:Type mt:DefaultTheme}}}"
-            SelectedValue="{Binding Settings.Theme}"
-            SelectedValuePath="Value"
-          />
-
-          <Label Content="{m:Translation PrintProjectsFolderLocation}" />
-          <mct:TextBox Text="{Binding Settings.PrintsPath}">
-            <mct:TextBox.EndContent>
-              <mct:IconButton
-                Command="{Binding BrowseDirectoryCommand}"
-                CommandParameter="PrintsPath"
-                Icon="{m:MaterialDesignIcon Icon=DotsHorizontal}"
-              />
-            </mct:TextBox.EndContent>
-          </mct:TextBox>
-        </StackPanel>
-      </Grid>
-    </GroupBox>
-    <GroupBox Header="{m:Translation CuraSettings}">
-      <StackPanel>
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+    <StackPanel>
+      <StackPanel.Resources>
+        <Style
+          BasedOn="{StaticResource {x:Type mct:IconButton}}"
+          TargetType="{x:Type mct:IconButton}"
+        >
+          <Setter Property="Padding" Value="8" />
+        </Style>
+      </StackPanel.Resources>
+      <GroupBox Header="{m:Translation ApplicationSettings}">
         <Grid>
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" MaxWidth="350" />
           </Grid.ColumnDefinitions>
           <StackPanel>
-            <Label Content="{m:Translation CuraVersion}" />
-            <Grid>
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-              </Grid.ColumnDefinitions>
-              <ComboBox
-                Margin="0,0,8,0"
-                ItemsSource="{Binding AvailableVersions}"
-                SelectedItem="{Binding SelectedAvailableVersion}"
-              >
-                <ComboBox.ItemTemplate>
-                  <DataTemplate DataType="{x:Type models:CuraVersion}">
+            <Label Margin="0" Content="{m:Translation ApplicationLanguage}" />
+            <ComboBox
+              DisplayMemberPath="Item2"
+              ItemsSource="{Binding AvailableLanguages}"
+              SelectedItem="{Binding CurrentLanguage}"
+            />
+
+            <Label Content="{m:Translation ApplicationTheme}" />
+            <ComboBox
+              DisplayMemberPath="Description"
+              ItemsSource="{Binding Source={m:Enumeration {x:Type mt:DefaultTheme}}}"
+              SelectedValue="{Binding Settings.Theme}"
+              SelectedValuePath="Value"
+            />
+
+            <Label Content="{m:Translation PrintProjectsFolderLocation}" />
+            <mct:TextBox Text="{Binding Settings.PrintsPath}">
+              <mct:TextBox.EndContent>
+                <mct:IconButton
+                  Command="{Binding BrowseDirectoryCommand}"
+                  Icon="{m:MaterialDesignIcon Icon=DotsHorizontal}"
+                />
+              </mct:TextBox.EndContent>
+            </mct:TextBox>
+
+            <CheckBox
+              Margin="0,10,0,0"
+              Content="{m:Translation ShowWebDialogWhenAddingLink}"
+              IsChecked="{Binding Settings.ShowWebDialogWhenAddingLink}"
+            />
+          </StackPanel>
+        </Grid>
+      </GroupBox>
+      <ItemsControl ItemsSource="{Binding Slicers}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate DataType="{x:Type vm:SlicerSettingsViewModel}">
+            <GroupBox Header="{Binding DisplayName}">
+              <StackPanel>
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" MaxWidth="350" />
+                  </Grid.ColumnDefinitions>
+                  <StackPanel>
+                    <mct:Switch
+                      Margin="0,0,0,10"
+                      Content="{m:Translation EnableSlicer}"
+                      IsChecked="{Binding Settings.IsEnabled}"
+                    />
+
+                    <Label Content="{m:Translation SlicerVersion}" />
                     <Grid>
                       <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                       </Grid.ColumnDefinitions>
-                      <TextBlock Text="{Binding DisplayName}" />
-                      <TextBlock
-                        Text="{m:Translation CustomCuraVersion}"
-                        Visibility="{Binding Version, Converter={StaticResource NullToVisible}}"
-                      />
-
-                      <mct:IconPresenter
-                        Grid.Column="1"
+                      <ComboBox
                         Margin="0,0,8,0"
-                        Background="Transparent"
-                        Icon="{m:MaterialDesignIcon Icon=AlertOutline}"
-                        ToolTip="{m:Translation UnsupportedCuraVersion}"
+                        ItemsSource="{Binding AvailableInstallations}"
+                        SelectedItem="{Binding SelectedInstallation}"
                       >
-                        <mct:IconPresenter.Style>
-                          <Style TargetType="mct:IconPresenter">
-                            <Setter Property="Foreground" Value="{StaticResource OrangeBrush}" />
-                            <Style.Triggers>
-                              <DataTrigger
-                                Binding="{Binding RelativeSource={RelativeSource AncestorType=ComboBoxItem}, Path=IsSelected}"
-                                Value="True"
+                        <ComboBox.ItemTemplate>
+                          <DataTemplate DataType="{x:Type models:SlicerInstallation}">
+                            <Grid>
+                              <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                              </Grid.ColumnDefinitions>
+                              <TextBlock Text="{Binding DisplayName}" />
+                              <TextBlock
+                                Text="{m:Translation CustomSlicerVersion}"
+                                Visibility="{Binding Version, Converter={StaticResource NullToVisible}}"
+                              />
+
+                              <mct:IconPresenter
+                                Grid.Column="1"
+                                Margin="0,0,8,0"
+                                Background="Transparent"
+                                Icon="{m:MaterialDesignIcon Icon=AlertOutline}"
+                                ToolTip="{m:Translation UnsupportedSlicerVersion}"
                               >
-                                <Setter
-                                  Property="Foreground"
-                                  Value="{m:ThemeValue Key=ComboBoxItemSelectedForegroundBrush}"
-                                />
-                              </DataTrigger>
-                              <DataTrigger Binding="{Binding IsSupported}" Value="True">
-                                <Setter Property="Visibility" Value="Hidden" />
-                              </DataTrigger>
-                              <DataTrigger
-                                Binding="{Binding RelativeSource={RelativeSource AncestorType=Popup}}"
-                                Value="{x:Null}"
-                              >
-                                <Setter Property="Visibility" Value="Hidden" />
-                              </DataTrigger>
-                            </Style.Triggers>
-                          </Style>
-                        </mct:IconPresenter.Style>
-                      </mct:IconPresenter>
+                                <mct:IconPresenter.Style>
+                                  <Style TargetType="mct:IconPresenter">
+                                    <Setter
+                                      Property="Foreground"
+                                      Value="{StaticResource OrangeBrush}"
+                                    />
+                                    <Style.Triggers>
+                                      <DataTrigger
+                                        Binding="{Binding RelativeSource={RelativeSource AncestorType=ComboBoxItem}, Path=IsSelected}"
+                                        Value="True"
+                                      >
+                                        <Setter
+                                          Property="Foreground"
+                                          Value="{m:ThemeValue Key=ComboBoxItemSelectedForegroundBrush}"
+                                        />
+                                      </DataTrigger>
+                                      <DataTrigger Binding="{Binding IsSupported}" Value="True">
+                                        <Setter Property="Visibility" Value="Hidden" />
+                                      </DataTrigger>
+                                      <DataTrigger
+                                        Binding="{Binding RelativeSource={RelativeSource AncestorType=Popup}}"
+                                        Value="{x:Null}"
+                                      >
+                                        <Setter Property="Visibility" Value="Hidden" />
+                                      </DataTrigger>
+                                    </Style.Triggers>
+                                  </Style>
+                                </mct:IconPresenter.Style>
+                              </mct:IconPresenter>
+                            </Grid>
+                          </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                      </ComboBox>
+                      <mct:IconButton
+                        x:Name="ReloadVersionButton"
+                        Grid.Column="1"
+                        Padding="10"
+                        VerticalAlignment="Center"
+                        Command="{Binding ReloadCommand}"
+                        Icon="{m:MaterialDesignIcon Icon=Reload}"
+                        IsEnabled="{Binding IsLoadingVersions, Converter={StaticResource BoolNegation}}"
+                      />
+                      <mct:BusyIndicator
+                        Grid.Column="1"
+                        Width="{Binding ElementName=ReloadVersionButton, Path=ActualHeight}"
+                        Height="{Binding ElementName=ReloadVersionButton, Path=ActualHeight}"
+                        IsEnabled="{Binding IsLoadingVersions}"
+                        IsHitTestVisible="False"
+                      />
                     </Grid>
-                  </DataTemplate>
-                </ComboBox.ItemTemplate>
-              </ComboBox>
-              <mct:IconButton
-                x:Name="ReloadVersionButton"
-                Grid.Column="1"
-                Padding="10"
-                VerticalAlignment="Center"
-                Command="{Binding ReloadAvailableVersionsCommand}"
-                Icon="{m:MaterialDesignIcon Icon=Reload}"
-                IsEnabled="{Binding IsLoadingVersions, Converter={StaticResource BoolNegation}}"
-              />
-              <mct:BusyIndicator
-                Grid.Column="1"
-                Width="{Binding ElementName=ReloadVersionButton, Path=ActualHeight}"
-                Height="{Binding ElementName=ReloadVersionButton, Path=ActualHeight}"
-                IsEnabled="{Binding IsLoadingVersions}"
-                IsHitTestVisible="False"
-              />
-            </Grid>
 
-            <Label Content="{m:Translation CuraAppDataLocation}" />
-            <mct:TextBox
-              IsEnabled="{Binding SelectedAvailableVersion.Version, Converter={StaticResource IsNull}}"
-              Text="{Binding Settings.CuraAppDataPath}"
-            >
-              <mct:TextBox.EndContent>
-                <mct:IconButton
-                  Command="{Binding BrowseDirectoryCommand}"
-                  CommandParameter="CuraAppDataPath"
-                  Icon="{m:MaterialDesignIcon Icon=DotsHorizontal}"
-                />
-              </mct:TextBox.EndContent>
-            </mct:TextBox>
+                    <Label Content="{m:Translation SlicerAppDataLocation}" />
+                    <mct:TextBox
+                      IsEnabled="{Binding SelectedInstallation.Version, Converter={StaticResource IsNull}}"
+                      Text="{Binding Settings.AppDataPath}"
+                    >
+                      <mct:TextBox.EndContent>
+                        <mct:IconButton
+                          Command="{Binding BrowseAppDataCommand}"
+                          Icon="{m:MaterialDesignIcon Icon=DotsHorizontal}"
+                        />
+                      </mct:TextBox.EndContent>
+                    </mct:TextBox>
 
-            <Label Content="{m:Translation CuraProgramFilesLocation}" />
-            <mct:TextBox
-              IsEnabled="{Binding SelectedAvailableVersion.Version, Converter={StaticResource IsNull}}"
-              Text="{Binding Settings.CuraProgramFilesPath}"
-            >
-              <mct:TextBox.EndContent>
-                <mct:IconButton
-                  Command="{Binding BrowseDirectoryCommand}"
-                  CommandParameter="CuraProgramFilesPath"
-                  Icon="{m:MaterialDesignIcon Icon=DotsHorizontal}"
+                    <Label Content="{m:Translation SlicerInstallLocation}" />
+                    <mct:TextBox
+                      IsEnabled="{Binding SelectedInstallation.Version, Converter={StaticResource IsNull}}"
+                      Text="{Binding Settings.ProgramFilesPath}"
+                    >
+                      <mct:TextBox.EndContent>
+                        <mct:IconButton
+                          Command="{Binding BrowseInstallCommand}"
+                          Icon="{m:MaterialDesignIcon Icon=DotsHorizontal}"
+                        />
+                      </mct:TextBox.EndContent>
+                    </mct:TextBox>
+                  </StackPanel>
+                </Grid>
+                <TextBlock
+                  Foreground="{StaticResource OrangeBrush}"
+                  Text="{m:Translation Warn_NoSlicerVersionFound}"
+                >
+                  <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                      <Setter Property="Visibility" Value="Collapsed" />
+                      <Style.Triggers>
+                        <DataTrigger Binding="{Binding DetectedVersion}" Value="{x:Null}">
+                          <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                      </Style.Triggers>
+                    </Style>
+                  </TextBlock.Style>
+                </TextBlock>
+                <TextBlock
+                  xml:space="preserve"
+                  Foreground="{StaticResource OrangeBrush}"
+                  TextWrapping="Wrap"
+                >
+                  <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                      <Setter Property="Visibility" Value="Collapsed" />
+                      <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsSupportedVersionSelected}" Value="False">
+                          <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                      </Style.Triggers>
+                    </Style>
+                  </TextBlock.Style>
+                  <Run Text="{m:Translation Warn_SlicerVersionNotSupported}" />
+                  <Run Text="{m:Translation DetectedSlicerVersion}" />: <Run Text="{Binding DetectedVersion}" />
+                  <Run Text="{m:Translation LatestSupportedSlicerVersion}" />: <Run Text="{Binding LatestSupportedVersion, Mode=OneWay}" />
+                </TextBlock>
+                <CheckBox
+                  Margin="0,10,0,0"
+                  Content="{m:Translation UpdateProfilesInSlicerProjects}"
+                  IsChecked="{Binding Settings.UpdateProjectsOnOpen}"
+                  Visibility="{Binding SupportsProfileUpdateOnOpen, Converter={StaticResource BoolToCollapsed}}"
                 />
-              </mct:TextBox.EndContent>
-            </mct:TextBox>
-          </StackPanel>
-        </Grid>
-        <TextBlock
-          Foreground="{StaticResource OrangeBrush}"
-          Text="{m:Translation Warn_NoCuraVersionFound}"
-        >
-          <TextBlock.Style>
-            <Style TargetType="TextBlock">
-              <Setter Property="Visibility" Value="Collapsed" />
-              <Style.Triggers>
-                <DataTrigger Binding="{Binding SelectedCuraVersion}" Value="{x:Null}">
-                  <Setter Property="Visibility" Value="Visible" />
-                </DataTrigger>
-              </Style.Triggers>
-            </Style>
-          </TextBlock.Style>
-        </TextBlock>
-        <TextBlock
-          xml:space="preserve"
-          Foreground="{StaticResource OrangeBrush}"
-          Style="{StaticResource CuraVersionNotSupportedStyle}"
-          TextWrapping="Wrap"
-        >
-          <Run Text="{m:Translation Warn_CuraVersionNotSupported}" />
-          <Run Text="{m:Translation SelectedCuraVersion}" />: <Run Text="{Binding SelectedCuraVersion}" />
-          <Run Text="{m:Translation LatestSupportedCuraVersion}" />: <Run Text="{Binding LatestSupportedCuraVersion, Mode=OneWay}" />
-        </TextBlock>
-        <CheckBox
-          Margin="0,10,0,0"
-          Content="{m:Translation UpdateProfilesInCuraProjects}"
-          IsChecked="{Binding Settings.UpdateCuraProjectsOnOpen}"
-        />
-        <CheckBox
-          Margin="0,10,0,0"
-          Content="{m:Translation ShowWebDialogWhenAddingLink}"
-          IsChecked="{Binding Settings.ShowWebDialogWhenAddingLink}"
-        />
-      </StackPanel>
-    </GroupBox>
-  </StackPanel>
+              </StackPanel>
+            </GroupBox>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <GroupBox Header="{m:Translation LegacyFeatures}">
+        <StackPanel>
+          <mct:Switch
+            Content="{m:Translation EnableLegacyCuraProjectNaming}"
+            IsChecked="{Binding Settings.EnableLegacyCuraProjectNaming}"
+          />
+          <TextBlock
+            Margin="0,8,0,0"
+            Opacity="0.7"
+            Text="{m:Translation Desc_LegacyCuraProjectNaming}"
+            TextWrapping="Wrap"
+          />
+        </StackPanel>
+      </GroupBox>
+    </StackPanel>
+  </ScrollViewer>
 </mv:ExtendedSplitViewContent>

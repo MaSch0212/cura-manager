@@ -3,25 +3,33 @@ using System.Windows;
 using System.Windows.Input;
 using CuraManager.Models;
 using CuraManager.Resources;
+using CuraManager.Services.Slicers;
 using MaSch.Presentation.Translation;
 using MessageBox = MaSch.Presentation.Wpf.MessageBox;
 
 namespace CuraManager.Views;
 
 [ObservablePropertyDefinition]
-internal interface ICreateCuraProjectDialog_Props
+internal interface ICreateSlicerProjectDialog_Props
 {
     string ProjectName { get; set; }
+    bool ShowProjectName { get; set; }
 }
 
-public partial class CreateCuraProjectDialog : ICreateCuraProjectDialog_Props
+public partial class CreateSlicerProjectDialog : ICreateSlicerProjectDialog_Props
 {
     private readonly ITranslationManager _translationManager;
     private bool _disableAll = true;
 
     public IList<PrintElementFileSelection> Models { get; }
 
-    public CreateCuraProjectDialog(PrintElement element)
+    public object SlicerIcon { get; }
+
+    public CreateSlicerProjectDialog(
+        PrintElement element,
+        ISlicerProvider provider,
+        bool showProjectName
+    )
     {
         ServiceContext.GetService(out _translationManager);
 
@@ -31,6 +39,12 @@ public partial class CreateCuraProjectDialog : ICreateCuraProjectDialog_Props
         );
         ProjectName =
             element?.Name ?? _translationManager.GetTranslation(nameof(StringTable.Untitled));
+        ShowProjectName = showProjectName;
+        SlicerIcon = Application.Current.TryFindResource(provider.IconResourceKey);
+        Title = string.Format(
+            _translationManager.GetTranslation(nameof(StringTable.Title_CreateSlicerProject)),
+            provider.DisplayName
+        );
 
         InitializeComponent();
     }

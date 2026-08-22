@@ -7,6 +7,7 @@ using System.Windows.Input;
 using CuraManager.Models;
 using CuraManager.Resources;
 using CuraManager.Services;
+using CuraManager.Services.Slicers;
 using CuraManager.Views;
 using MaSch.Core.Observable.Collections;
 using MaSch.Presentation;
@@ -27,13 +28,14 @@ internal interface IPrintsViewModel_Props
     string FilterText { get; set; }
     bool ShowArchivedElements { get; set; }
     bool ShowNonArchivedElements { get; set; }
+    ISlicerProvider ActiveSlicer { get; set; }
 }
 
 public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewModel_Props
 {
     private readonly ITranslationManager _translationManager;
     private readonly IPrintsService _printsService;
-    private readonly ICuraService _curaService;
+    private readonly ISlicerRegistry _slicerRegistry;
     private readonly ISettingsService _settingsService;
     private readonly IDownloadService _downloadService;
     private readonly ICachingService _cachingService;
@@ -55,7 +57,7 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
     public ICommand RefreshFilterCommand { get; }
 
     public ICommand AddFilesToProjectCommand { get; }
-    public ICommand NewCuraProjectCommand { get; }
+    public ICommand NewSlicerProjectCommand { get; }
     public ICommand OpenProjectFolderCommand { get; }
     public ICommand OpenProjectWebsiteCommand { get; }
     public ICommand DeleteProjectCommand { get; }
@@ -67,6 +69,27 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
     public ICommand RenameProjectFileCommand { get; }
     public ICommand CopyProjectFileToCommand { get; }
 
+    public IReadOnlyList<ISlicerProvider> EnabledSlicers { get; set; } =
+        Array.Empty<ISlicerProvider>();
+
+    [DependsOn(nameof(ActiveSlicer), nameof(EnabledSlicers))]
+    public bool IsSlicerSelectionVisible => EnabledSlicers.Count > 1;
+
+    [DependsOn(nameof(ActiveSlicer))]
+    public object ActiveSlicerIcon =>
+        ActiveSlicer == null
+            ? null
+            : Application.Current.TryFindResource(ActiveSlicer.IconResourceKey);
+
+    [DependsOn(nameof(ActiveSlicer))]
+    public string NewSlicerProjectToolTip =>
+        ActiveSlicer == null
+            ? _translationManager.GetTranslation(nameof(StringTable.Msg_NoSlicerEnabled))
+            : string.Format(
+                _translationManager.GetTranslation(nameof(StringTable.ToolTip_NewSlicerProject)),
+                ActiveSlicer.DisplayName
+            );
+
     public PrintsViewModel()
     {
         _showArchivedElements = true;
@@ -76,7 +99,7 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
         {
             ServiceContext.GetService(out _translationManager);
             ServiceContext.GetService(out _printsService);
-            ServiceContext.GetService(out _curaService);
+            ServiceContext.GetService(out _slicerRegistry);
             ServiceContext.GetService(out _settingsService);
             ServiceContext.GetService(out _downloadService);
             ServiceContext.GetService(out _cachingService);
@@ -113,9 +136,9 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
             x => x != null,
             ExecuteAddFilesToProject
         );
-        NewCuraProjectCommand = new AsyncDelegateCommand<PrintElement>(
-            x => x != null,
-            ExecuteNewCuraProject
+        NewSlicerProjectCommand = new AsyncDelegateCommand<PrintElement>(
+            x => x != null && ActiveSlicer != null,
+            ExecuteNewSlicerProject
         );
         OpenProjectFolderCommand = new DelegateCommand<PrintElement>(
             x => x != null,
@@ -192,6 +215,19 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
     {
         PrintElementsViewSource.View.Refresh();
     }
+
+    partial void OnActiveSlicerChanged(ISlicerProvider previous, ISlicerProvider value)
+    {
+        if (value == null)
+            return;
+
+        var settings = _settingsService.LoadSettings();
+        if (string.Equals(settings.ActiveSlicerId, value.Id, StringComparison.OrdinalIgnoreCase))
+            return;
+
+        settings.ActiveSlicerId = value.Id;
+        _settingsService.SaveSettings(settings);
+    }
     #endregion
 
     #region Public Methods
@@ -229,6 +265,10 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
             PrintElements.Add(newElements);
             PrintElementsViewSource.View.Refresh();
         }
+
+        EnabledSlicers = _slicerRegistry.EnabledProviders;
+        NotifyPropertyChanged(nameof(EnabledSlicers));
+        ActiveSlicer = _slicerRegistry.ActiveProvider;
     }
 
     public override async Task OnClose(CancelEventArgs e)
@@ -362,27 +402,80 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
         }
     }
 
-    private async Task ExecuteNewCuraProject(PrintElement project)
+    private async Task ExecuteNewSlicerProject(PrintElement project)
     {
-        var settings = _settingsService.LoadSettings();
-        if (!_curaService.AreCuraPathsCorrect(settings))
+        var provider = _slicerRegistry.ActiveProvider;
+        if (provider == null)
         {
             MessageBox.Show(
-                _translationManager.GetTranslation(nameof(StringTable.Msg_CuraPathsNotConfigured)),
+                _translationManager.GetTranslation(nameof(StringTable.Msg_NoSlicerEnabled)),
                 "CuraManager",
                 AlertButton.Ok,
                 AlertImage.Warning
             );
+            return;
         }
-        else
+
+        var slicerSettings = _slicerRegistry.GetSettings(provider);
+        if (!provider.ArePathsValid(slicerSettings))
         {
-            await ExecuteLoadingAction(
-                _translationManager.GetTranslation(nameof(StringTable.Prog_CreateCuraProject)),
-                async () => await _curaService.CreateCuraProject(project),
-                _translationManager.GetTranslation(nameof(StringTable.Suc_CreateCuraProject)),
-                _translationManager.GetTranslation(nameof(StringTable.Fail_CreateCuraProject))
+            MessageBox.Show(
+                string.Format(
+                    _translationManager.GetTranslation(
+                        nameof(StringTable.Msg_SlicerPathsNotConfigured)
+                    ),
+                    provider.DisplayName
+                ),
+                "CuraManager",
+                AlertButton.Ok,
+                AlertImage.Warning
             );
+            return;
         }
+
+        var useLegacyNaming =
+            _settingsService.LoadSettings().EnableLegacyCuraProjectNaming
+            && provider.Id == CuraSlicerProvider.ProviderId;
+
+        var dialog = new CreateSlicerProjectDialog(project, provider, useLegacyNaming)
+        {
+            Owner = Application.Current.MainWindow,
+        };
+        if (dialog.ShowDialog() != true)
+            return;
+
+        var modelFiles = (
+            from x in dialog.Models
+            where x.IsEnabled && x.Amount > 0
+            from _ in Enumerable.Range(0, x.Amount)
+            select x.Element.FilePath
+        ).ToArray();
+
+        await ExecuteLoadingAction(
+            string.Format(
+                _translationManager.GetTranslation(nameof(StringTable.Prog_CreateSlicerProject)),
+                provider.DisplayName
+            ),
+            () =>
+                Task.Run(() =>
+                    provider.LaunchWithModels(
+                        slicerSettings,
+                        new SlicerLaunchRequest(
+                            project.DirectoryLocation,
+                            modelFiles,
+                            useLegacyNaming ? dialog.ProjectName : null
+                        )
+                    )
+                ),
+            string.Format(
+                _translationManager.GetTranslation(nameof(StringTable.Suc_CreateSlicerProject)),
+                provider.DisplayName
+            ),
+            string.Format(
+                _translationManager.GetTranslation(nameof(StringTable.Fail_CreateSlicerProject)),
+                provider.DisplayName
+            )
+        );
     }
 
     private void ExecuteOpenProjectFolder(PrintElement project)
@@ -516,9 +609,16 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
 
     private void ExecuteOpenProjectFile(PrintElementFile file)
     {
-        if (PrintElement.IsCuraProjectFile(file.FilePath))
+        var provider = _slicerRegistry.FindProviderForFile(file.FilePath);
+
+        // Fall back to the shell not only when nothing matches, but also when the
+        // matched provider is currently disabled: its SlicerSettings would be an empty
+        // placeholder (see SlicerRegistry.GetSettings), and launching with that throws
+        // FileNotFoundException from the provider's Start/OpenProject instead of just
+        // opening the file the way it did before per-slicer providers existed.
+        if (provider != null && _slicerRegistry.EnabledProviders.Contains(provider))
         {
-            _curaService.OpenCuraProject(file.FilePath);
+            provider.OpenProject(_slicerRegistry.GetSettings(provider), file.FilePath);
         }
         else
         {

@@ -14,27 +14,33 @@ public class SettingsService : ISettingsService
         "CuraManager"
     );
     private static readonly string SettingFilePath = Path.Combine(AppDataPath, "settings.json");
+    private static readonly string SettingsBackupFilePath = Path.Combine(
+        AppDataPath,
+        "settings.json.bak"
+    );
     private static readonly string GuiSettingsFilePath = Path.Combine(
         AppDataPath,
         "settings.gui.json"
     );
 
-    public CuraManagerSettings LoadSettings()
+    public AppSettings LoadSettings()
     {
-        CuraManagerSettings result;
+        var json = File.Exists(SettingFilePath) ? File.ReadAllText(SettingFilePath) : null;
+        var (result, migrated) = SettingsMigration.Load(json);
 
-        if (!File.Exists(SettingFilePath))
-            result = new CuraManagerSettings();
-        else
-            result = JsonConvert.DeserializeObject<CuraManagerSettings>(
-                File.ReadAllText(SettingFilePath)
-            );
+        if (migrated)
+        {
+            // Keep the pre-migration file recoverable, once.
+            if (!File.Exists(SettingsBackupFilePath))
+                File.Copy(SettingFilePath, SettingsBackupFilePath);
+            SaveSettings(result);
+        }
 
         result.ResetChangeTracking();
         return result;
     }
 
-    public void SaveSettings(CuraManagerSettings settings)
+    public void SaveSettings(AppSettings settings)
     {
         Directory.CreateDirectory(AppDataPath);
         File.WriteAllText(
@@ -54,21 +60,21 @@ public class SettingsService : ISettingsService
         themeManager.LoadTheme(Theme.FromDefaultTheme(settings.Theme));
     }
 
-    public CuraManagerGuiSettings LoadGuiSettings()
+    public AppGuiSettings LoadGuiSettings()
     {
-        CuraManagerGuiSettings result;
+        AppGuiSettings result;
 
         if (!File.Exists(GuiSettingsFilePath))
-            result = new CuraManagerGuiSettings();
+            result = new AppGuiSettings();
         else
-            result = JsonConvert.DeserializeObject<CuraManagerGuiSettings>(
+            result = JsonConvert.DeserializeObject<AppGuiSettings>(
                 File.ReadAllText(GuiSettingsFilePath)
             );
 
         return result;
     }
 
-    public void SaveGuiSettings(CuraManagerGuiSettings settings)
+    public void SaveGuiSettings(AppGuiSettings settings)
     {
         Directory.CreateDirectory(AppDataPath);
         File.WriteAllText(

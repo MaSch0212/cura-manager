@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <!--
+            Legacy Cura UI-automation project naming. Removed in 2.0.
+            Kept in its own assembly so removal is deleting a directory and a
+            ProjectReference, and so a non-Windows port can simply drop it.
+        -->
+        <TargetFramework>net10.0-windows</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <UseWPF>true</UseWPF>
+        <UseWindowsForms>true</UseWindowsForms>
+        <Nullable>disable</Nullable>
+        <IsPublishable>false</IsPublishable>
+        <OutputPath>../../bin/$(Configuration)</OutputPath>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>1591</NoWarn>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+        <CSharpier_UnformattedAsWarnings>true</CSharpier_UnformattedAsWarnings>
+        <SupportedOSPlatform>windows</SupportedOSPlatform>
+        <Configurations>Debug;Release;Debug_MaSchLocal</Configurations>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="CSharpier.MsBuild">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+</Project>
