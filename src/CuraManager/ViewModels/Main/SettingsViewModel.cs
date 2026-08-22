@@ -27,6 +27,8 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
     private readonly ITranslationManager _translationManager;
     private readonly ISlicerRegistry _slicerRegistry;
 
+    private Task _slicersReloadTask = Task.CompletedTask;
+
     public ObservableTuple<int?, string>[] AvailableLanguages { get; set; }
 
     [DependsOn(nameof(AvailableLanguages), nameof(Settings))]
@@ -65,7 +67,7 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
     {
         RebuildAvailableLanguages();
         Settings = _settingsService.LoadSettings();
-        await Task.WhenAll(Slicers.Select(x => x.ReloadInstallationsAsync(false)));
+        await _slicersReloadTask;
         await base.OnOpen(e);
     }
 
@@ -100,7 +102,19 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
                 _slicerRegistry.GetSettings(value, x)
             ))
             .ToArray();
+
+        // Fresh SlicerSettingsViewModels start with AvailableInstallations == null, so every
+        // reassignment of Settings (OnOpen's initial load, and ExecuteUndo below) needs to
+        // repopulate the version dropdowns. OnSettingsChanged is a synchronous partial void, so
+        // this can't be awaited here; OnOpen awaits this same task afterwards instead of starting
+        // a second, redundant scan, and ExecuteUndo (which cannot await from a DelegateCommand)
+        // relies on this fire-and-forget kickoff alone. ReloadInstallationsAsync cannot throw out
+        // of the task it returns, so there is nothing to observe here.
+        _slicersReloadTask = ReloadAllInstallationsAsync();
     }
+
+    private Task ReloadAllInstallationsAsync() =>
+        Task.WhenAll(Slicers.Select(x => x.ReloadInstallationsAsync(false)));
 
     #region Command Handlers
     private void ExecuteUndo()

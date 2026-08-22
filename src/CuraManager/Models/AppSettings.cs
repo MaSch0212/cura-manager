@@ -85,4 +85,18 @@ public partial class AppSettings : ObservableChangeTrackingObject, IAppSettings_
 
     private void OnSlicerSettingsPropertyChanged(object sender, PropertyChangedEventArgs e) =>
         ChangeTracker.AddFixedChange();
+
+    /// <inheritdoc />
+    /// <remarks>
+    /// The base implementation only resets this object's own tracker; nothing else reaches into
+    /// <see cref="Slicers"/> to reset each entry's independent tracker, so without this override a
+    /// <see cref="SlicerSettings"/>'s own <c>HasChanges</c> would stay <see langword="true"/>
+    /// forever after its first edit.
+    /// </remarks>
+    public override void ResetChangeTracking()
+    {
+        foreach (var slicerSettings in Slicers.Values)
+            slicerSettings.ResetChangeTracking();
+        base.ResetChangeTracking();
+    }
 }

@@ -92,6 +92,16 @@ public partial class SlicerSettingsViewModel : ObservableObject, ISlicerSettings
                     )
                 ) ?? AvailableInstallations[0];
         }
+        catch (Exception)
+        {
+            // Called fire-and-forget from SettingsViewModel.OnSettingsChanged (e.g. after Undo),
+            // where there is nothing awaiting this task. Scanning for installations touches the
+            // filesystem and can fail (permissions, a removed drive, ...); swallow so that
+            // failure degrades to an empty/unpopulated dropdown instead of an unobserved task
+            // exception. The explicit "reload" button surfaces failures through the normal WPF
+            // unhandled-exception handling for its command instead, same as before this method
+            // grew a fire-and-forget caller.
+        }
         finally
         {
             IsLoadingVersions = false;
@@ -106,8 +116,27 @@ public partial class SlicerSettingsViewModel : ObservableObject, ISlicerSettings
         if (value?.Version == null)
             return;
 
-        Settings.AppDataPath = value.AppDataPath;
-        Settings.ProgramFilesPath = value.ProgramFilesPath;
+        // Matching in ReloadInstallationsAsync is case-insensitive, so a stored path that only
+        // differs from the detected one by casing is still "the same" installation. Assigning
+        // unconditionally would still raise PropertyChanged for that no-op (SlicerSettings'
+        // change tracking compares ordinally), arming AppSettings.HasChanges - and therefore the
+        // unsaved-changes prompt - the moment the page opens, with no actual user edit.
+        if (
+            !string.Equals(
+                Settings.AppDataPath,
+                value.AppDataPath,
+                StringComparison.OrdinalIgnoreCase
+            )
+        )
+            Settings.AppDataPath = value.AppDataPath;
+        if (
+            !string.Equals(
+                Settings.ProgramFilesPath,
+                value.ProgramFilesPath,
+                StringComparison.OrdinalIgnoreCase
+            )
+        )
+            Settings.ProgramFilesPath = value.ProgramFilesPath;
     }
 
     private static void Browse(string current, string fallback, Action<string> apply)
