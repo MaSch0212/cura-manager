@@ -259,6 +259,15 @@ namespace CuraManager.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Custom Version.
+        /// </summary>
+        internal static string CustomSlicerVersion {
+            get {
+                return ResourceManager.GetString("CustomSlicerVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Delete.
         /// </summary>
         internal static string Delete {
@@ -277,6 +286,15 @@ namespace CuraManager.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Uses the older UI-automation-based naming scheme for Cura projects. Only enable this if you rely on behavior from previous versions of CuraManager..
+        /// </summary>
+        internal static string Desc_LegacyCuraProjectNaming {
+            get {
+                return ResourceManager.GetString("Desc_LegacyCuraProjectNaming", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Type in a new name for the file &quot;{0}&quot;..
         /// </summary>
         internal static string Desc_RenameFile {
@@ -291,6 +309,15 @@ namespace CuraManager.Resources {
         internal static string Desc_RenameProject {
             get {
                 return ResourceManager.GetString("Desc_RenameProject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Detected slicer version.
+        /// </summary>
+        internal static string DetectedSlicerVersion {
+            get {
+                return ResourceManager.GetString("DetectedSlicerVersion", resourceCulture);
             }
         }
         
@@ -363,6 +390,24 @@ namespace CuraManager.Resources {
         internal static string EnableAll {
             get {
                 return ResourceManager.GetString("EnableAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use legacy Cura project naming.
+        /// </summary>
+        internal static string EnableLegacyCuraProjectNaming {
+            get {
+                return ResourceManager.GetString("EnableLegacyCuraProjectNaming", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable this slicer.
+        /// </summary>
+        internal static string EnableSlicer {
+            get {
+                return ResourceManager.GetString("EnableSlicer", resourceCulture);
             }
         }
         
@@ -484,11 +529,29 @@ namespace CuraManager.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Latest supported slicer version.
+        /// </summary>
+        internal static string LatestSupportedSlicerVersion {
+            get {
+                return ResourceManager.GetString("LatestSupportedSlicerVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Latest version.
         /// </summary>
         internal static string LatestVersion {
             get {
                 return ResourceManager.GetString("LatestVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Legacy Features.
+        /// </summary>
+        internal static string LegacyFeatures {
+            get {
+                return ResourceManager.GetString("LegacyFeatures", resourceCulture);
             }
         }
         
@@ -943,11 +1006,38 @@ namespace CuraManager.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Slicer AppData location.
+        /// </summary>
+        internal static string SlicerAppDataLocation {
+            get {
+                return ResourceManager.GetString("SlicerAppDataLocation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Slicer install location.
+        /// </summary>
+        internal static string SlicerInstallLocation {
+            get {
+                return ResourceManager.GetString("SlicerInstallLocation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} Project Files.
         /// </summary>
         internal static string SlicerProjectFiles {
             get {
                 return ResourceManager.GetString("SlicerProjectFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Slicer Version.
+        /// </summary>
+        internal static string SlicerVersion {
+            get {
+                return ResourceManager.GetString("SlicerVersion", resourceCulture);
             }
         }
         
@@ -1258,6 +1348,15 @@ namespace CuraManager.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This slicer version is not officially supported..
+        /// </summary>
+        internal static string UnsupportedSlicerVersion {
+            get {
+                return ResourceManager.GetString("UnsupportedSlicerVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Untitled.
         /// </summary>
         internal static string Untitled {
@@ -1295,6 +1394,15 @@ namespace CuraManager.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Update profile and machine settings in the slicer project before opening it. This prevents unwanted changes to your profiles when opening slicer projects..
+        /// </summary>
+        internal static string UpdateProfilesInSlicerProjects {
+            get {
+                return ResourceManager.GetString("UpdateProfilesInSlicerProjects", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to URL to project page (e.g.: Thingiverse).
         /// </summary>
         internal static string UrlToProjectPage {
@@ -1327,6 +1435,24 @@ namespace CuraManager.Resources {
         internal static string Warn_NoCuraVersionFound {
             get {
                 return ResourceManager.GetString("Warn_NoCuraVersionFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The slicer version could not be detected using the provided path..
+        /// </summary>
+        internal static string Warn_NoSlicerVersionFound {
+            get {
+                return ResourceManager.GetString("Warn_NoSlicerVersionFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The slicer version installed in the provided path is higher than the latest supported version. This might not be an issue, but be aware that there might be unforseen issues when creating a new project. You can also check if there is a new Version of CuraManager available that supports that version..
+        /// </summary>
+        internal static string Warn_SlicerVersionNotSupported {
+            get {
+                return ResourceManager.GetString("Warn_SlicerVersionNotSupported", resourceCulture);
             }
         }
         

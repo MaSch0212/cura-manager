@@ -1,3 +1,6 @@
+using System.Collections.Specialized;
+using System.ComponentModel;
+using MaSch.Core.Observable.Collections;
 using MaSch.Presentation.Wpf;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -8,9 +11,6 @@ namespace CuraManager.Models;
 internal interface IAppSettings_Props
 {
     string PrintsPath { get; set; }
-    string CuraAppDataPath { get; set; }
-    string CuraProgramFilesPath { get; set; }
-    bool UpdateCuraProjectsOnOpen { get; set; }
     int? Language { get; set; }
     bool ShowWebDialogWhenAddingLink { get; set; }
 
@@ -31,9 +31,58 @@ public partial class AppSettings : ObservableChangeTrackingObject, IAppSettings_
 {
     public AppSettings()
     {
-        _updateCuraProjectsOnOpen = true;
         _showWebDialogWhenAddingLink = true;
         _theme = DefaultTheme.Dark;
-        _slicers = new Dictionary<string, SlicerSettings>();
+
+        // A plain Dictionary would not tell us when a nested SlicerSettings changes, so
+        // HasChanges would never see edits made to an already-configured slicer. Route
+        // every addition/replacement/removal through the two events ObservableDictionary
+        // exposes: DictionaryItemChanged fires only for `dict[key] = value` (used by
+        // SlicerRegistry.GetSettings), while CollectionChanged fires only for `Add`/`Remove`
+        // (used when Newtonsoft.Json populates this property from disk) - together they
+        // cover every way an entry can enter or leave the dictionary.
+        var slicers = new ObservableDictionary<string, SlicerSettings>();
+        slicers.DictionaryItemChanged += OnSlicerItemChanged;
+        slicers.CollectionChanged += OnSlicersCollectionChanged;
+        _slicers = slicers;
     }
+
+    private void OnSlicersCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.OldItems != null)
+        {
+            foreach (KeyValuePair<string, SlicerSettings> item in e.OldItems)
+                UnsubscribeSlicerSettings(item.Value);
+        }
+
+        if (e.NewItems != null)
+        {
+            foreach (KeyValuePair<string, SlicerSettings> item in e.NewItems)
+                SubscribeSlicerSettings(item.Value);
+        }
+    }
+
+    private void OnSlicerItemChanged(
+        object sender,
+        DictionaryItemChangedEventArgs<string, SlicerSettings> e
+    )
+    {
+        UnsubscribeSlicerSettings(e.OldValue);
+        SubscribeSlicerSettings(e.NewValue);
+    }
+
+    private void SubscribeSlicerSettings(SlicerSettings settings)
+    {
+        if (settings != null)
+            settings.PropertyChanged += OnSlicerSettingsPropertyChanged;
+    }
+
+    private void UnsubscribeSlicerSettings(SlicerSettings settings)
+    {
+        if (settings != null)
+            settings.PropertyChanged -= OnSlicerSettingsPropertyChanged;
+    }
+
+    private void OnSlicerSettingsPropertyChanged(object sender, PropertyChangedEventArgs e) =>
+        ChangeTracker.AddFixedChange();
 }

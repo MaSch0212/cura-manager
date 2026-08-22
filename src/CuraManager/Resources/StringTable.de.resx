@@ -547,4 +547,46 @@ Nach dem Drücken der Schaltfläche wird die Anwendung neu gestartet.</value>
   <data name="UnsupportedCuraVersion" xml:space="preserve">
     <value>Diese Cura Version wird nicht offiziell unterstützt.</value>
   </data>
+  <data name="SlicerVersion" xml:space="preserve">
+    <value>Slicer-Version</value>
+  </data>
+  <data name="CustomSlicerVersion" xml:space="preserve">
+    <value>Benutzerdefinierte Version</value>
+  </data>
+  <data name="UnsupportedSlicerVersion" xml:space="preserve">
+    <value>Diese Slicer-Version wird nicht offiziell unterstützt.</value>
+  </data>
+  <data name="SlicerAppDataLocation" xml:space="preserve">
+    <value>Pfad des Slicer AppData-Verzeichnisses</value>
+  </data>
+  <data name="SlicerInstallLocation" xml:space="preserve">
+    <value>Pfad des Slicer-Installationsverzeichnisses</value>
+  </data>
+  <data name="UpdateProfilesInSlicerProjects" xml:space="preserve">
+    <value>Das Profil und die Maschineneinstellungen im Slicer-Projekt aktualisieren, bevor es geöffnet wird. Dies verhindert unerwünschte Änderungen an Ihren Profilen beim Öffnen von Slicer-Projekten.</value>
+  </data>
+  <data name="Warn_NoSlicerVersionFound" xml:space="preserve">
+    <value>Die Slicer-Version konnte anhand des angegebenen Pfades nicht ermittelt werden.</value>
+  </data>
+  <data name="Warn_SlicerVersionNotSupported" xml:space="preserve">
+    <value>Die im angegebenen Pfad installierte Slicer-Version ist höher als die neueste unterstützte Version. Dies ist möglicherweise kein Problem, aber es kann zu unvorhergesehenen Problemen bei der Erstellung eines neuen Projekts kommen. Sie können auch prüfen, ob eine neue Version von CuraManager verfügbar ist, die diese Version unterstützt.</value>
+  </data>
+  <data name="LatestSupportedSlicerVersion" xml:space="preserve">
+    <value>Neueste unterstützte Slicer-Version</value>
+  </data>
+  <data name="DetectedSlicerVersion" xml:space="preserve">
+    <value>Erkannte Slicer-Version</value>
+  </data>
+  <data name="EnableSlicer" xml:space="preserve">
+    <value>Diesen Slicer aktivieren</value>
+  </data>
+  <data name="LegacyFeatures" xml:space="preserve">
+    <value>Legacy-Funktionen</value>
+  </data>
+  <data name="EnableLegacyCuraProjectNaming" xml:space="preserve">
+    <value>Alte Cura-Projektbenennung verwenden</value>
+  </data>
+  <data name="Desc_LegacyCuraProjectNaming" xml:space="preserve">
+    <value>Verwendet das ältere, auf UI-Automatisierung basierende Benennungsschema für Cura-Projekte. Aktivieren Sie dies nur, wenn Sie auf das Verhalten früherer CuraManager-Versionen angewiesen sind.</value>
+  </data>
 </root>

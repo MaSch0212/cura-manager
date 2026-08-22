@@ -8,8 +8,6 @@ public class SmokeTests
     [Fact]
     public void CanReferenceTheApplicationAssembly()
     {
-        var settings = new AppSettings();
-
-        Assert.True(settings.UpdateCuraProjectsOnOpen);
+        Assert.NotNull(new AppSettings().Slicers);
     }
 }

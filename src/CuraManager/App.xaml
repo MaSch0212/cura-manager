@@ -38,6 +38,9 @@
         <mconv:BoolNegationConverter />
         <mconv:BoolToVisibilityConverter UseCollapse="True" />
       </mconv:ValueConverterGroup>
+      <mconv:ValueConverterGroup x:Key="BoolToCollapsed">
+        <mconv:BoolToVisibilityConverter UseCollapse="True" />
+      </mconv:ValueConverterGroup>
       <mconv:ByteSizeToStringConverter x:Key="ByteFormat" />
       <DataTemplate DataType="{x:Type m:Icon}">
         <mct:IconPresenter Icon="{Binding}" />
