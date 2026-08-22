@@ -69,9 +69,10 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
     public ICommand RenameProjectFileCommand { get; }
     public ICommand CopyProjectFileToCommand { get; }
 
-    public IReadOnlyList<ISlicerProvider> EnabledSlicers => _slicerRegistry.EnabledProviders;
+    public IReadOnlyList<ISlicerProvider> EnabledSlicers { get; set; } =
+        Array.Empty<ISlicerProvider>();
 
-    [DependsOn(nameof(ActiveSlicer))]
+    [DependsOn(nameof(ActiveSlicer), nameof(EnabledSlicers))]
     public bool IsSlicerSelectionVisible => EnabledSlicers.Count > 1;
 
     [DependsOn(nameof(ActiveSlicer))]
@@ -130,7 +131,7 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
             ExecuteAddFilesToProject
         );
         NewSlicerProjectCommand = new AsyncDelegateCommand<PrintElement>(
-            x => x != null && _slicerRegistry.ActiveProvider != null,
+            x => x != null && ActiveSlicer != null,
             ExecuteNewSlicerProject
         );
         OpenProjectFolderCommand = new DelegateCommand<PrintElement>(
@@ -215,6 +216,9 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
             return;
 
         var settings = _settingsService.LoadSettings();
+        if (string.Equals(settings.ActiveSlicerId, value.Id, StringComparison.OrdinalIgnoreCase))
+            return;
+
         settings.ActiveSlicerId = value.Id;
         _settingsService.SaveSettings(settings);
     }
@@ -256,6 +260,8 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
             PrintElementsViewSource.View.Refresh();
         }
 
+        EnabledSlicers = _slicerRegistry.EnabledProviders;
+        NotifyPropertyChanged(nameof(EnabledSlicers));
         ActiveSlicer = _slicerRegistry.ActiveProvider;
     }
 

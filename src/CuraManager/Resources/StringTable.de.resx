@@ -550,6 +550,9 @@ Nach dem Drücken der Schaltfläche wird die Anwendung neu gestartet.</value>
   <data name="Msg_NoSlicerEnabled" xml:space="preserve">
     <value>Es ist kein Slicer aktiviert. Aktivieren Sie einen auf der Einstellungsseite, um Projekte zu erstellen.</value>
   </data>
+  <data name="MenuItem_NewSlicerProject" xml:space="preserve">
+    <value>Neues Slicerprojekt erstellen</value>
+  </data>
   <data name="LegacyFeatures" xml:space="preserve">
     <value>Veraltete Funktionen</value>
   </data>

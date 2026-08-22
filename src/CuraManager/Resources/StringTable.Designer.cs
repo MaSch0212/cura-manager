@@ -502,6 +502,15 @@ namespace CuraManager.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Create new slicer project.
+        /// </summary>
+        internal static string MenuItem_NewSlicerProject {
+            get {
+                return ResourceManager.GetString("MenuItem_NewSlicerProject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 3D Model Files.
         /// </summary>
         internal static string ModelFiles {

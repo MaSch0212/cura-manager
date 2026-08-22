@@ -550,6 +550,9 @@ After pressing the button, the application is restarted.</value>
   <data name="Msg_NoSlicerEnabled" xml:space="preserve">
     <value>No slicer is enabled. Enable one on the settings page to create projects.</value>
   </data>
+  <data name="MenuItem_NewSlicerProject" xml:space="preserve">
+    <value>Create new slicer project</value>
+  </data>
   <data name="LegacyFeatures" xml:space="preserve">
     <value>Legacy Features</value>
   </data>
