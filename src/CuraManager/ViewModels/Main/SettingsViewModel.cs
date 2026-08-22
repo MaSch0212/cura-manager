@@ -108,13 +108,29 @@ public partial class SettingsViewModel : SplitViewContentViewModel, ISettingsVie
         // repopulate the version dropdowns. OnSettingsChanged is a synchronous partial void, so
         // this can't be awaited here; OnOpen awaits this same task afterwards instead of starting
         // a second, redundant scan, and ExecuteUndo (which cannot await from a DelegateCommand)
-        // relies on this fire-and-forget kickoff alone. ReloadInstallationsAsync cannot throw out
-        // of the task it returns, so there is nothing to observe here.
-        _slicersReloadTask = ReloadAllInstallationsAsync();
+        // relies on this fire-and-forget kickoff alone.
+        _slicersReloadTask = ReloadAllInstallationsSafeAsync();
     }
 
-    private Task ReloadAllInstallationsAsync() =>
-        Task.WhenAll(Slicers.Select(x => x.ReloadInstallationsAsync(false)));
+    /// <summary>
+    /// Reloads every slicer's installations, guarding against the fire-and-forget call from
+    /// <see cref="OnSettingsChanged"/> faulting an unobserved task. The protection lives here,
+    /// not inside <see cref="SlicerSettingsViewModel.ReloadInstallationsAsync"/>, so the
+    /// user-initiated <c>ReloadCommand</c> (awaited by its own <c>AsyncDelegateCommand</c>) still
+    /// surfaces a genuine scan failure through the normal unhandled-exception path instead of
+    /// silently leaving the dropdown empty.
+    /// </summary>
+    private async Task ReloadAllInstallationsSafeAsync()
+    {
+        try
+        {
+            await Task.WhenAll(Slicers.Select(x => x.ReloadInstallationsAsync(false)));
+        }
+        catch (Exception)
+        {
+            // A failed scan degrades to an empty/stale dropdown; the reload button retries.
+        }
+    }
 
     #region Command Handlers
     private void ExecuteUndo()

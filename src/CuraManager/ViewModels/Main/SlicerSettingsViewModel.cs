@@ -92,16 +92,6 @@ public partial class SlicerSettingsViewModel : ObservableObject, ISlicerSettings
                     )
                 ) ?? AvailableInstallations[0];
         }
-        catch (Exception)
-        {
-            // Called fire-and-forget from SettingsViewModel.OnSettingsChanged (e.g. after Undo),
-            // where there is nothing awaiting this task. Scanning for installations touches the
-            // filesystem and can fail (permissions, a removed drive, ...); swallow so that
-            // failure degrades to an empty/unpopulated dropdown instead of an unobserved task
-            // exception. The explicit "reload" button surfaces failures through the normal WPF
-            // unhandled-exception handling for its command instead, same as before this method
-            // grew a fire-and-forget caller.
-        }
         finally
         {
             IsLoadingVersions = false;
