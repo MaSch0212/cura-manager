@@ -14,6 +14,12 @@ public static class VersionExtensions
 
     public static Version SafeParse(string version)
     {
+        // FileVersionInfo.FileVersion/ProductVersion come back null (not "") for an
+        // executable with no version resource at all -- as seen on a Microsoft
+        // Store-packaged orca-slicer.exe -- and Regex.Match throws on a null input.
+        if (string.IsNullOrEmpty(version))
+            return null;
+
         var versionMatch = RegularExpressions.Version().Match(version);
         if (!versionMatch.Success)
             return null;
