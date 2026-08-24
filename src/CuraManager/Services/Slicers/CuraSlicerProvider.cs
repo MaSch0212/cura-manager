@@ -40,7 +40,9 @@ public class CuraSlicerProvider : ISlicerProvider
     public string DisplayName => "UltiMaker Cura";
     public string IconResourceKey => "CuraIcon";
     public bool SupportsProfileUpdateOnOpen => true;
-    public Version LatestSupportedVersion { get; } = new Version(5, 10, 0, 0);
+    // Four-part on purpose: an omitted Revision is -1, which compares lower than a
+    // detected 5.13.0.0 and would flag an exact version match as unsupported.
+    public Version LatestSupportedVersion { get; } = new Version(5, 13, 0, 0);
 
     public IEnumerable<SlicerInstallation> FindInstallations()
     {
