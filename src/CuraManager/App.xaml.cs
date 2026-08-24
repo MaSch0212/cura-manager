@@ -85,6 +85,9 @@ public partial class App
         var fileLockInspector = new WindowsFileLockInspector();
         ServiceContext.AddService<IFileLockInspector>(fileLockInspector);
 
+        var msixPackageLocator = new WindowsMsixPackageLocator();
+        ServiceContext.AddService<IMsixPackageLocator>(msixPackageLocator);
+
         var slicerRegistry = new SlicerRegistry(
             new ISlicerProvider[]
             {
@@ -93,7 +96,7 @@ public partial class App
                     () => settingsService.LoadSettings().EnableLegacyCuraProjectNaming
                 ),
                 new AnycubicSlicerProvider(),
-                new OrcaSlicerProvider(),
+                new OrcaSlicerProvider(msixPackageLocator),
             },
             fileLockInspector,
             settingsService

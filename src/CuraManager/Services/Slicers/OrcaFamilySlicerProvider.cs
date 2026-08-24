@@ -40,6 +40,13 @@ public abstract class OrcaFamilySlicerProvider : ISlicerProvider
         Environment.SpecialFolder.ApplicationData
     );
 
+    private readonly IMsixPackageLocator _msixPackageLocator;
+
+    protected OrcaFamilySlicerProvider(IMsixPackageLocator msixPackageLocator = null)
+    {
+        _msixPackageLocator = msixPackageLocator;
+    }
+
     public abstract string Id { get; }
     public abstract string DisplayName { get; }
     public abstract string IconResourceKey { get; }
@@ -55,6 +62,14 @@ public abstract class OrcaFamilySlicerProvider : ISlicerProvider
 
     /// <summary>Matched case-insensitively against Program Files directory names.</summary>
     protected abstract string InstallDirNameFilter { get; }
+
+    /// <summary>
+    /// MSIX package name prefix (e.g. <c>"OrcaSlicer."</c> for the package
+    /// <c>OrcaSlicer.OrcaSlicer</c>) used to find a Microsoft Store install via
+    /// <see cref="IMsixPackageLocator"/>. <see langword="null"/> means this flavour is
+    /// not distributed via the Store, and Store discovery is skipped entirely.
+    /// </summary>
+    protected virtual string MsixPackageNamePrefix => null;
 
     /// <summary>
     /// Producer key prefix in <c>Metadata/slice_info.config</c>, for example
@@ -119,7 +134,12 @@ public abstract class OrcaFamilySlicerProvider : ISlicerProvider
         return SlicerMatch.None;
     }
 
-    public IEnumerable<SlicerInstallation> FindInstallations()
+    public IEnumerable<SlicerInstallation> FindInstallations() =>
+        DeduplicateByProgramFilesPath(
+            FindProgramFilesInstallations().Concat(FindMsixInstallations())
+        );
+
+    private IEnumerable<SlicerInstallation> FindProgramFilesInstallations()
     {
         if (!Directory.Exists(ProgramFilesDir))
             yield break;
@@ -150,13 +170,87 @@ public abstract class OrcaFamilySlicerProvider : ISlicerProvider
         }
     }
 
+    /// <summary>
+    /// Discovers a Microsoft Store install via <see cref="IMsixPackageLocator"/>. Does
+    /// nothing when this flavour is not Store-distributed (<see cref="MsixPackageNamePrefix"/>
+    /// is <see langword="null"/>) or no locator was supplied (e.g. a non-Windows port).
+    /// The package's <c>WindowsApps</c> folder cannot be browsed to by the user, but its
+    /// executable can still be probed with <see cref="File.Exists(string)"/>.
+    /// </summary>
+    private IEnumerable<SlicerInstallation> FindMsixInstallations()
+    {
+        if (MsixPackageNamePrefix == null || _msixPackageLocator == null)
+            yield break;
+
+        foreach (var package in _msixPackageLocator.FindPackages(MsixPackageNamePrefix))
+        {
+            if (GetExecutablePath(package.InstallLocation) == null)
+                continue;
+
+            var appDataPath = Path.Combine(AppDataDir, AppKey);
+            if (!Directory.Exists(appDataPath))
+                continue;
+
+            yield return new SlicerInstallation(
+                package.Version,
+                $"{DisplayName} (Microsoft Store)",
+                package.InstallLocation,
+                appDataPath,
+                package.Version <= LatestSupportedVersion
+            );
+        }
+    }
+
+    /// <summary>
+    /// Drops later entries whose <see cref="SlicerInstallation.ProgramFilesPath"/> was
+    /// already yielded -- guards against the same install surfacing from both program-files
+    /// scanning and MSIX discovery. Pure and side-effect free so it can be unit-tested
+    /// directly with hand-built installations, without touching the registry or filesystem.
+    /// </summary>
+    internal static IEnumerable<SlicerInstallation> DeduplicateByProgramFilesPath(
+        IEnumerable<SlicerInstallation> installations
+    )
+    {
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var installation in installations)
+        {
+            if (seen.Add(installation.ProgramFilesPath))
+                yield return installation;
+        }
+    }
+
     public Version GetVersion(string programFilesPath)
     {
         var exePath = GetExecutablePath(programFilesPath);
         if (exePath == null)
             return null;
 
-        return VersionExtensions.SafeParse(FileVersionInfo.GetVersionInfo(exePath).FileVersion);
+        var version = VersionExtensions.SafeParse(
+            FileVersionInfo.GetVersionInfo(exePath).FileVersion
+        );
+        if (version != null)
+            return version;
+
+        // A Store-packaged executable ships no version resource at all (both FileVersion
+        // and ProductVersion come back empty), so fall back to the package identity --
+        // matched by install location, since that is all a caller passes in here. Trim a
+        // trailing separator from both sides before comparing: programFilesPath usually
+        // comes from a user-editable settings TextBox, and a path pasted from Explorer's
+        // address bar commonly carries a trailing '\' that InstallLocation never has.
+        if (MsixPackageNamePrefix == null || _msixPackageLocator == null)
+            return null;
+
+        var trimmedPath = Path.TrimEndingDirectorySeparator(programFilesPath);
+        return _msixPackageLocator
+            .FindPackages(MsixPackageNamePrefix)
+            .FirstOrDefault(p =>
+                string.Equals(
+                    Path.TrimEndingDirectorySeparator(p.InstallLocation),
+                    trimmedPath,
+                    StringComparison.OrdinalIgnoreCase
+                )
+            )
+            ?.Version;
     }
 
     public bool ArePathsValid(SlicerSettings settings) =>
