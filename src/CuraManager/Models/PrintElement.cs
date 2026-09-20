@@ -12,7 +12,7 @@ namespace CuraManager.Models;
 /// </summary>
 public enum PrintElementFileCategory
 {
-    /// <summary>A 3D model file, e.g. <c>.stl</c>, <c>.obj</c>, or <c>.x3d</c>.</summary>
+    /// <summary>A 3D model file, e.g. <c>.stl</c>, <c>.obj</c>, <c>.step</c>, or <c>.x3d</c>.</summary>
     Model,
 
     /// <summary>
@@ -326,7 +326,10 @@ public sealed partial class PrintElement : ObservableObject, IDisposable, IPrint
     /// <returns>The category the extension falls into.</returns>
     internal static PrintElementFileCategory CategorizeByExtension(string extension)
     {
-        if (IsExt(".stl", ".obj", ".x3d"))
+        // .stp/.step are CAD exchange files rather than mesh files, but slicers accept them as
+        // model input, so they belong in the same category: that is what makes them selectable
+        // in the "new slicer project" dialog, which lists a print element's model files.
+        if (IsExt(".stl", ".obj", ".x3d", ".stp", ".step"))
             return PrintElementFileCategory.Model;
         if (IsExt(".3mf"))
             return PrintElementFileCategory.MaybeSlicerProject;
