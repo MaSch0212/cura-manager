@@ -288,12 +288,6 @@
                     Icon="{m:MaterialDesignIcon Web}"
                   />
                   <Separator />
-                  <MenuItem
-                    Command="{Binding RenameProjectCommand}"
-                    CommandParameter="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                    Header="{m:Translation ToolTip_RenameProject}"
-                    Icon="{m:MaterialDesignIcon Icon=FormTextbox}"
-                  />
                   <MenuItem Header="{m:Translation Tags}" Icon="{m:MaterialDesignIcon Icon=Tag}">
                     <MenuItem.Resources>
                       <CollectionViewSource x:Key="Tags">
@@ -348,6 +342,12 @@
                     IsCheckable="True"
                     IsChecked="{Binding Path=PlacementTarget.DataContext.IsArchived, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                     StaysOpenOnClick="True"
+                  />
+                  <MenuItem
+                    Command="{Binding EditProjectCommand}"
+                    CommandParameter="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                    Header="{m:Translation ToolTip_EditProject}"
+                    Icon="{m:MaterialDesignIcon Icon=Pencil}"
                   />
                   <Separator />
                   <MenuItem
@@ -444,14 +444,8 @@
             Icon="{m:MaterialDesignIcon Web}"
             ToolTip="{m:Translation ToolTip_OpenProjectPage}"
           />
-          <mct:IconButton
-            Margin="10,0,0,0"
-            Command="{Binding RenameProjectCommand}"
-            CommandParameter="{Binding SelectedElement}"
-            Icon="{m:MaterialDesignIcon Icon=FormTextbox}"
-            ToolTip="{m:Translation ToolTip_RenameProject}"
-          />
           <mct:IconToggleButton
+            Margin="10,0,0,0"
             Checked="ContextMenuToggleButton_Checked"
             Icon="{m:MaterialDesignIcon Icon=Tag}"
             Tag="{StaticResource ElementTagsContextMenu}"
@@ -478,6 +472,12 @@
               </Style>
             </mct:IconToggleButton.Style>
           </mct:IconToggleButton>
+          <mct:IconButton
+            Command="{Binding EditProjectCommand}"
+            CommandParameter="{Binding SelectedElement}"
+            Icon="{m:MaterialDesignIcon Icon=Pencil}"
+            ToolTip="{m:Translation ToolTip_EditProject}"
+          />
           <mct:IconButton
             Margin="10,0,0,0"
             Command="{Binding DeleteProjectCommand}"
