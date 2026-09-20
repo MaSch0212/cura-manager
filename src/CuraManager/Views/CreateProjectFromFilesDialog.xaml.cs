@@ -51,20 +51,6 @@ public partial class CreateProjectFromFilesDialog : ICreateProjectFromFilesDialo
             return;
         }
 
-        if (!Files.Any())
-        {
-            MessageBox.Show(
-                this,
-                _translationManager.GetTranslation(
-                    nameof(StringTable.Msg_AddAtLeastOneFileToProject)
-                ),
-                "CuraManager",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information
-            );
-            return;
-        }
-
         if (!ProjectWebsite.IsValid(ProjectUrl))
         {
             MessageBox.Show(

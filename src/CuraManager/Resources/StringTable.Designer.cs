@@ -538,15 +538,6 @@ namespace CuraManager.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Please add at least one file to the project..
-        /// </summary>
-        internal static string Msg_AddAtLeastOneFileToProject {
-            get {
-                return ResourceManager.GetString("Msg_AddAtLeastOneFileToProject", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to You have selected an archive file that does not exist..
         /// </summary>
         internal static string Msg_ArchiveDoesNotExist {
