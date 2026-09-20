@@ -301,9 +301,6 @@ After pressing the button, the application is restarted.</value>
   <data name="ToolTip_OpenProjectPage" xml:space="preserve">
     <value>Open project page</value>
   </data>
-  <data name="ToolTip_RenameProject" xml:space="preserve">
-    <value>Rename the project</value>
-  </data>
   <data name="ToolTip_DeleteProject" xml:space="preserve">
     <value>Delete the project</value>
   </data>
@@ -390,12 +387,6 @@ After pressing the button, the application is restarted.</value>
   </data>
   <data name="Suc_DeleteProject" xml:space="preserve">
     <value>Project "{0}" have been deleted</value>
-  </data>
-  <data name="Title_RenameProject" xml:space="preserve">
-    <value>Rename project</value>
-  </data>
-  <data name="Desc_RenameProject" xml:space="preserve">
-    <value>Type in a new name for the project "{0}".</value>
   </data>
   <data name="Msg_ConfirmFileDeletion" xml:space="preserve">
     <value>Do you really want to delete the file "{0}"?</value>
@@ -561,5 +552,35 @@ After pressing the button, the application is restarted.</value>
   </data>
   <data name="Desc_LegacyCuraProjectNaming" xml:space="preserve">
     <value>After launching Cura, type the project name into its name field using UI automation. Only affects Cura, only works on Windows, and can break when Cura changes its interface. This option will be removed in version 2.0.</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="UrlToProjectPageOptional" xml:space="preserve">
+    <value>URL to project page (optional)</value>
+  </data>
+  <data name="ProjectUrl" xml:space="preserve">
+    <value>Project URL</value>
+  </data>
+  <data name="Msg_InvalidProjectUrl" xml:space="preserve">
+    <value>Please enter a valid URL.</value>
+  </data>
+  <data name="Title_EditProject" xml:space="preserve">
+    <value>Edit project</value>
+  </data>
+  <data name="ToolTip_EditProject" xml:space="preserve">
+    <value>Edit the project</value>
+  </data>
+  <data name="NoTagsAssigned" xml:space="preserve">
+    <value>No tags assigned yet.</value>
+  </data>
+  <data name="AddTag" xml:space="preserve">
+    <value>Add tag</value>
+  </data>
+  <data name="AddTagDescription" xml:space="preserve">
+    <value>Pick an existing tag or type a new one</value>
+  </data>
+  <data name="RemoveTag" xml:space="preserve">
+    <value>Remove tag</value>
   </data>
 </root>

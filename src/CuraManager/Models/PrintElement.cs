@@ -58,6 +58,22 @@ public sealed partial class PrintElement : ObservableObject, IDisposable, IPrint
     public ObservableCollection<string> Tags { get; }
     public string TagsDisplay => string.Join(", ", Tags.OrderBy(x => x));
 
+    /// <summary>
+    /// Gets or sets the URL of the web page this project originates from, or <c>null</c> when
+    /// the project has none. Setting it persists the change to the project's metadata file.
+    /// </summary>
+    [DependsOn(nameof(Metadata))]
+    public string Website
+    {
+        get => Metadata.Website;
+        set
+        {
+            Metadata.Website = value;
+            SaveMetadata();
+            NotifyPropertyChanged();
+        }
+    }
+
     [DependsOn(nameof(Metadata))]
     public bool IsArchived
     {
