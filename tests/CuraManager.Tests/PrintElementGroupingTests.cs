@@ -14,6 +14,13 @@ public class PrintElementGroupingTests
     }
 
     [Fact]
+    public void StepExtensions_GoToModelFiles()
+    {
+        Assert.Equal(PrintElementFileCategory.Model, PrintElement.CategorizeByExtension(".stp"));
+        Assert.Equal(PrintElementFileCategory.Model, PrintElement.CategorizeByExtension(".step"));
+    }
+
+    [Fact]
     public void ThreeMf_NeedsSlicerInspection()
     {
         Assert.Equal(
@@ -36,5 +43,6 @@ public class PrintElementGroupingTests
             PrintElementFileCategory.MaybeSlicerProject,
             PrintElement.CategorizeByExtension(".3MF")
         );
+        Assert.Equal(PrintElementFileCategory.Model, PrintElement.CategorizeByExtension(".STEP"));
     }
 }
