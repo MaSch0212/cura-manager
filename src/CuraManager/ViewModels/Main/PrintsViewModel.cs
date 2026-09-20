@@ -541,7 +541,7 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
         if (dialog.ShowDialog() != true)
             return;
 
-        AvailableTags.AddIfNotExists(dialog.Tags.Select(x => x.Name));
+        AvailableTags.AddIfNotExists(dialog.KnownTags);
 
         // The metadata is applied before a rename on purpose: it lives in metadata.json inside
         // the project directory, so writing it first means Directory.Move carries it along and

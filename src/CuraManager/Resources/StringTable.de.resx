@@ -571,7 +571,16 @@ Nach dem Drücken der Schaltfläche wird die Anwendung neu gestartet.</value>
   <data name="ToolTip_EditProject" xml:space="preserve">
     <value>Projekt bearbeiten</value>
   </data>
-  <data name="NoTagsAvailable" xml:space="preserve">
-    <value>Noch keine Tags vorhanden. Geben Sie oben einen Namen ein, um einen zu erstellen.</value>
+  <data name="NoTagsAssigned" xml:space="preserve">
+    <value>Noch keine Tags zugewiesen.</value>
+  </data>
+  <data name="AddTag" xml:space="preserve">
+    <value>Tag hinzufügen</value>
+  </data>
+  <data name="AddTagDescription" xml:space="preserve">
+    <value>Vorhandenes Tag auswählen oder neues eingeben</value>
+  </data>
+  <data name="RemoveTag" xml:space="preserve">
+    <value>Tag entfernen</value>
   </data>
 </root>

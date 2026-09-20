@@ -571,7 +571,16 @@ After pressing the button, the application is restarted.</value>
   <data name="ToolTip_EditProject" xml:space="preserve">
     <value>Edit the project</value>
   </data>
-  <data name="NoTagsAvailable" xml:space="preserve">
-    <value>No tags yet. Type a name above to create one.</value>
+  <data name="NoTagsAssigned" xml:space="preserve">
+    <value>No tags assigned yet.</value>
+  </data>
+  <data name="AddTag" xml:space="preserve">
+    <value>Add tag</value>
+  </data>
+  <data name="AddTagDescription" xml:space="preserve">
+    <value>Pick an existing tag or type a new one</value>
+  </data>
+  <data name="RemoveTag" xml:space="preserve">
+    <value>Remove tag</value>
   </data>
 </root>

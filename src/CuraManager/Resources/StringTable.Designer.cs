@@ -70,6 +70,24 @@ namespace CuraManager.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add tag.
+        /// </summary>
+        internal static string AddTag {
+            get {
+                return ResourceManager.GetString("AddTag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pick an existing tag or type a new one.
+        /// </summary>
+        internal static string AddTagDescription {
+            get {
+                return ResourceManager.GetString("AddTagDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Application language.
         /// </summary>
         internal static string ApplicationLanguage {
@@ -745,11 +763,11 @@ namespace CuraManager.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No tags yet. Type a name above to create one.
+        ///   Looks up a localized string similar to No tags assigned yet.
         /// </summary>
-        internal static string NoTagsAvailable {
+        internal static string NoTagsAssigned {
             get {
-                return ResourceManager.GetString("NoTagsAvailable", resourceCulture);
+                return ResourceManager.GetString("NoTagsAssigned", resourceCulture);
             }
         }
         
@@ -921,6 +939,15 @@ namespace CuraManager.Resources {
         internal static string RemovableDrive {
             get {
                 return ResourceManager.GetString("RemovableDrive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove tag.
+        /// </summary>
+        internal static string RemoveTag {
+            get {
+                return ResourceManager.GetString("RemoveTag", resourceCulture);
             }
         }
         
