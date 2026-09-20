@@ -198,9 +198,6 @@
   <data name="Msg_ProjectAlreadyExists" xml:space="preserve">
     <value>Ein Projekt mit dem Namen "{0}" existiert bereits. Bitte wählen Sie einen anderen Namen.</value>
   </data>
-  <data name="Msg_AddAtLeastOneFileToProject" xml:space="preserve">
-    <value>Bitte fügen Sie dem Projekt mindestens eine Datei hinzu.</value>
-  </data>
   <data name="Msg_TypeInUrl" xml:space="preserve">
     <value>Bitte geben Sie eine Webadresse ein.</value>
   </data>
