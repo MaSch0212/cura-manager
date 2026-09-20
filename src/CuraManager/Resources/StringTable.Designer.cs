@@ -259,15 +259,6 @@ namespace CuraManager.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type in a new name for the project &quot;{0}&quot;..
-        /// </summary>
-        internal static string Desc_RenameProject {
-            get {
-                return ResourceManager.GetString("Desc_RenameProject", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Version found in the provided path.
         /// </summary>
         internal static string DetectedSlicerVersion {
@@ -583,6 +574,15 @@ namespace CuraManager.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please enter a valid URL.
+        /// </summary>
+        internal static string Msg_InvalidProjectUrl {
+            get {
+                return ResourceManager.GetString("Msg_InvalidProjectUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No slicer is enabled. Enable one on the settings page to create projects..
         /// </summary>
         internal static string Msg_NoSlicerEnabled {
@@ -745,6 +745,15 @@ namespace CuraManager.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No tags yet. Type a name above to create one.
+        /// </summary>
+        internal static string NoTagsAvailable {
+            get {
+                return ResourceManager.GetString("NoTagsAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to OK.
         /// </summary>
         internal static string OK {
@@ -889,6 +898,15 @@ namespace CuraManager.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Project URL.
+        /// </summary>
+        internal static string ProjectUrl {
+            get {
+                return ResourceManager.GetString("ProjectUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Refresh Filter.
         /// </summary>
         internal static string RefreshFilter {
@@ -912,6 +930,15 @@ namespace CuraManager.Resources {
         internal static string Rename {
             get {
                 return ResourceManager.GetString("Rename", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save.
+        /// </summary>
+        internal static string Save {
+            get {
+                return ResourceManager.GetString("Save", resourceCulture);
             }
         }
         
@@ -1114,6 +1141,15 @@ namespace CuraManager.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Edit project.
+        /// </summary>
+        internal static string Title_EditProject {
+            get {
+                return ResourceManager.GetString("Title_EditProject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Rename.
         /// </summary>
         internal static string Title_Rename {
@@ -1128,15 +1164,6 @@ namespace CuraManager.Resources {
         internal static string Title_RenameFile {
             get {
                 return ResourceManager.GetString("Title_RenameFile", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Rename project.
-        /// </summary>
-        internal static string Title_RenameProject {
-            get {
-                return ResourceManager.GetString("Title_RenameProject", resourceCulture);
             }
         }
         
@@ -1213,6 +1240,15 @@ namespace CuraManager.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Edit the project.
+        /// </summary>
+        internal static string ToolTip_EditProject {
+            get {
+                return ResourceManager.GetString("ToolTip_EditProject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Filter.
         /// </summary>
         internal static string ToolTip_Filter {
@@ -1254,15 +1290,6 @@ namespace CuraManager.Resources {
         internal static string ToolTip_ReloadModels {
             get {
                 return ResourceManager.GetString("ToolTip_ReloadModels", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Rename the project.
-        /// </summary>
-        internal static string ToolTip_RenameProject {
-            get {
-                return ResourceManager.GetString("ToolTip_RenameProject", resourceCulture);
             }
         }
         
@@ -1345,6 +1372,15 @@ namespace CuraManager.Resources {
         internal static string UrlToProjectPage {
             get {
                 return ResourceManager.GetString("UrlToProjectPage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to URL to project page (optional).
+        /// </summary>
+        internal static string UrlToProjectPageOptional {
+            get {
+                return ResourceManager.GetString("UrlToProjectPageOptional", resourceCulture);
             }
         }
         

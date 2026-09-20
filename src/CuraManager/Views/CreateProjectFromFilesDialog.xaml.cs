@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
+using CuraManager.Common;
 using CuraManager.Models;
 using CuraManager.Resources;
 using MaSch.Presentation.Translation;
@@ -14,6 +15,7 @@ namespace CuraManager.Views;
 internal interface ICreateProjectFromFilesDialog_Props
 {
     string ProjectName { get; set; }
+    string ProjectUrl { get; set; }
 }
 
 public partial class CreateProjectFromFilesDialog : ICreateProjectFromFilesDialog_Props
@@ -56,6 +58,18 @@ public partial class CreateProjectFromFilesDialog : ICreateProjectFromFilesDialo
                 _translationManager.GetTranslation(
                     nameof(StringTable.Msg_AddAtLeastOneFileToProject)
                 ),
+                "CuraManager",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information
+            );
+            return;
+        }
+
+        if (!ProjectWebsite.IsValid(ProjectUrl))
+        {
+            MessageBox.Show(
+                this,
+                _translationManager.GetTranslation(nameof(StringTable.Msg_InvalidProjectUrl)),
                 "CuraManager",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information
@@ -131,6 +145,13 @@ public partial class CreateProjectFromFilesDialog : ICreateProjectFromFilesDialo
     {
         var result = new PrintElement(Path.Combine(_targetPath, ProjectName));
         await Task.Run(() => Directory.CreateDirectory(Path.Combine(result.DirectoryLocation)));
+
+        var website = ProjectWebsite.Normalize(ProjectUrl);
+        if (website != null)
+        {
+            result.Metadata.Website = website;
+            result.SaveMetadata();
+        }
 
         foreach (var file in Files)
         {

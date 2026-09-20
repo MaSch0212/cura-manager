@@ -39,6 +39,8 @@
         />
       </mct:TextBox.EndContent>
     </mct:TextBox>
+    <Label Content="{m:Translation UrlToProjectPageOptional}" />
+    <TextBox Text="{Binding ProjectUrl, RelativeSource={RelativeSource AncestorType=local:CreateProjectFromArchiveDialog}, UpdateSourceTrigger=PropertyChanged}" />
     <StackPanel Margin="0,20,0,0" HorizontalAlignment="Right" Orientation="Horizontal">
       <Button
         MinWidth="100"

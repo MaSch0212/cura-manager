@@ -301,9 +301,6 @@ Nach dem Drücken der Schaltfläche wird die Anwendung neu gestartet.</value>
   <data name="ToolTip_OpenProjectPage" xml:space="preserve">
     <value>Projekt-Webseite öffnen</value>
   </data>
-  <data name="ToolTip_RenameProject" xml:space="preserve">
-    <value>Projekt umbenennen</value>
-  </data>
   <data name="ToolTip_DeleteProject" xml:space="preserve">
     <value>Projekt löschen</value>
   </data>
@@ -390,12 +387,6 @@ Nach dem Drücken der Schaltfläche wird die Anwendung neu gestartet.</value>
   </data>
   <data name="Suc_DeleteProject" xml:space="preserve">
     <value>Projekt "{0}" wurde gelöscht</value>
-  </data>
-  <data name="Title_RenameProject" xml:space="preserve">
-    <value>Projekt umbenennen</value>
-  </data>
-  <data name="Desc_RenameProject" xml:space="preserve">
-    <value>Geben Sie einen neuen Namen für das Projekt "{0}" ein.</value>
   </data>
   <data name="Msg_ConfirmFileDeletion" xml:space="preserve">
     <value>Möchten SIe die Datei "{0}" wirklich löschen?</value>
@@ -561,5 +552,26 @@ Nach dem Drücken der Schaltfläche wird die Anwendung neu gestartet.</value>
   </data>
   <data name="Desc_LegacyCuraProjectNaming" xml:space="preserve">
     <value>Nach dem Start von Cura wird der Projektname per UI-Automatisierung in das Namensfeld eingetragen. Betrifft nur Cura, funktioniert nur unter Windows und kann bei Oberflächenänderungen in Cura fehlschlagen. Diese Option wird in Version 2.0 entfernt.</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Speichern</value>
+  </data>
+  <data name="UrlToProjectPageOptional" xml:space="preserve">
+    <value>URL zur Projektseite (optional)</value>
+  </data>
+  <data name="ProjectUrl" xml:space="preserve">
+    <value>Projekt-URL</value>
+  </data>
+  <data name="Msg_InvalidProjectUrl" xml:space="preserve">
+    <value>Bitte geben Sie eine gültige URL ein.</value>
+  </data>
+  <data name="Title_EditProject" xml:space="preserve">
+    <value>Projekt bearbeiten</value>
+  </data>
+  <data name="ToolTip_EditProject" xml:space="preserve">
+    <value>Projekt bearbeiten</value>
+  </data>
+  <data name="NoTagsAvailable" xml:space="preserve">
+    <value>Noch keine Tags vorhanden. Geben Sie oben einen Namen ein, um einen zu erstellen.</value>
   </data>
 </root>

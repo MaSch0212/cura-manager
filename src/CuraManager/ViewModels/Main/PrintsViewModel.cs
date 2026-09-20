@@ -4,6 +4,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
+using CuraManager.Common;
 using CuraManager.Models;
 using CuraManager.Resources;
 using CuraManager.Services;
@@ -60,8 +61,8 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
     public ICommand NewSlicerProjectCommand { get; }
     public ICommand OpenProjectFolderCommand { get; }
     public ICommand OpenProjectWebsiteCommand { get; }
+    public ICommand EditProjectCommand { get; }
     public ICommand DeleteProjectCommand { get; }
-    public ICommand RenameProjectCommand { get; }
     public ICommand CreateTagCommand { get; }
 
     public ICommand OpenProjectFileCommand { get; }
@@ -148,13 +149,10 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
             x => x != null && !string.IsNullOrEmpty(x.Metadata.Website),
             ExecuteOpenProjectWebsite
         );
+        EditProjectCommand = new DelegateCommand<PrintElement>(x => x != null, ExecuteEditProject);
         DeleteProjectCommand = new AsyncDelegateCommand<PrintElement>(
             x => x != null,
             ExecuteDeleteProject
-        );
-        RenameProjectCommand = new DelegateCommand<PrintElement>(
-            x => x != null,
-            ExecuteRenameProject
         );
         CreateTagCommand = new DelegateCommand<PrintElement>(x => x != null, ExecuteCreateTag);
 
@@ -534,55 +532,43 @@ public partial class PrintsViewModel : SplitViewContentViewModel, IPrintsViewMod
         );
     }
 
-    private void ExecuteRenameProject(PrintElement project)
+    private void ExecuteEditProject(PrintElement project)
     {
-        string Validation(string newName)
-        {
-            if (string.Equals(project.Name, newName, StringComparison.OrdinalIgnoreCase))
-                return null;
-
-            var path = Path.Combine(Path.GetDirectoryName(project.DirectoryLocation), newName);
-            if (Directory.Exists(path))
-                return string.Format(
-                    _translationManager.GetTranslation(
-                        nameof(StringTable.Msg_ProjectAlreadyExists)
-                    ),
-                    newName
-                );
-
-            return null;
-        }
-
-        var dialog = new RenameDialog(
-            _translationManager.GetTranslation(nameof(StringTable.Title_RenameProject)),
-            string.Format(
-                _translationManager.GetTranslation(nameof(StringTable.Desc_RenameProject)),
-                project.Name
-            ),
-            project.Name,
-            Validation
-        )
+        var dialog = new EditProjectDialog(project, AvailableTags)
         {
             Owner = Application.Current.MainWindow,
         };
+        if (dialog.ShowDialog() != true)
+            return;
 
-        if (dialog.ShowDialog() == true)
-        {
-            var newPath = Path.Combine(
-                Path.GetDirectoryName(project.DirectoryLocation),
-                dialog.NewName
-            );
+        AvailableTags.AddIfNotExists(dialog.Tags.Select(x => x.Name));
 
-            SelectedElement = null;
-            PrintElements.Remove(project);
-            project.Dispose();
+        // The metadata is applied before a rename on purpose: it lives in metadata.json inside
+        // the project directory, so writing it first means Directory.Move carries it along and
+        // the PrintElement created for the new path reads the updated values straight from disk.
+        project.Website = ProjectWebsite.Normalize(dialog.ProjectUrl);
+        foreach (var removedTag in project.Tags.Except(dialog.SelectedTags).ToArray())
+            project.Tags.Remove(removedTag);
+        project.Tags.AddIfNotExists(dialog.SelectedTags);
+        project.IsArchived = dialog.IsArchived;
 
-            Directory.Move(project.DirectoryLocation, newPath);
+        if (string.Equals(project.Name, dialog.ProjectName, StringComparison.Ordinal))
+            return;
 
-            var newProject = new PrintElement(newPath);
-            PrintElements.Add(newProject);
-            SelectedElement = newProject;
-        }
+        var newPath = Path.Combine(
+            Path.GetDirectoryName(project.DirectoryLocation),
+            dialog.ProjectName
+        );
+
+        SelectedElement = null;
+        PrintElements.Remove(project);
+        project.Dispose();
+
+        Directory.Move(project.DirectoryLocation, newPath);
+
+        var newProject = new PrintElement(newPath);
+        PrintElements.Add(newProject);
+        SelectedElement = newProject;
     }
 
     private void ExecuteCreateTag(PrintElement project)

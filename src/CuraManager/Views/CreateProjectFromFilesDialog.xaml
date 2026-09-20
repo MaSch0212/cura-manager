@@ -38,6 +38,11 @@
       KeyDown="ProjectNameTextBoxOnKeyDown"
       Text="{Binding ProjectName, RelativeSource={RelativeSource AncestorType=local:CreateProjectFromFilesDialog}}"
     />
+    <Label Content="{m:Translation UrlToProjectPageOptional}" />
+    <TextBox
+      KeyDown="ProjectNameTextBoxOnKeyDown"
+      Text="{Binding ProjectUrl, RelativeSource={RelativeSource AncestorType=local:CreateProjectFromFilesDialog}, UpdateSourceTrigger=PropertyChanged}"
+    />
     <DockPanel>
       <Label Content="{m:Translation FilesAddToProject}" />
       <mct:IconButton

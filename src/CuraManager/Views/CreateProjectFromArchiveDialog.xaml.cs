@@ -2,6 +2,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Windows;
 using System.Windows.Input;
+using CuraManager.Common;
 using CuraManager.Models;
 using CuraManager.Resources;
 using HtmlAgilityPack;
@@ -16,6 +17,7 @@ internal interface ICreateProjectFromArchiveDialog_Props
 {
     string ProjectName { get; set; }
     string ArchivePath { get; set; }
+    string ProjectUrl { get; set; }
 }
 
 public partial class CreateProjectFromArchiveDialog : ICreateProjectFromArchiveDialog_Props
@@ -88,6 +90,18 @@ public partial class CreateProjectFromArchiveDialog : ICreateProjectFromArchiveD
             return;
         }
 
+        if (!ProjectWebsite.IsValid(ProjectUrl))
+        {
+            MessageBox.Show(
+                this,
+                _translationManager.GetTranslation(nameof(StringTable.Msg_InvalidProjectUrl)),
+                "CuraManager",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information
+            );
+            return;
+        }
+
         if (
             Directory
                 .EnumerateDirectories(_targetPath, "*", SearchOption.TopDirectoryOnly)
@@ -124,10 +138,18 @@ public partial class CreateProjectFromArchiveDialog : ICreateProjectFromArchiveD
         var result = new PrintElement(Path.Combine(_targetPath, ProjectName));
         await Task.Run(() => Directory.CreateDirectory(result.DirectoryLocation));
 
+        var website = ProjectWebsite.Normalize(ProjectUrl);
+        if (website != null)
+        {
+            result.Metadata.Website = website;
+            result.SaveMetadata();
+        }
+
         using (var zipFile = ZipFile.OpenRead(ArchivePath))
         {
             if (
-                zipFile.Entries.TryFirst(
+                website == null
+                && zipFile.Entries.TryFirst(
                     x => x.FullName == "attribution_card.html",
                     out var htmlEntry
                 )
