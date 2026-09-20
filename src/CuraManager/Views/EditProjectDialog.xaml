@@ -73,23 +73,84 @@
       PlacementTarget="{Binding ElementName=TagInputTextBox}"
       StaysOpen="True"
     >
+      <!--  Styled from the ComboBox theme values so the suggestions match every other dropdown.  -->
       <Border
-        Background="{m:ThemeValue Key=NormalBackgroundBrush}"
-        BorderBrush="{m:ThemeValue Key=NormalBorderBrush}"
-        BorderThickness="1"
+        Background="{m:ThemeValue Key=ComboBoxPopupBackgroundBrush}"
+        BorderBrush="{m:ThemeValue Key=ComboBoxPopupBorderBrush}"
+        BorderThickness="{m:ThemeValue Key=ComboBoxPopupBorderThickness}"
+        CornerRadius="{m:ThemeValue Key=ComboBoxPopupCornerRadius}"
       >
         <ListBox
           x:Name="TagSuggestionsListBox"
           MaxHeight="160"
+          Padding="0"
           Background="Transparent"
           BorderThickness="0"
           ItemsSource="{Binding TagSuggestions, RelativeSource={RelativeSource AncestorType=local:EditProjectDialog}}"
           PreviewMouseLeftButtonUp="TagSuggestions_OnPreviewMouseLeftButtonUp"
         >
           <ListBox.ItemContainerStyle>
-            <Style BasedOn="{StaticResource {x:Type ListBoxItem}}" TargetType="ListBoxItem">
+            <Style TargetType="ListBoxItem">
               <!--  Keeps clicking a suggestion from pulling focus out of the input.  -->
               <Setter Property="Focusable" Value="False" />
+              <Setter Property="Padding" Value="8,5" />
+              <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+              <Setter
+                Property="Background"
+                Value="{m:ThemeValue Key=ComboBoxItemNormalBackgroundBrush}"
+              />
+              <Setter
+                Property="Foreground"
+                Value="{m:ThemeValue Key=ComboBoxItemNormalForegroundBrush}"
+              />
+              <Setter Property="Template">
+                <Setter.Value>
+                  <ControlTemplate TargetType="ListBoxItem">
+                    <Border
+                      Padding="{TemplateBinding Padding}"
+                      Background="{TemplateBinding Background}"
+                    >
+                      <ContentPresenter />
+                    </Border>
+                  </ControlTemplate>
+                </Setter.Value>
+              </Setter>
+              <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                  <Setter
+                    Property="Background"
+                    Value="{m:ThemeValue Key=ComboBoxItemHoverBackgroundBrush}"
+                  />
+                  <Setter
+                    Property="Foreground"
+                    Value="{m:ThemeValue Key=ComboBoxItemHoverForegroundBrush}"
+                  />
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                  <Setter
+                    Property="Background"
+                    Value="{m:ThemeValue Key=ComboBoxItemSelectedBackgroundBrush}"
+                  />
+                  <Setter
+                    Property="Foreground"
+                    Value="{m:ThemeValue Key=ComboBoxItemSelectedForegroundBrush}"
+                  />
+                </Trigger>
+                <MultiTrigger>
+                  <MultiTrigger.Conditions>
+                    <Condition Property="IsSelected" Value="True" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                  </MultiTrigger.Conditions>
+                  <Setter
+                    Property="Background"
+                    Value="{m:ThemeValue Key=ComboBoxItemSelectedHoverBackgroundBrush}"
+                  />
+                  <Setter
+                    Property="Foreground"
+                    Value="{m:ThemeValue Key=ComboBoxItemSelectedHoverForegroundBrush}"
+                  />
+                </MultiTrigger>
+              </Style.Triggers>
             </Style>
           </ListBox.ItemContainerStyle>
         </ListBox>

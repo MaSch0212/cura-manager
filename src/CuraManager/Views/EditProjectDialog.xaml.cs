@@ -49,7 +49,8 @@ public partial class EditProjectDialog : IEditProjectDialog_Props
 
     /// <summary>
     /// Gets the tags currently offered below the input box: every known tag that is not assigned
-    /// yet and matches what has been typed so far.
+    /// yet and matches what has been typed. Empty while the input is, so the list only appears
+    /// once there is something to narrow it down with.
     /// </summary>
     public ObservableCollection<string> TagSuggestions { get; }
 
@@ -94,13 +95,17 @@ public partial class EditProjectDialog : IEditProjectDialog_Props
     private void RefreshTagSuggestions()
     {
         var filter = NewTagName?.Trim() ?? string.Empty;
-        var matches = KnownTags
-            .Where(x => !SelectedTags.Contains(x, StringComparer.Ordinal))
-            .Where(x =>
-                filter.Length == 0 || x.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
-            )
-            .OrderBy(x => x, StringComparer.CurrentCulture)
-            .ToArray();
+
+        // An empty input offers nothing, so the list never opens on a bare click into the box and
+        // closes again as soon as the text is cleared -- including after a tag has been added.
+        var matches =
+            filter.Length == 0
+                ? Array.Empty<string>()
+                : KnownTags
+                    .Where(x => !SelectedTags.Contains(x, StringComparer.Ordinal))
+                    .Where(x => x.Contains(filter, StringComparison.CurrentCultureIgnoreCase))
+                    .OrderBy(x => x, StringComparer.CurrentCulture)
+                    .ToArray();
 
         TagSuggestions.Clear();
         foreach (var match in matches)
@@ -137,11 +142,9 @@ public partial class EditProjectDialog : IEditProjectDialog_Props
         KnownTags.AddIfNotExists(tagName);
         SelectedTags.AddIfNotExists(tagName);
 
+        // Clearing the input empties the suggestions, which closes the list -- the next thing
+        // typed opens it again, so tags can still be added one after another.
         NewTagName = string.Empty;
-
-        // No explicit close: the refresh reopens the list with whatever is left as long as the
-        // input still has the focus, so several tags can be added in a row without reaching for
-        // the mouse. It closes on its own once nothing is left to suggest.
         RefreshTagSuggestions();
     }
 
@@ -172,9 +175,9 @@ public partial class EditProjectDialog : IEditProjectDialog_Props
     }
 
     /// <summary>
-    /// Reopens the suggestions when the input is clicked. Focus alone is not enough: clicking an
-    /// input that already has the focus raises no focus change, which would otherwise leave the
-    /// user with no way to bring the list back after it was closed.
+    /// Reopens the suggestions when an input that already holds text is clicked. Focus alone is
+    /// not enough: clicking an input that already has the focus raises no focus change, which
+    /// would otherwise leave the user with no way to bring the list back after it was closed.
     /// </summary>
     private void TagInput_OnPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
